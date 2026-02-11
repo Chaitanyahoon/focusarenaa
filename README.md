@@ -1,4 +1,5 @@
-# 🎮 Focus Arena - Solo Leveling Gamified Task Manager
+# ⚔️ Focus Arena: Awaken Your Inner Hunter
+> *"I alone level up."* — **Turn your daily tasks into a Solo Leveling RPG experience.**
 
 Focus Arena is a gamified productivity application inspired by "Solo Leveling". It turns your daily tasks into quests, awarding XP, badges, and ranks (E to S) as you complete them.
 
