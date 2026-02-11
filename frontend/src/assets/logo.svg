@@ -1,0 +1,41 @@
+<!-- Focus Arena Logo - SVG Component -->
+<svg width="300" height="80" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Frame -->
+  <rect x="2" y="2" width="296" height="76" fill="#020408" stroke="#00EAFF" stroke-width="2" rx="4"/>
+  
+  <!-- Inner Glow Effect -->
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00EAFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0099CC;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Decorative Corner Elements -->
+  <path d="M 10 10 L 25 10 L 25 12 L 12 12 L 12 25 L 10 25 Z" fill="#00EAFF" opacity="0.6"/>
+  <path d="M 290 10 L 275 10 L 275 12 L 288 12 L 288 25 L 290 25 Z" fill="#00EAFF" opacity="0.6"/>
+  <path d="M 10 70 L 25 70 L 25 68 L 12 68 L 12 55 L 10 55 Z" fill="#00EAFF" opacity="0.6"/>
+  <path d="M 290 70 L 275 70 L 275 68 L 288 68 L 288 55 L 290 55 Z" fill="#00EAFF" opacity="0.6"/>
+  
+  <!-- Sword/Blade Icon -->
+  <g transform="translate(40, 30)">
+    <path d="M 5 0 L 7 0 L 7 16 L 9 16 L 9 18 L 3 18 L 3 16 L 5 16 Z" fill="url(#textGradient)" filter="url(#glow)"/>
+    <path d="M 4 18 L 8 18 L 6 22 Z" fill="url(#textGradient)"/>
+    <rect x="0" y="14" width="12" height="2" fill="#00EAFF" opacity="0.8"/>
+  </g>
+  
+  <!-- Main Text: FOCUS ARENA -->
+  <text x="70" y="50" font-family="Rajdhani, Arial, sans-serif" font-size="28" font-weight="700" fill="url(#textGradient)" filter="url(#glow)" letter-spacing="2">
+    FOCUS ARENA
+  </text>
+  
+  <!-- Accent Line -->
+  <line x1="70" y1="55" x2="260" y2="55" stroke="#00EAFF" stroke-width="1" opacity="0.4"/>
+</svg>

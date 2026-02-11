@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        /* Base styles */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #020408;
+            font-family: 'Rajdhani', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        /* Container */
+        .wrapper {
+            background-color: #020408;
+            padding: 40px 10px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #0a1120;
+            border: 1px solid #1e293b;
+            border-top: 4px solid #00eaff;
+            /* Cyan Accent */
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background-color: #0f172a;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .logo-text {
+            color: #00eaff;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-decoration: none;
+            text-shadow: 0 0 10px rgba(0, 234, 255, 0.3);
+        }
+
+        /* Content */
+        .content {
+            padding: 40px 30px;
+        }
+
+        h1 {
+            color: #f8fafc;
+            font-size: 24px;
+            margin: 0 0 20px 0;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        p {
+            margin: 0 0 20px 0;
+            color: #cbd5e1;
+            font-size: 16px;
+        }
+
+        .highlight-box {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        /* Action Button */
+        .btn-container {
+            text-align: center;
+            margin: 35px 0;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #ffffff !important;
+            display: inline-block;
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid #3b82f6;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            box-shadow: 0 0 25px rgba(37, 99, 235, 0.6);
+            transform: translateY(-2px);
+        }
+
+        /* Raw Link */
+        .raw-link {
+            word-break: break-all;
+            color: #3b82f6;
+            font-size: 13px;
+            text-align: center;
+            margin-top: 10px;
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #0f172a;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #1e293b;
+        }
+
+        .footer-text {
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .security-note {
+            color: #ef4444;
+            /* Red for warning */
+            font-size: 11px;
+            margin-top: 15px;
+            border-top: 1px dashed #334155;
+            padding-top: 15px;
+        }
+
+        /* Variables for EmailJS */
+        /* use {{link}} for the reset link */
+        /* use {{email}} for the user's email */
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <!-- Header with Logo -->
+            <div class="header">
+                <!-- If you have a hosted logo, replace the text below with: -->
+                <!-- <img src="https://your-hosted-logo.com/logo.png" alt="Focus Arena" height="40" style="vertical-align: middle;"> -->
+                <div class="logo-text">Focus Arena</div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="content">
+                <h1>🔒 Password Change Request</h1>
+
+                <p>Hello,</p>
+
+                <p>We received a request to reset the password for your account associated with
+                    <strong>{{email}}</strong>. To create a new password, please click the button below:</p>
+
+                <div class="btn-container">
+                    <a href="{{link}}" class="btn">RESET PASSWORD</a>
+                </div>
+
+                <div class="highlight-box">
+                    <p style="margin: 0; font-size: 14px; color: #94a3b8;">
+                        Or copy and paste this link into your browser:<br />
+                        <a href="{{link}}" class="raw-link">{{link}}</a>
+                    </p>
+                </div>
+
+                <p style="text-align: center; font-size: 14px; color: #94a3b8;">
+                    This link will expire in <strong>one hour</strong>.
+                </p>
+
+                <p>Best regards,<br />The Focus Arena Team</p>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p class="footer-text">
+                    This email was sent to {{email}}<br />
+                    You received this because you are registered with Focus Arena.
+                </p>
+                <div class="security-note">
+                    ⚠️ If you didn't request this password reset, please ignore this email immediately. Your account
+                    remains secure.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

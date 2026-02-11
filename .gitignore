@@ -1,0 +1,11 @@
+node_modules/
+bin/
+obj/
+.vs/
+*.user
+*.lock.json
+.DS_Store
+dist/
+build/
+*.log
+.gemini/

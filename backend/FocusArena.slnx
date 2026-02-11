@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="FocusArena.API/FocusArena.API.csproj" />
+  <Project Path="FocusArena.Application/FocusArena.Application.csproj" />
+  <Project Path="FocusArena.Domain/FocusArena.Domain.csproj" />
+  <Project Path="FocusArena.Tests/FocusArena.Tests.csproj" />
+</Solution>

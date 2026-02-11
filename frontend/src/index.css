@@ -1,0 +1,203 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+/* Solo Leveling 'The System' Theme */
+@theme {
+  --color-system-blue: #00EAFF;
+  --color-system-dark: #050914;
+  --color-system-panel: rgba(5, 9, 20, 0.85);
+  --color-system-red: #FF003C;
+  --color-system-gold: #FFD700;
+  --color-system-text: #E0F2FE;
+
+  --font-display: "Rajdhani", sans-serif;
+  --font-body: "Exo 2", sans-serif;
+}
+
+/* Reset & Base */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background-color: #020408;
+  color: var(--color-system-text);
+  overflow-x: hidden;
+  /* Subtle grid texture like the anime's digital space */
+  background-image:
+    linear-gradient(rgba(0, 234, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 234, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Typography Overrides */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* The System Panel - Authentic Style */
+/* Sharp edges, glowing blue borders, slight transparency */
+.system-panel {
+  background: var(--color-system-panel);
+  border: 1px solid rgba(0, 234, 255, 0.3);
+  box-shadow: 0 0 15px rgba(0, 234, 255, 0.1);
+  position: relative;
+  backdrop-filter: blur(8px);
+  /* Chamfered corners utilizing clip-path or pseudo-elements would be cool, 
+     but simple sharp borders fit the anime's window style well. */
+}
+
+.system-panel::before {
+  /* Top accent line */
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-system-blue), transparent);
+  opacity: 0.8;
+}
+
+.system-panel::after {
+  /* Bottom accent line */
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-system-blue), transparent);
+  opacity: 0.8;
+}
+
+/* System Text Styles */
+.system-header {
+  color: var(--color-system-blue);
+  text-shadow: 0 0 10px rgba(0, 234, 255, 0.5);
+  border-bottom: 1px solid rgba(0, 234, 255, 0.2);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.system-value {
+  color: #FFFFFF;
+  font-weight: 600;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+.system-label {
+  color: #94A3B8;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+}
+
+/* System Button */
+.system-button {
+  background: transparent;
+  border: 1px solid var(--color-system-blue);
+  color: var(--color-system-blue);
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 0.75rem 2rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-transform: uppercase;
+  clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
+}
+
+.system-button:hover {
+  background: rgba(0, 234, 255, 0.1);
+  box-shadow: 0 0 20px rgba(0, 234, 255, 0.4);
+  text-shadow: 0 0 8px var(--color-system-blue);
+}
+
+.system-button:active {
+  transform: scale(0.98);
+}
+
+/* System Input */
+.system-input {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid #334155;
+  color: white;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  font-family: var(--font-body);
+  transition: all 0.3s;
+}
+
+.system-input:focus {
+  outline: none;
+  border-color: var(--color-system-blue);
+  box-shadow: 0 0 10px rgba(0, 234, 255, 0.2);
+}
+
+/* Notification / Urgent Quest Style */
+.system-notification {
+  border: 1px solid var(--color-system-red);
+  background: rgba(255, 0, 60, 0.1);
+  box-shadow: 0 0 20px rgba(255, 0, 60, 0.2);
+}
+
+.system-notification h3 {
+  color: var(--color-system-red);
+  text-shadow: 0 0 10px rgba(255, 0, 60, 0.6);
+}
+
+/* Animations */
+@keyframes blue-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(0, 234, 255, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(0, 234, 255, 0.6);
+  }
+}
+
+.animate-pulse-blue {
+  animation: blue-pulse 2s infinite;
+}
+
+/* Rank Styling */
+.rank-s {
+  color: #FFD700;
+  text-shadow: 0 0 15px #FFD700;
+}
+
+.rank-a {
+  color: #C0C0C0;
+  text-shadow: 0 0 15px #C0C0C0;
+}
+
+.rank-b {
+  color: #CD7F32;
+  text-shadow: 0 0 15px #CD7F32;
+}
+
+.rank-c {
+  color: var(--color-system-blue);
+}
+
+.rank-d {
+  color: #22C55E;
+}
+
+.rank-e {
+  color: #FFFFFF;
+}
