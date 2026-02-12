@@ -17,6 +17,9 @@ public class AppTask
     public int? EstimatedTime { get; set; } // in minutes
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? CompletedAt { get; set; }
+    
+    public RecurrenceType Recurrence { get; set; } = RecurrenceType.None;
+    public int? RecurrenceInterval { get; set; }
 
     // Navigation property
     public virtual User? User { get; set; }

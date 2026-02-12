@@ -55,6 +55,8 @@ export interface Task {
     dueDate?: string
     completedAt?: string
     createdAt: string
+    recurrence?: RecurrenceType
+    recurrenceInterval?: number
 }
 
 export enum TaskCategory {
@@ -77,12 +79,21 @@ export enum TaskStatus {
     Done = 2
 }
 
+export enum RecurrenceType {
+    None = 0,
+    Daily = 1,
+    Weekly = 2,
+    Monthly = 3
+}
+
 export interface CreateTaskDto {
     title: string
     description?: string
     category: TaskCategory
     difficulty: TaskDifficulty
     dueDate?: string
+    recurrence?: RecurrenceType
+    recurrenceInterval?: number
 }
 
 export interface Badge {

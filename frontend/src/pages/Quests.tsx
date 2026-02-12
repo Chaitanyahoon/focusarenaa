@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useTaskStore } from '../stores/taskStore'
 import { useAuthStore } from '../stores/authStore'
-import { PlusIcon, CheckIcon, TrashIcon, ClockIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
-import { TaskStatus, TaskDifficulty, TaskCategory, CreateTaskDto } from '../types'
+import { PlusIcon, CheckIcon, TrashIcon, ClockIcon, ExclamationTriangleIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
+import { TaskStatus, TaskDifficulty, TaskCategory, CreateTaskDto, RecurrenceType } from '../types'
 import toast from 'react-hot-toast'
 
 export default function Quests() {
@@ -16,7 +16,9 @@ export default function Quests() {
         description: '',
         category: TaskCategory.Work,
         difficulty: TaskDifficulty.Easy,
-        dueDate: ''
+        dueDate: '',
+        recurrence: RecurrenceType.None,
+        recurrenceInterval: 1
     })
 
     useEffect(() => {
@@ -34,7 +36,9 @@ export default function Quests() {
                 description: '',
                 category: TaskCategory.Work,
                 difficulty: TaskDifficulty.Easy,
-                dueDate: ''
+                dueDate: '',
+                recurrence: RecurrenceType.None,
+                recurrenceInterval: 1
             })
         } catch (error) {
             toast.error('System Error: Quest Creation Failed')
@@ -116,6 +120,12 @@ export default function Quests() {
                                                 <span className="text-xs text-yellow-500 flex items-center gap-1">
                                                     <ClockIcon className="w-3 h-3" />
                                                     {new Date(task.dueDate).toLocaleDateString()}
+                                                </span>
+                                            )}
+                                            {task.recurrence !== undefined && task.recurrence !== RecurrenceType.None && (
+                                                <span className="text-xs text-purple-400 flex items-center gap-1 border border-purple-500/30 px-1 rounded">
+                                                    <ArrowPathIcon className="w-3 h-3" />
+                                                    {RecurrenceType[task.recurrence]}
                                                 </span>
                                             )}
                                         </div>
@@ -242,6 +252,34 @@ export default function Quests() {
                                     onChange={e => setNewTask({ ...newTask, dueDate: e.target.value })}
                                     className="system-input"
                                 />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs text-blue-400 tracking-widest mb-1 block">RECURRENCE</label>
+                                    <select
+                                        value={newTask.recurrence}
+                                        onChange={e => setNewTask({ ...newTask, recurrence: Number(e.target.value) })}
+                                        className="system-input"
+                                    >
+                                        <option value={RecurrenceType.None}>NO REPEAT</option>
+                                        <option value={RecurrenceType.Daily}>DAILY</option>
+                                        <option value={RecurrenceType.Weekly}>WEEKLY</option>
+                                        <option value={RecurrenceType.Monthly}>MONTHLY</option>
+                                    </select>
+                                </div>
+                                {newTask.recurrence !== RecurrenceType.None && (
+                                    <div>
+                                        <label className="text-xs text-blue-400 tracking-widest mb-1 block">INTERVAL</label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            value={newTask.recurrenceInterval}
+                                            onChange={e => setNewTask({ ...newTask, recurrenceInterval: Number(e.target.value) })}
+                                            className="system-input"
+                                        />
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex justify-end gap-4 mt-8 pt-4 border-t border-gray-800">

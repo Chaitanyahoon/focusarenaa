@@ -15,4 +15,6 @@ public class TaskDto
     public int? EstimatedTime { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? CompletedAt { get; set; }
+    public RecurrenceType Recurrence { get; set; }
+    public int? RecurrenceInterval { get; set; }
 }

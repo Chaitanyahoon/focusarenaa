@@ -10,4 +10,6 @@ public class CreateTaskDto
     public TaskDifficulty Difficulty { get; set; }
     public DateTime? DueDate { get; set; }
     public int? EstimatedTime { get; set; }
+    public RecurrenceType Recurrence { get; set; } = RecurrenceType.None;
+    public int? RecurrenceInterval { get; set; }
 }

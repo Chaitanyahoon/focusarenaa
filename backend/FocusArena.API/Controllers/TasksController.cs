@@ -79,7 +79,9 @@ public class TasksController : ControllerBase
                 DueDate = t.DueDate,
                 EstimatedTime = t.EstimatedTime,
                 CreatedAt = t.CreatedAt,
-                CompletedAt = t.CompletedAt
+                CompletedAt = t.CompletedAt,
+                Recurrence = t.Recurrence,
+                RecurrenceInterval = t.RecurrenceInterval
             })
             .ToListAsync();
 
@@ -101,7 +103,9 @@ public class TasksController : ControllerBase
             DueDate = dto.DueDate,
             EstimatedTime = dto.EstimatedTime,
             Status = DomainEnums.TaskStatus.ToDo,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
+            Recurrence = dto.Recurrence,
+            RecurrenceInterval = dto.RecurrenceInterval
         };
 
         // Calculate XP reward based on difficulty
@@ -121,7 +125,9 @@ public class TasksController : ControllerBase
             Status = task.Status,
             DueDate = task.DueDate,
             EstimatedTime = task.EstimatedTime,
-            CreatedAt = task.CreatedAt
+            CreatedAt = task.CreatedAt,
+            Recurrence = task.Recurrence,
+            RecurrenceInterval = task.RecurrenceInterval
         };
 
         return CreatedAtAction(nameof(GetTasks), new { id = task.TaskId }, taskDto);
@@ -170,6 +176,38 @@ public class TasksController : ControllerBase
         // Mark task as complete
         task.Status = DomainEnums.TaskStatus.Done;
         task.CompletedAt = DateTime.UtcNow;
+
+        // Handle Recurrence
+        if (task.Recurrence != DomainEnums.RecurrenceType.None)
+        {
+            var nextDueDate = task.DueDate ?? DateTime.UtcNow;
+            int interval = task.RecurrenceInterval ?? 1;
+
+            if (task.Recurrence == DomainEnums.RecurrenceType.Daily)
+                nextDueDate = nextDueDate.AddDays(interval);
+            else if (task.Recurrence == DomainEnums.RecurrenceType.Weekly)
+                nextDueDate = nextDueDate.AddDays(interval * 7);
+            else if (task.Recurrence == DomainEnums.RecurrenceType.Monthly)
+                nextDueDate = nextDueDate.AddMonths(interval);
+
+            var newTask = new AppTask
+            {
+                UserId = task.UserId,
+                Title = task.Title,
+                Description = task.Description,
+                Category = task.Category,
+                Difficulty = task.Difficulty,
+                XPReward = task.XPReward,
+                Status = DomainEnums.TaskStatus.ToDo,
+                DueDate = nextDueDate,
+                EstimatedTime = task.EstimatedTime,
+                CreatedAt = DateTime.UtcNow,
+                Recurrence = task.Recurrence,
+                RecurrenceInterval = task.RecurrenceInterval
+            };
+
+            _context.Tasks.Add(newTask);
+        }
 
         await _context.SaveChangesAsync();
 
@@ -249,6 +287,8 @@ public class TasksController : ControllerBase
         task.Difficulty = dto.Difficulty;
         task.DueDate = dto.DueDate;
         task.EstimatedTime = dto.EstimatedTime;
+        task.Recurrence = dto.Recurrence;
+        task.RecurrenceInterval = dto.RecurrenceInterval;
         task.CalculateXPReward();
 
         await _context.SaveChangesAsync();
