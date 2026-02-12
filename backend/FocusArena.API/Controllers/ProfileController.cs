@@ -54,7 +54,8 @@ public class ProfileController : ControllerBase
             StreakCount = user.StreakCount,
             JoinDate = user.JoinDate,
             TotalTasksCompleted = completedTasks,
-            BadgesEarned = user.UserBadges.Count
+            BadgesEarned = user.UserBadges.Count,
+            Gold = user.Gold
         };
 
         return Ok(profile);

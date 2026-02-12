@@ -16,7 +16,7 @@ export default function Quests() {
         description: '',
         category: TaskCategory.Work,
         difficulty: TaskDifficulty.Easy,
-        deadline: ''
+        dueDate: ''
     })
 
     useEffect(() => {
@@ -34,7 +34,7 @@ export default function Quests() {
                 description: '',
                 category: TaskCategory.Work,
                 difficulty: TaskDifficulty.Easy,
-                deadline: ''
+                dueDate: ''
             })
         } catch (error) {
             toast.error('System Error: Quest Creation Failed')
@@ -112,10 +112,10 @@ export default function Quests() {
                                         <div className="flex items-center gap-3 mb-2">
                                             {renderDifficulty(task.difficulty)}
                                             <span className="text-xs text-gray-500 uppercase tracking-wider">{TaskCategory[task.category]}</span>
-                                            {task.deadline && (
+                                            {task.dueDate && (
                                                 <span className="text-xs text-yellow-500 flex items-center gap-1">
                                                     <ClockIcon className="w-3 h-3" />
-                                                    {new Date(task.deadline).toLocaleDateString()}
+                                                    {new Date(task.dueDate).toLocaleDateString()}
                                                 </span>
                                             )}
                                         </div>
@@ -238,8 +238,8 @@ export default function Quests() {
                                 <label className="text-xs text-blue-400 tracking-widest mb-1 block">DEADLINE (OPTIONAL)</label>
                                 <input
                                     type="date"
-                                    value={newTask.deadline}
-                                    onChange={e => setNewTask({ ...newTask, deadline: e.target.value })}
+                                    value={newTask.dueDate}
+                                    onChange={e => setNewTask({ ...newTask, dueDate: e.target.value })}
                                     className="system-input"
                                 />
                             </div>

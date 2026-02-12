@@ -13,4 +13,5 @@ public class UserProfileDto
     public DateTime JoinDate { get; set; }
     public int TotalTasksCompleted { get; set; }
     public int BadgesEarned { get; set; }
+    public int Gold { get; set; }
 }

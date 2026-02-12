@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useAuthStore } from '../stores/authStore'
 import { profileAPI } from '../services/api'
 import toast from 'react-hot-toast'
@@ -192,8 +192,8 @@ export default function Dashboard() {
                             <span className="text-white text-xl font-bold">{10 + Math.floor(user.level * 1.3)}</span>
                         </div>
                         <div className="flex justify-between items-center border-t border-gray-800 pt-2 mt-2">
-                            <span className="text-gray-400 font-display text-lg">PTS</span>
-                            <span className="text-yellow-400 text-xl font-bold animate-pulse">0</span>
+                            <span className="text-gray-400 font-display text-lg">GOLD</span>
+                            <span className="text-yellow-400 text-xl font-bold animate-pulse">{user.gold}</span>
                         </div>
                     </div>
 

@@ -80,8 +80,8 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
             entity.Property(e => e.PasswordHash).IsRequired();
-            entity.Property(e => e.Theme).HasMaxLength(10).HasDefaultValue("dark");
-            entity.Property(e => e.JoinDate).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.Theme).HasMaxLength(10);
+            entity.Property(e => e.JoinDate);
         });
 
         // AppTask configuration
@@ -91,7 +91,7 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.UserId);
             entity.HasIndex(e => e.Status);
             entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.CreatedAt);
 
             // Foreign key relationship
             entity.HasOne(e => e.User)
@@ -112,7 +112,7 @@ public class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => new { e.UserId, e.BadgeId }).IsUnique();
-            entity.Property(e => e.EarnedDate).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.EarnedDate);
 
             // Foreign key relationships
             entity.HasOne(e => e.User)
@@ -132,7 +132,7 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.UserId);
             entity.Property(e => e.Title).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.CreatedAt);
 
             entity.HasOne(e => e.User)
                 .WithMany()

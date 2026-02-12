@@ -20,7 +20,8 @@ export default function CreateGateModal({ isOpen, onClose, onGateCreated }: Prop
         try {
             await gateAPI.createGate({
                 ...data,
-                rank: Number(data.rank) // Ensure number
+                rank: Number(data.rank), // Ensure number
+                deadline: data.deadline ? data.deadline : undefined // Handle empty string/null
             })
             toast.success('Dungeon Gate Opened!')
             reset()

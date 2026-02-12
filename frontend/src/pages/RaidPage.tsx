@@ -3,11 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { gateAPI, Gate, GateRank, GateStatus } from '../services/gate';
 import { toast } from 'react-hot-toast';
 import { ArrowLeftIcon, CheckCircleIcon, ExclamationTriangleIcon, PlusIcon } from '@heroicons/react/24/outline';
-import { Task } from '../types';
 import { Dialog, Transition } from '@headlessui/react';
 import { useForm } from 'react-hook-form';
 import { TaskDifficulty, TaskCategory } from '../types';
 import { taskAPI } from '../services/api';
+import ConfirmModal from '../components/ConfirmModal';
+import { useAuthStore } from '../stores/authStore';
 
 // Reusing Task creation logic, simplified for Raid
 interface CreateTaskDto {
@@ -20,9 +21,11 @@ interface CreateTaskDto {
 export default function RaidPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { fetchProfile } = useAuthStore();
     const [gate, setGate] = useState<Gate | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
+    const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, taskId: number | null }>({ isOpen: false, taskId: null });
 
     const loadGate = async () => {
         if (!id) return;
@@ -45,7 +48,7 @@ export default function RaidPage() {
 
     const handleTaskComplete = async (taskId: number) => {
         try {
-            await taskAPI.updateStatus(taskId, 2); // 2 = Done
+            await taskAPI.complete(taskId);
             toast.success("Monster defeated!", { icon: '⚔️' });
             loadGate(); // Refresh to check progress
 
@@ -64,9 +67,25 @@ export default function RaidPage() {
         try {
             await gateAPI.claimRewards(gate.id);
             toast.success(`Rewards Claimed: ${gate.xpReward} XP, ${gate.goldReward} Gold!`);
+            await fetchProfile();
             loadGate();
         } catch (error) {
             toast.error("Failed to claim rewards.");
+        }
+    };
+
+    const handleDeleteTask = (taskId: number) => {
+        setConfirmModal({ isOpen: true, taskId });
+    };
+
+    const confirmAbandon = async () => {
+        if (!confirmModal.taskId) return;
+        try {
+            await taskAPI.delete(confirmModal.taskId);
+            toast.success("Quest abandoned.");
+            loadGate();
+        } catch (error) {
+            toast.error("Failed to abandon quest.");
         }
     };
 
@@ -163,14 +182,14 @@ export default function RaidPage() {
                 ) : (
                     gate.tasks.map(task => (
                         <div
-                            key={task.id}
+                            key={task.taskId || task.id}
                             className={`p-4 rounded-lg border transition-all flex items-center gap-4 ${task.status === 2
                                 ? 'bg-gray-900/50 border-gray-800 opacity-50'
                                 : 'bg-[#0a1120] border-blue-900/30 hover:border-blue-500/50'
                                 }`}
                         >
                             <button
-                                onClick={() => task.status !== 2 && handleTaskComplete(task.id)}
+                                onClick={() => task.status !== 2 && handleTaskComplete(task.taskId || task.id)}
                                 disabled={task.status === 2 || isCleared}
                                 className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${task.status === 2
                                     ? 'bg-green-500/20 border-green-500 text-green-500'
@@ -181,9 +200,20 @@ export default function RaidPage() {
                             </button>
 
                             <div className="flex-1">
-                                <h3 className={`font-semibold ${task.status === 2 ? 'text-gray-500 line-through' : 'text-white'}`}>
-                                    {task.title}
-                                </h3>
+                                <div className="flex items-center gap-2">
+                                    <h3 className={`font-semibold ${task.status === 2 ? 'text-gray-500 line-through' : 'text-white'}`}>
+                                        {task.title}
+                                    </h3>
+                                    {!isCleared && (
+                                        <button
+                                            onClick={() => handleDeleteTask(task.taskId || task.id)}
+                                            className="p-1 text-gray-600 hover:text-red-400 transition-colors"
+                                            title="Abandon Quest"
+                                        >
+                                            <ExclamationTriangleIcon className="w-4 h-4" />
+                                        </button>
+                                    )}
+                                </div>
                                 {task.description && (
                                     <p className="text-sm text-gray-500">{task.description}</p>
                                 )}
@@ -205,6 +235,16 @@ export default function RaidPage() {
                 onClose={() => setIsAddTaskOpen(false)}
                 gateId={gate.id}
                 onTaskAdded={loadGate}
+            />
+
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal({ isOpen: false, taskId: null })}
+                onConfirm={confirmAbandon}
+                title="Abandon Quest"
+                message="Are you sure you want to give up on this task? This action cannot be undone."
+                confirmText="Abandon"
+                isDestructive={true}
             />
         </div>
     );
@@ -242,7 +282,7 @@ function AddTaskModal({ isOpen, onClose, gateId, onTaskAdded }: { isOpen: boolea
             // First create task
             const newTask = await taskAPI.create({
                 ...data,
-                deadline: undefined
+                dueDate: undefined
             });
 
             // Then link to gate
@@ -282,12 +322,12 @@ function AddTaskModal({ isOpen, onClose, gateId, onTaskAdded }: { isOpen: boolea
                             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                                 <input {...register('title', { required: true })} placeholder="Task Name" className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white" />
                                 <div className="grid grid-cols-2 gap-4">
-                                    <select {...register('difficulty')} className="bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white">
+                                    <select {...register('difficulty', { valueAsNumber: true })} className="bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white">
                                         <option value={TaskDifficulty.Easy}>Easy</option>
                                         <option value={TaskDifficulty.Medium}>Medium</option>
                                         <option value={TaskDifficulty.Hard}>Hard</option>
                                     </select>
-                                    <select {...register('category')} className="bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white">
+                                    <select {...register('category', { valueAsNumber: true })} className="bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white">
                                         <option value={TaskCategory.Work}>Work</option>
                                         <option value={TaskCategory.Personal}>Personal</option>
                                         <option value={TaskCategory.Fitness}>Fitness</option>

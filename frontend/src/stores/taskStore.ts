@@ -6,13 +6,13 @@ interface TaskStore {
     tasks: Task[]
     isLoading: boolean
     error: string | null
-  
-  fetch Tasks: () => Promise<void>
-createTask: (data: CreateTaskDto) => Promise<void>
-updateTask: (id: number, data: Partial<CreateTaskDto>) => Promise<void>
-updateStatus: (id: number, status: number) => Promise<void>
-completeTask: (id: number) => Promise<any>
-deleteTask: (id: number) => Promise<void>
+
+    fetchTasks: () => Promise<void>
+    createTask: (data: CreateTaskDto) => Promise<void>
+    updateTask: (id: number, data: Partial<CreateTaskDto>) => Promise<void>
+    updateStatus: (id: number, status: number) => Promise<void>
+    completeTask: (id: number) => Promise<any>
+    deleteTask: (id: number) => Promise<void>
 }
 
 export const useTaskStore = create<TaskStore>((set, get) => ({

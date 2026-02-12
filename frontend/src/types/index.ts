@@ -44,6 +44,7 @@ export interface RegisterDto {
 
 export interface Task {
     id: number
+    taskId?: number // For compatibility with Gate entity response
     userId: number
     title: string
     description?: string
@@ -51,17 +52,17 @@ export interface Task {
     difficulty: TaskDifficulty
     status: TaskStatus
     xpReward: number
-    deadline?: string
+    dueDate?: string
     completedAt?: string
     createdAt: string
 }
 
 export enum TaskCategory {
-    Work = 0,
-    Study = 1,
+    Study = 0,
+    Work = 1,
     Fitness = 2,
     Personal = 3,
-    Other = 4
+    Learning = 4
 }
 
 export enum TaskDifficulty {
@@ -81,7 +82,7 @@ export interface CreateTaskDto {
     description?: string
     category: TaskCategory
     difficulty: TaskDifficulty
-    deadline?: string
+    dueDate?: string
 }
 
 export interface Badge {

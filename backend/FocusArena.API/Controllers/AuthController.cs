@@ -27,7 +27,6 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    [HttpPost("register")]
     public async Task<ActionResult<AuthResponseDto>> Register([FromBody] RegisterDto dto)
     {
         try
