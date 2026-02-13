@@ -190,3 +190,26 @@ export interface BadgeUnlockEvent {
     badgeName: string
     timestamp: string
 }
+
+// Chat Types
+export interface ChatUser {
+    id: number
+    name: string
+    avatarUrl?: string
+    lastMessage?: string
+    lastMessageTime?: string
+    unreadCount: number
+    isOnline: boolean
+}
+
+export interface PrivateMessage {
+    id: number
+    senderId: number
+    senderName: string
+    senderAvatarUrl?: string
+    receiverId: number
+    content: string
+    sentAt: string
+    isRead: boolean
+    isMe: boolean
+}

@@ -80,7 +80,7 @@ export default function Quests() {
         <div className="max-w-6xl mx-auto animate-in fade-in duration-500">
 
             {/* Header Section */}
-            <div className="flex justify-between items-end mb-8 border-b border-blue-500/30 pb-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 border-b border-blue-500/30 pb-4 gap-4 md:gap-0">
                 <div>
                     <h1 className="text-4xl text-white font-display font-bold tracking-wider mb-2">QUEST LOG</h1>
                     <p className="text-blue-400/60 font-mono text-sm tracking-widest">
@@ -89,7 +89,7 @@ export default function Quests() {
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="system-button flex items-center gap-2 hover:bg-blue-500/10"
+                    className="system-button flex items-center justify-center gap-2 hover:bg-blue-500/10 w-full md:w-auto"
                 >
                     <PlusIcon className="w-5 h-5" />
                     <span>NEW QUEST</span>

@@ -48,7 +48,7 @@ export default function ShopPage() {
     return (
         <div className="p-6 h-full overflow-y-auto custom-scrollbar relative">
             {/* Header */}
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 md:gap-0">
                 <div>
                     <h1 className="text-3xl font-bold font-rajdhani text-transparent bg-clip-text bg-gradient-to-r from-system-blue to-purple-500 filter drop-shadow-[0_0_5px_rgba(var(--color-system-blue-rgb),0.5)]">
                         SYSTEM SHOP
@@ -58,7 +58,7 @@ export default function ShopPage() {
                     </p>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
                     {/* Gold Display */}
                     <div className="px-4 py-2 bg-black/40 border border-system-gold/30 rounded flex items-center gap-2 shadow-[0_0_10px_rgba(255,215,0,0.1)]">
                         <span className="text-xl">💰</span>

@@ -147,4 +147,22 @@ export const analyticsAPI = {
     }
 }
 
+// Chat API
+export const chatAPI = {
+    getRecent: async (): Promise<any[]> => {
+        const response = await api.get('/chat/recent')
+        return response.data
+    },
+
+    getHistory: async (otherUserId: number): Promise<any[]> => {
+        const response = await api.get(`/chat/history/${otherUserId}`)
+        return response.data
+    },
+
+    searchUsers: async (query: string): Promise<any[]> => {
+        const response = await api.get(`/chat/search?query=${query}`)
+        return response.data
+    }
+}
+
 export { api }

@@ -1,9 +1,19 @@
+using FocusArena.Domain.Entities;
+using FocusArena.Infrastructure.Data;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace FocusArena.Infrastructure.Hubs;
 
 public class GameHub : Hub
 {
+    private readonly ApplicationDbContext _context;
+
+    public GameHub(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
     // Send XP update to all connected clients
     public async Task BroadcastXPUpdate(int userId, string userName, int newXP, int newLevel)
     {
@@ -74,6 +84,44 @@ public class GameHub : Hub
             avatarUrl,
             timestamp = DateTime.UtcNow
         });
+    }
+
+    // Private Chat
+    public async Task SendPrivateMessage(int senderId, int receiverId, string content)
+    {
+        // 1. Persist to Database
+        var message = new PrivateMessage
+        {
+            SenderId = senderId,
+            ReceiverId = receiverId,
+            Content = content,
+            SentAt = DateTime.UtcNow,
+            IsRead = false
+        };
+
+        _context.PrivateMessages.Add(message);
+        await _context.SaveChangesAsync();
+
+        // 2. Load sender info to send full DTO
+        var sender = await _context.Users.FindAsync(senderId);
+        
+        var messageDto = new
+        {
+            id = message.Id,
+            senderId = message.SenderId,
+            senderName = sender?.Name ?? "Unknown",
+            senderAvatarUrl = sender?.AvatarUrl,
+            receiverId = message.ReceiverId,
+            content = message.Content,
+            sentAt = message.SentAt,
+            isRead = false
+        };
+
+        // 3. Send to Receiver (using User ID mapping)
+        await Clients.User(receiverId.ToString()).SendAsync("ReceivePrivateMessage", messageDto);
+
+        // 4. Send back to Sender (so it appears in their chat window accurately with ID)
+        await Clients.User(senderId.ToString()).SendAsync("ReceivePrivateMessage", messageDto);
     }
 
     // Send leaderboard update to all clients in the group

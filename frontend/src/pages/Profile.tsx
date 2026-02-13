@@ -12,22 +12,22 @@ export default function Profile() {
     return (
         <div className="max-w-4xl mx-auto animate-in fade-in duration-500">
             {/* Header */}
-            <div className="flex items-center gap-6 mb-12">
-                <div className="w-24 h-24 bg-gray-900 rounded-full border-2 border-system-blue overflow-hidden shadow-[0_0_20px_rgba(var(--color-system-blue-rgb),0.3)]">
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-12 text-center md:text-left">
+                <div className="w-24 h-24 bg-gray-900 rounded-full border-2 border-system-blue overflow-hidden shadow-[0_0_20px_rgba(var(--color-system-blue-rgb),0.3)] shrink-0">
                     {user.avatarUrl ? (
                         <img src={user.avatarUrl} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
                         <UserCircleIcon className="w-full h-full text-gray-600 p-4" />
                     )}
                 </div>
-                <div>
+                <div className="flex-1">
                     <h1 className="text-4xl font-display font-bold text-white tracking-widest uppercase mb-1">
                         {user.name}
                     </h1>
                     <p className="text-system-blue font-mono tracking-widest text-sm">
                         HUNTER ID: #{user.id.toString().padStart(6, '0')}
                     </p>
-                    <div className="flex gap-2 mt-3">
+                    <div className="flex gap-2 mt-3 justify-center md:justify-start">
                         <span className="px-2 py-0.5 border border-system-blue/50 bg-system-blue/10 text-system-blue text-xs tracking-wider">
                             SHADOW MONARCH
                         </span>
@@ -39,7 +39,7 @@ export default function Profile() {
 
                 <button
                     onClick={() => setIsEditOpen(true)}
-                    className="ml-auto px-4 py-2 bg-system-blue/10 border border-system-blue/50 text-system-blue hover:bg-system-blue/20 rounded flex items-center gap-2 transition-all"
+                    className="w-full md:w-auto px-4 py-2 bg-system-blue/10 border border-system-blue/50 text-system-blue hover:bg-system-blue/20 rounded flex items-center justify-center gap-2 transition-all"
                 >
                     <PencilIcon className="w-4 h-4" />
                     EDIT PROFILE

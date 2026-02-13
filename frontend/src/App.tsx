@@ -16,6 +16,7 @@ import ShopPage from './pages/ShopPage'
 import GatePage from './pages/GatePage'
 import RaidPage from './pages/RaidPage'
 import GuildPage from './pages/GuildPage'
+import ChatPage from './pages/ChatPage'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 
@@ -101,6 +102,7 @@ function App() {
                     <Route path="/gates" element={<GatePage />} />
                     <Route path="/gates/:id" element={<RaidPage />} />
                     <Route path="/guilds" element={<GuildPage />} />
+                    <Route path="/chat" element={<ChatPage />} />
                 </Route>
             </Routes>
         </BrowserRouter>

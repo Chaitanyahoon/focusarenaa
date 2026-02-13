@@ -21,12 +21,32 @@ public class ApplicationDbContext : DbContext
     public DbSet<Gate> Gates { get; set; }
     public DbSet<Guild> Guilds { get; set; }
     public DbSet<GuildMember> GuildMembers { get; set; }
+    public DbSet<PrivateMessage> PrivateMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         
         // ... existing configurations
+
+        // PrivateMessage configuration
+        modelBuilder.Entity<PrivateMessage>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Content).IsRequired().HasMaxLength(1000);
+            entity.HasIndex(e => new { e.SenderId, e.ReceiverId }); // Optimize lookup
+            entity.HasIndex(e => e.SentAt);
+
+            entity.HasOne(e => e.Sender)
+                .WithMany()
+                .HasForeignKey(e => e.SenderId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cascading delete of messages if user is deleted (or use SetNull)
+
+            entity.HasOne(e => e.Receiver)
+                .WithMany()
+                .HasForeignKey(e => e.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
         
         // Seed Shop Items
         modelBuilder.Entity<ShopItem>().HasData(

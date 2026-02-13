@@ -9,7 +9,8 @@ import {
     ArrowRightOnRectangleIcon,
     ShoppingBagIcon,
     MapIcon,
-    UserGroupIcon
+    UserGroupIcon,
+    ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline'
 import Logo from '../ui/Logo'
 import LevelUpCelebration from '../effects/LevelUpCelebration'
@@ -20,6 +21,7 @@ const NAVIGATION = [
     { name: 'GATES', path: '/gates', icon: MapIcon },
     { name: 'GUILDS', path: '/guilds', icon: UserGroupIcon },
     { name: 'RANKING', path: '/leaderboard', icon: TrophyIcon },
+    { name: 'CHAT', path: '/chat', icon: ChatBubbleLeftRightIcon },
     { name: 'SHOP', path: '/shop', icon: ShoppingBagIcon },
     { name: 'ANALYSIS', path: '/analytics', icon: ChartBarIcon },
     { name: 'PROFILE', path: '/profile', icon: UserIcon },
