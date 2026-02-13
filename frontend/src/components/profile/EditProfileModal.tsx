@@ -98,7 +98,7 @@ export default function EditProfileModal({ isOpen, onClose }: Props) {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-[#0a1120] border border-system-blue/30 p-6 text-left align-middle shadow-xl transition-all">
+                            <Dialog.Panel className="w-[95%] max-w-md transform overflow-hidden rounded-2xl bg-[#0a1120] border border-system-blue/30 p-4 md:p-6 text-left align-middle shadow-xl transition-all">
                                 <div className="flex justify-between items-center mb-6 border-b border-system-blue/20 pb-4">
                                     <Dialog.Title
                                         as="h3"
