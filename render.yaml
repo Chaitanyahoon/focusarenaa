@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: focusarena-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false  # Set manually in Render dashboard
+      - key: JwtSettings__SecretKey
+        generateValue: true  # Render auto-generates a secure random value
+      - key: JwtSettings__Issuer
+        value: FocusArenaAPI
+      - key: JwtSettings__Audience
+        value: FocusArenaClient
+      - key: ALLOWED_ORIGINS
+        sync: false  # Set to your Vercel URL after deploying frontend
+      - key: EmailSettings__SmtpServer
+        sync: false
+      - key: EmailSettings__SmtpPort
+        value: "587"
+      - key: EmailSettings__Username
+        sync: false
+      - key: EmailSettings__Password
+        sync: false
+      - key: EmailSettings__FromEmail
+        value: noreply@focusarena.com
+      - key: AppSettings__FrontendUrl
+        sync: false  # Set to your Vercel URL

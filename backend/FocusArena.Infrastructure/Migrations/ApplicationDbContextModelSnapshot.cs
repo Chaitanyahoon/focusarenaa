@@ -257,6 +257,11 @@ namespace FocusArena.Infrastructure.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("BossName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
                     b.Property<DateTime?>("ClearedAt")
                         .HasColumnType("datetime(6)");
 
@@ -282,6 +287,11 @@ namespace FocusArena.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -435,43 +445,63 @@ namespace FocusArena.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
-                            Description = "Restores 50% HP. Essential for survival.",
-                            EffectData = "{\"effect\":\"restore_hp\",\"value\":50}",
-                            ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=potion1",
-                            Name = "Health Potion",
-                            Price = 100,
-                            Type = "Consumable"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Description = "Restores 50% MP. Boosts mental clarity.",
-                            EffectData = "{\"effect\":\"restore_mp\",\"value\":50}",
-                            ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=crystal1",
-                            Name = "Mana Crystal",
-                            Price = 100,
-                            Type = "Consumable"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Description = "Restores your streak if you missed a day.",
-                            EffectData = "{\"effect\":\"repair_streak\",\"value\":1}",
-                            ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=repair",
-                            Name = "Streak Repair",
+                            Id = 5,
+                            Description = "A mysterious box containing random rewards (Gold, Items, or Jackpot).",
+                            EffectData = "{\"effect\":\"random_reward\",\"pool\":\"standard\"}",
+                            ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=box",
+                            Name = "Shadow Extract",
                             Price = 500,
                             Type = "Consumable"
                         },
                         new
                         {
-                            Id = 4,
-                            Description = "Doubles XP gain for 1 hour.",
-                            EffectData = "{\"effect\":\"xp_boost\",\"duration\":3600,\"multiplier\":2}",
-                            ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=xp",
-                            Name = "XP Boost (1hr)",
-                            Price = 300,
-                            Type = "Consumable"
+                            Id = 6,
+                            Description = "Official license required to establish a new Guild.",
+                            EffectData = "{\"effect\":\"unlock_feature\",\"feature\":\"create_guild\"}",
+                            ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=charter",
+                            Name = "Guild Charter",
+                            Price = 5000,
+                            Type = "KeyItem"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Description = "Unlock the Blood Red system theme. Paint your interface in crimson.",
+                            EffectData = "{\"effect\":\"unlock_theme\",\"theme\":\"red\"}",
+                            ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=red",
+                            Name = "Blood Red Crystal",
+                            Price = 1000,
+                            Type = "Theme"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Description = "Unlock the Void Purple system theme. Embrace the darkness.",
+                            EffectData = "{\"effect\":\"unlock_theme\",\"theme\":\"purple\"}",
+                            ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=purple",
+                            Name = "Void Purple Crystal",
+                            Price = 1500,
+                            Type = "Theme"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Description = "Unlock the Royal Gold system theme. A king's interface.",
+                            EffectData = "{\"effect\":\"unlock_theme\",\"theme\":\"gold\"}",
+                            ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=gold",
+                            Name = "Royal Gold Crystal",
+                            Price = 2000,
+                            Type = "Theme"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Description = "Unlock the Necromancer Green theme. Toxic power awaits.",
+                            EffectData = "{\"effect\":\"unlock_theme\",\"theme\":\"green\"}",
+                            ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=green",
+                            Name = "Necromancer Green Crystal",
+                            Price = 2500,
+                            Type = "Theme"
                         });
                 });
 

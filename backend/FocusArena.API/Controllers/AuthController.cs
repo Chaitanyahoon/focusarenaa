@@ -48,6 +48,7 @@ public class AuthController : ControllerBase
                 PasswordHash = passwordHash,
                 XP = 0,
                 Level = 1,
+                Gold = 5000,
                 StreakCount = 0,
                 JoinDate = DateTime.UtcNow
             };
@@ -65,7 +66,8 @@ public class AuthController : ControllerBase
                 Name = user.Name,
                 UserId = user.Id,
                 XP = user.XP,
-                Level = user.Level
+                Level = user.Level,
+                GuildId = user.GuildId
             });
         }
         catch (Exception ex)
@@ -105,7 +107,8 @@ public class AuthController : ControllerBase
             Name = user.Name,
             UserId = user.Id,
             XP = user.XP,
-            Level = user.Level
+            Level = user.Level,
+            GuildId = user.GuildId
         });
     }
 

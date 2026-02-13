@@ -34,14 +34,14 @@ export default function SystemLayout() {
             <LevelUpCelebration />
 
             {/* SIDEBAR NAVIGATION - Premium Upgrade */}
-            <aside className="fixed left-0 top-0 h-full w-20 md:w-64 glass-panel z-50 flex flex-col transition-all duration-300 border-r border-blue-500/30">
+            <aside className="fixed left-0 top-0 h-full w-20 md:w-64 glass-panel z-50 flex flex-col transition-all duration-300 border-r border-system-blue/30">
 
                 {/* Logo / Header with Scan effect */}
-                <div className="h-20 flex items-center justify-center md:justify-start md:px-6 border-b border-blue-500/20 relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors"></div>
-                    <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-50"></div>
+                <div className="h-20 flex items-center justify-center md:justify-start md:px-6 border-b border-system-blue/20 relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-system-blue/5 group-hover:bg-system-blue/10 transition-colors"></div>
+                    <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-system-blue to-transparent opacity-50"></div>
 
-                    <Logo className="h-10 w-auto relative z-10 drop-shadow-[0_0_8px_rgba(0,234,255,0.5)]" />
+                    <Logo className="h-10 w-auto relative z-10 drop-shadow-[0_0_8px_rgba(var(--color-system-blue-rgb),0.5)]" />
                     <span className="hidden md:block ml-3 font-display font-bold text-xl tracking-widest text-white neon-text-blue relative z-10">
                         FOCUS ARENA
                     </span>
@@ -58,22 +58,22 @@ export default function SystemLayout() {
                                 className={`
                   group flex items-center gap-3 px-3 md:px-4 py-3 rounded-sm transition-all duration-300 relative overflow-hidden
                   ${isActive
-                                        ? 'bg-blue-600/20 border-l-2 border-blue-500 text-blue-300 shadow-[inset_0_0_20px_rgba(0,234,255,0.1)]'
-                                        : 'text-gray-500 hover:text-blue-300 hover:bg-blue-500/5'
+                                        ? 'bg-system-blue/20 border-l-2 border-system-blue text-blue-300 shadow-[inset_0_0_20px_rgba(var(--color-system-blue-rgb),0.1)]'
+                                        : 'text-gray-500 hover:text-blue-300 hover:bg-system-blue/5'
                                     }
                 `}
                             >
                                 {isActive && (
-                                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-r from-system-blue/10 to-transparent pointer-events-none"></div>
                                 )}
-                                <item.icon className={`w-6 h-6 shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-blue-400 drop-shadow-[0_0_5px_rgba(59,130,246,0.5)]' : ''}`} />
+                                <item.icon className={`w-6 h-6 shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-system-blue drop-shadow-[0_0_5px_rgba(var(--color-system-blue-rgb),0.5)]' : ''}`} />
                                 <span className={`hidden md:block font-display tracking-widest text-sm font-medium ${isActive ? 'text-blue-200' : ''}`}>
                                     {item.name}
                                 </span>
 
                                 {/* Active Indicator (Right side) */}
                                 {isActive && (
-                                    <div className="hidden md:block ml-auto w-1.5 h-1.5 bg-blue-400 rounded-full shadow-[0_0_8px_#3b82f6] animate-pulse"></div>
+                                    <div className="hidden md:block ml-auto w-1.5 h-1.5 bg-system-blue rounded-full shadow-[0_0_8px_rgb(var(--color-system-blue-rgb))] animate-pulse"></div>
                                 )}
                             </Link>
                         )
@@ -81,18 +81,18 @@ export default function SystemLayout() {
                 </nav>
 
                 {/* System Info / Logout */}
-                <div className="p-4 border-t border-blue-500/20 bg-black/40 backdrop-blur-sm relative">
+                <div className="p-4 border-t border-system-blue/20 bg-black/40 backdrop-blur-sm relative">
                     <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-900 to-transparent"></div>
                     <button
                         onClick={logout}
-                        className="w-full flex items-center justify-center md:justify-start gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all rounded-sm border border-transparent hover:border-red-500/30 group"
+                        className="w-full flex items-center justify-center md:justify-start gap-3 px-4 py-3 text-system-red hover:bg-system-red/10 hover:text-red-300 transition-all rounded-sm border border-transparent hover:border-system-red/30 group"
                     >
                         <ArrowRightOnRectangleIcon className="w-6 h-6 shrink-0 group-hover:translate-x-1 transition-transform" />
                         <span className="hidden md:block font-display tracking-widest text-sm">SYSTEM LOGOUT</span>
                     </button>
 
                     <div className="hidden md:flex justify-between mt-4 text-[10px] text-gray-600 font-mono tracking-widest">
-                        <span className="text-blue-500/50">VER. 2.5.0</span>
+                        <span className="text-system-blue/50">VER. 2.5.0</span>
                         <span className="flex items-center gap-1">
                             <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
                             ONLINE

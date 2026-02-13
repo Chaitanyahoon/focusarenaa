@@ -26,7 +26,7 @@ class AudioController {
         const sound = this.sounds[key]
         if (sound) {
             sound.currentTime = 0
-            sound.play().catch(e => console.log("Audio play failed (user interaction required first)", e))
+            sound.play().catch(() => { /* Audio requires user interaction first */ })
         }
     }
 

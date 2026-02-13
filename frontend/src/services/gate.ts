@@ -21,6 +21,8 @@ export interface Gate {
     userId: number
     title: string
     description?: string
+    bossName: string
+    type: string
     rank: GateRank
     status: GateStatus
     createdAt: string
@@ -34,6 +36,8 @@ export interface Gate {
 export interface CreateGateDto {
     title: string
     description?: string
+    bossName?: string
+    type?: string
     rank: GateRank
     deadline?: string
 }

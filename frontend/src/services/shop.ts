@@ -35,9 +35,12 @@ export const shopService = {
     },
 
     useItem: async (itemId: number): Promise<{ message: string }> => {
-        // itemId here is ShopItemId as per backend logic for now? Or InventoryId?
-        // Backend logic uses ShopItemId to find in inventory.
         const response = await api.post<{ message: string }>(`/shop/use/${itemId}`);
+        return response.data;
+    },
+
+    getOwnedThemes: async (): Promise<string[]> => {
+        const response = await api.get<string[]>('/profile/owned-themes');
         return response.data;
     }
 };

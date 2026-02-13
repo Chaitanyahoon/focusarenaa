@@ -13,23 +13,12 @@ export default function GuildPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-    // If user has a guild, show dashboard
-    if (user?.guildId) {
-        return (
-            <GuildDashboard
-                guildId={user.guildId}
-                onLeave={() => fetchProfile()}
-            />
-        );
-    }
-
     const loadGuilds = async () => {
         setIsLoading(true);
         try {
             const data = await guildAPI.search(searchQuery);
             setGuilds(data);
-        } catch (error) {
-            console.error(error);
+        } catch {
             toast.error("Failed to load Guilds.");
         } finally {
             setIsLoading(false);
@@ -37,12 +26,12 @@ export default function GuildPage() {
     };
 
     useEffect(() => {
-        loadGuilds();
+        if (!user?.guildId) {
+            loadGuilds();
+        }
         // Also ensure user profile is up to date to check guild status
         fetchProfile();
-    }, [searchQuery]);
-
-    // Not implemented yet, for now just list.
+    }, [searchQuery, user?.guildId]);
 
     const handleJoin = async (guild: Guild) => {
         try {
@@ -63,6 +52,16 @@ export default function GuildPage() {
             toast.error("Failed to join. Invalid invite code or guild full.");
         }
     };
+
+    // If user has a guild, show dashboard
+    if (user?.guildId) {
+        return (
+            <GuildDashboard
+                guildId={user.guildId}
+                onLeave={() => fetchProfile()}
+            />
+        );
+    }
 
     return (
         <div className="p-6 h-full overflow-y-auto custom-scrollbar relative">
@@ -139,7 +138,7 @@ export default function GuildPage() {
             <CreateGuildModal
                 isOpen={isCreateOpen}
                 onClose={() => setIsCreateOpen(false)}
-                onGuildCreated={() => {
+                onGuildCreated={(_guildId: number) => {
                     loadGuilds();
                     fetchProfile();
                 }}

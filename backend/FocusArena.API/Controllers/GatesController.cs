@@ -38,7 +38,7 @@ public class GatesController : ControllerBase
     public async Task<ActionResult<Gate>> CreateGate(CreateGateDto dto)
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-        var gate = await _gateService.CreateGateAsync(userId, dto.Title, dto.Description, dto.Rank, dto.Deadline);
+        var gate = await _gateService.CreateGateAsync(userId, dto.Title, dto.Description, dto.Rank, dto.Deadline, dto.BossName, dto.Type);
         return CreatedAtAction(nameof(GetGate), new { id = gate.Id }, gate);
     }
 
@@ -67,6 +67,8 @@ public class CreateGateDto
 {
     public string Title { get; set; } = string.Empty;
     public string? Description { get; set; }
+    public string? BossName { get; set; }
+    public string? Type { get; set; }
     public GateRank Rank { get; set; }
     public DateTime? Deadline { get; set; }
 }

@@ -25,9 +25,9 @@ export default {
                 },
                 system: {
                     purple: '#8b5cf6',
-                    blue: '#3b82f6',
+                    blue: 'rgb(var(--color-system-blue-rgb) / <alpha-value>)',
                     green: '#10b981',
-                    red: '#ef4444',
+                    red: 'rgb(var(--color-system-red-rgb) / <alpha-value>)',
                     gold: '#f59e0b',
                 }
             },

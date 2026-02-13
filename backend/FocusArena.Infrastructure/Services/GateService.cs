@@ -32,7 +32,7 @@ public class GateService : IGateService
             .FirstOrDefaultAsync(g => g.Id == gateId);
     }
 
-    public async Task<Gate> CreateGateAsync(int userId, string title, string? description, GateRank rank, DateTime? deadline)
+    public async Task<Gate> CreateGateAsync(int userId, string title, string? description, GateRank rank, DateTime? deadline, string? bossName, string? type)
     {
         // Calculate Rewards based on Rank
         int xpReward = 0;
@@ -53,6 +53,8 @@ public class GateService : IGateService
             UserId = userId,
             Title = title,
             Description = description,
+            BossName = bossName ?? "Dungeon Boss",
+            Type = type ?? "Dungeon",
             Rank = rank,
             Deadline = deadline,
             Status = GateStatus.Active,

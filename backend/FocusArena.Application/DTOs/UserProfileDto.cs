@@ -14,4 +14,6 @@ public class UserProfileDto
     public int TotalTasksCompleted { get; set; }
     public int BadgesEarned { get; set; }
     public int Gold { get; set; }
+    public string? Theme { get; set; }
+    public int? GuildId { get; set; }
 }

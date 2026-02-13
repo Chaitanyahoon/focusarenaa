@@ -6,7 +6,6 @@ export enum GuildRole {
     Leader = 2
 }
 
-// Restoration of interfaces
 export interface GuildMember {
     id: number;
     guildId: number;
@@ -55,6 +54,11 @@ export const guildAPI = {
         return response.data;
     },
 
+    getMyGuild: async (): Promise<Guild> => {
+        const response = await api.get<Guild>('/guilds/my');
+        return response.data;
+    },
+
     create: async (data: CreateGuildDto): Promise<Guild> => {
         const response = await api.post<Guild>('/guilds', data);
         return response.data;
@@ -66,5 +70,13 @@ export const guildAPI = {
 
     leave: async (): Promise<void> => {
         await api.post(`/guilds/leave`);
+    },
+
+    kickMember: async (guildId: number, userId: number): Promise<void> => {
+        await api.post(`/guilds/${guildId}/kick/${userId}`);
+    },
+
+    deleteGuild: async (guildId: number): Promise<void> => {
+        await api.delete(`/guilds/${guildId}`);
     }
 };

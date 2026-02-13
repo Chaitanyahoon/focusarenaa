@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PlusIcon } from '@heroicons/react/24/outline';
-import { gateAPI, Gate, GateRank, GateStatus } from '../services/gate';
+import { gateAPI, Gate, GateRank } from '../services/gate';
 import { toast } from 'react-hot-toast';
 import CreateGateModal from '../components/gates/CreateGateModal';
 
 export default function GatePage() {
+    const navigate = useNavigate();
     const [gates, setGates] = useState<Gate[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -91,7 +93,7 @@ export default function GatePage() {
                             </div>
 
                             <button
-                                onClick={() => window.location.href = `/gates/${gate.id}`}
+                                onClick={() => navigate(`/gates/${gate.id}`)}
                                 className="w-full py-2 bg-blue-600/10 border border-blue-500/30 text-blue-400 font-bold rounded hover:bg-blue-600 hover:text-white transition-all uppercase tracking-widest text-sm"
                             >
                                 ENTER GATE

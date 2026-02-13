@@ -67,10 +67,6 @@ public class ShopService : IShopService
 
     public async Task<string> UseItemAsync(int userId, int itemId)
     {
-        // itemId here refers to ShopItemId (buying context) or InventoryItemId?
-        // Usually inventory check happens by ShopItemId if items are stackable.
-        // Let's assume itemId is ShopItemId for simplicity in UI, but finding InventoryItem relies on UserId + ShopItemId.
-        
         var inventoryItem = await _context.InventoryItems
             .Include(i => i.ShopItem)
             .FirstOrDefaultAsync(i => i.UserId == userId && i.ShopItemId == itemId);
@@ -96,32 +92,43 @@ public class ShopService : IShopService
 
                 switch (effectType)
                 {
-                    case "restore_hp":
-                        // Logic to restore HP (assuming HP exists on User? No, HP is calculated on Frontend usually based on Streak/Penalty?)
-                        // Wait, User entity doesn't have HP. "Penalty Zone" logic uses Streak.
-                        // Let's say restoring HP means nothing right now unless I add HP. 
-                        // Or maybe it restores Streak? "repair_streak" does that.
-                        // For Restore HP, maybe it prevents penalty next time?
-                        // Actually, I don't have HP field. User has Level/XP.
-                        // Let's assume currently only "repair_streak" and "xp_boost" are useful.
-                        message = "HP Restored! (Visual only for now)";
-                        break;
-                    
-                    case "restore_mp":
-                        message = "MP Restored! (Visual only for now)";
+                    case "unlock_theme":
+                        var themeName = root.GetProperty("theme").GetString() ?? "";
+                        user.Theme = themeName;
+                        message = $"Theme '{themeName}' activated! Your system has been updated.";
+                        // Theme items are NOT consumed - they stay as proof of ownership
                         break;
 
-                    case "repair_streak":
-                        // Logic: Set StreakCount = StreakCount + 1? Or restore value?
-                        // Simple logic: Restore +1 streak.
-                        user.StreakCount += root.GetProperty("value").GetInt32();
-                        message = $"Streak repaired! +{root.GetProperty("value").GetInt32()} streak.";
+                    case "unlock_feature":
+                        message = "Feature unlocked! System recognizes your authority.";
                         break;
 
-                    case "xp_boost":
-                        // Requires separate table or field for active effects.
-                        // I'll skip implementation for now and just say applied.
-                        message = "XP Boost activated! (Not fully implemented)";
+                    case "random_reward":
+                        var rand = new Random();
+                        int roll = rand.Next(1, 101);
+                        
+                        if (roll <= 50)
+                        {
+                            int goldReward = rand.Next(150, 401);
+                            user.Gold += goldReward;
+                            message = $"You found {goldReward} Gold!";
+                        }
+                        else if (roll <= 80)
+                        {
+                            int goldReward = rand.Next(600, 1001);
+                            user.Gold += goldReward;
+                            message = $"Lucky! You found {goldReward} Gold!";
+                        }
+                        else if (roll <= 95)
+                        {
+                            user.Gold += 1000;
+                            message = "Rare find! You got 1000 Gold!";
+                        }
+                        else
+                        {
+                            user.Gold += 2500;
+                            message = "JACKPOT!! You found 2500 Gold in the shadows!";
+                        }
                         break;
                         
                     default:
@@ -135,7 +142,7 @@ public class ShopService : IShopService
             }
         }
 
-        // Consume item
+        // Consume item only if Consumable type
         if (item.Type == "Consumable")
         {
             inventoryItem.Quantity--;

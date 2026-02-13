@@ -23,8 +23,7 @@ export default function CreateGuildModal({ isOpen, onClose, onGuildCreated }: Pr
             reset()
             onGuildCreated(guild.id)
             onClose()
-        } catch (error) {
-            console.error(error)
+        } catch {
             toast.error('Failed to create Guild.')
         } finally {
             setIsLoading(false)

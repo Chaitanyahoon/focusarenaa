@@ -33,6 +33,12 @@ public class Gate
     public string Title { get; set; } = string.Empty;
     
     public string? Description { get; set; }
+
+    [MaxLength(50)]
+    public string BossName { get; set; } = "Dungeon Boss"; // Default
+    
+    [MaxLength(20)]
+    public string Type { get; set; } = "Dungeon"; // Dungeon or Raid
     
     public GateRank Rank { get; set; } = GateRank.E;
     

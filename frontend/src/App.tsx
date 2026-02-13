@@ -24,7 +24,7 @@ import ProtectedRoute from './components/layout/ProtectedRoute'
 import SystemLayout from './components/layout/SystemLayout'
 
 function App() {
-    const { isAuthenticated, checkAuth } = useAuthStore()
+    const { isAuthenticated, checkAuth, user } = useAuthStore()
 
     // Initialize SignalR on auth
     useEffect(() => {
@@ -38,6 +38,41 @@ function App() {
             })
         }
     }, [isAuthenticated])
+
+    // Global Theme Listener
+    useEffect(() => {
+        if (user?.theme) {
+            const root = document.documentElement;
+            const theme = user.theme;
+
+            if (theme === 'blue') {
+                root.style.setProperty('--color-system-blue', '#00EAFF');
+                root.style.setProperty('--color-system-blue-rgb', '0 234 255');
+                root.style.setProperty('--color-system-red', '#FF003C');
+                root.style.setProperty('--color-system-red-rgb', '255 0 60');
+            } else if (theme === 'red') {
+                root.style.setProperty('--color-system-blue', '#FF003C');
+                root.style.setProperty('--color-system-blue-rgb', '255 0 60');
+                root.style.setProperty('--color-system-red', '#FF5E00');
+                root.style.setProperty('--color-system-red-rgb', '255 94 0');
+            } else if (theme === 'purple') {
+                root.style.setProperty('--color-system-blue', '#9D00FF');
+                root.style.setProperty('--color-system-blue-rgb', '157 0 255');
+                root.style.setProperty('--color-system-red', '#FF00EA');
+                root.style.setProperty('--color-system-red-rgb', '255 0 234');
+            } else if (theme === 'gold') {
+                root.style.setProperty('--color-system-blue', '#FFD700');
+                root.style.setProperty('--color-system-blue-rgb', '255 215 0');
+                root.style.setProperty('--color-system-red', '#FFA500');
+                root.style.setProperty('--color-system-red-rgb', '255 165 0');
+            } else if (theme === 'green') {
+                root.style.setProperty('--color-system-blue', '#00FF9D'); // Neon Necromancer Green
+                root.style.setProperty('--color-system-blue-rgb', '0 255 157');
+                root.style.setProperty('--color-system-red', '#008F58'); // Darker Green for accents
+                root.style.setProperty('--color-system-red-rgb', '0 143 88');
+            }
+        }
+    }, [user?.theme])
 
     return (
         <BrowserRouter>

@@ -39,7 +39,7 @@ export default function ForgotPassword() {
                         'oj27ybVSh1kjvSPzV' // ✅ Configured
                     );
 
-                    console.log("EmailJS Sent to:", email);
+                    // Email sent successfully
                     toast.success('Reset link sent to your email!');
                     setEmailSent(true);
                 } catch (emailError) {

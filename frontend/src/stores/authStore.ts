@@ -39,7 +39,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
                 level: response.level,
                 streakCount: 0,
                 joinDate: new Date().toISOString(),
-                gold: 0 // Default until profile fetch
+                gold: 0, // Default until profile fetch
+                theme: 'blue', // Default
+                guildId: response.guildId ?? (response as any).GuildId
             }
 
             set({
@@ -48,12 +50,25 @@ export const useAuthStore = create<AuthStore>((set) => ({
                 isAuthenticated: true,
                 isLoading: false
             })
-            // Fetch full profile to get Gold
-            if (response.token) {
-                // We can trigger fetchProfile but getting the store instance inside might be tricky.
-                // Actually we can just call the internal logic or let the component do it.
-                // Ideally authentication just sets basic info.
-            }
+            // Fetch full profile to get avatar, gold, theme, etc.
+            const { profileAPI } = await import('../services/api')
+            const userProfile = await profileAPI.get()
+            set({
+                user: {
+                    id: userProfile.id,
+                    name: userProfile.name,
+                    email: userProfile.email,
+                    xp: userProfile.xp,
+                    level: userProfile.level,
+                    streakCount: userProfile.streakCount,
+                    joinDate: userProfile.joinDate,
+                    avatarUrl: userProfile.avatarUrl,
+                    gold: userProfile.gold ?? 0,
+                    theme: userProfile.theme || 'blue',
+                    bio: userProfile.bio,
+                    guildId: userProfile.guildId ?? (userProfile as any).GuildId
+                }
+            })
         } catch (error: any) {
             set({
                 error: error.response?.data?.message || 'Login failed',
@@ -77,7 +92,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
                 level: response.level,
                 streakCount: 0,
                 joinDate: new Date().toISOString(),
-                gold: 0
+                gold: 0,
+                theme: 'blue',
+                guildId: response.guildId ?? (response as any).GuildId
             }
 
             set({
@@ -119,7 +136,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
                 streakCount: userProfile.streakCount,
                 joinDate: userProfile.joinDate,
                 avatarUrl: userProfile.avatarUrl,
-                gold: userProfile.gold ?? 0
+                gold: userProfile.gold ?? 0,
+                guildId: userProfile.guildId ?? (userProfile as any).GuildId
             }
 
             set({ user })
@@ -149,7 +167,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
                 streakCount: userProfile.streakCount,
                 joinDate: userProfile.joinDate,
                 avatarUrl: userProfile.avatarUrl,
-                gold: userProfile.gold ?? 0
+                gold: userProfile.gold ?? 0,
+                guildId: userProfile.guildId ?? (userProfile as any).GuildId
             }
 
             set({

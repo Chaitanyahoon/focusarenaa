@@ -55,7 +55,9 @@ public class ProfileController : ControllerBase
             JoinDate = user.JoinDate,
             TotalTasksCompleted = completedTasks,
             BadgesEarned = user.UserBadges.Count,
-            Gold = user.Gold
+            Gold = user.Gold,
+            Theme = user.Theme,
+            GuildId = user.GuildId
         };
 
         return Ok(profile);
@@ -90,12 +92,62 @@ public class ProfileController : ControllerBase
 
         if (dto.Theme != null)
         {
-            user.Theme = dto.Theme;
+            // Blue is always free
+            if (dto.Theme == "blue")
+            {
+                user.Theme = dto.Theme;
+            }
+            else
+            {
+                // Check if user owns the theme via inventory
+                var ownsTheme = await _context.InventoryItems
+                    .Include(i => i.ShopItem)
+                    .AnyAsync(i => i.UserId == userId 
+                        && i.ShopItem.Type == "Theme" 
+                        && i.ShopItem.EffectData.Contains($"\"theme\":\"{dto.Theme}\"")
+                        && i.Quantity > 0);
+
+                if (!ownsTheme)
+                {
+                    return BadRequest(new { message = $"You don't own the '{dto.Theme}' theme. Purchase it from the Shop first!" });
+                }
+                user.Theme = dto.Theme;
+            }
         }
 
         await _context.SaveChangesAsync();
 
         return NoContent();
+    }
+
+    [HttpGet("owned-themes")]
+    public async Task<ActionResult<List<string>>> GetOwnedThemes()
+    {
+        var userId = GetUserId();
+
+        // Blue is always owned
+        var ownedThemes = new List<string> { "blue" };
+
+        var themeItems = await _context.InventoryItems
+            .Include(i => i.ShopItem)
+            .Where(i => i.UserId == userId && i.ShopItem.Type == "Theme" && i.Quantity > 0)
+            .ToListAsync();
+
+        foreach (var item in themeItems)
+        {
+            try
+            {
+                using var doc = System.Text.Json.JsonDocument.Parse(item.ShopItem.EffectData);
+                var themeName = doc.RootElement.GetProperty("theme").GetString();
+                if (!string.IsNullOrEmpty(themeName))
+                {
+                    ownedThemes.Add(themeName);
+                }
+            }
+            catch { }
+        }
+
+        return Ok(ownedThemes);
     }
 
     [HttpGet("badges")]

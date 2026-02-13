@@ -1,4 +1,4 @@
-﻿namespace FocusArena.Tests;
+﻿namespace FocusArena.IntegrationTests;
 
 public class UnitTest1
 {

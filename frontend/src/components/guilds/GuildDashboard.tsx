@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { guildAPI, Guild } from '../../services/guild';
+import { guildAPI, Guild, GuildRole } from '../../services/guild';
 import { useAuthStore } from '../../stores/authStore';
 import { toast } from 'react-hot-toast';
-import { ArrowLeftOnRectangleIcon, UserGroupIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftOnRectangleIcon, UserGroupIcon, TrashIcon, XMarkIcon, ClipboardIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 import GuildChat from './GuildChat';
+import ConfirmModal from '../ConfirmModal';
 
 interface Props {
     guildId: number;
@@ -11,74 +12,153 @@ interface Props {
 }
 
 export default function GuildDashboard({ guildId, onLeave }: Props) {
+    const { user } = useAuthStore();
     const [guild, setGuild] = useState<Guild | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, type: 'kick' | 'delete' | 'leave', targetUserId?: number, targetName?: string }>({ isOpen: false, type: 'leave' });
 
-    useEffect(() => {
-        const loadGuild = async () => {
-            setIsLoading(true);
-            try {
-                const data = await guildAPI.get(guildId);
-                setGuild(data);
-            } catch (error) {
-                console.error(error);
-                toast.error("Failed to load Guild data.");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        loadGuild();
-    }, [guildId]);
+    const isLeader = guild?.leaderId === user?.id;
 
-    const handleLeave = async () => {
-        if (!confirm("Are you sure you want to leave the guild?")) return;
+    const loadGuild = async () => {
+        setIsLoading(true);
         try {
-            await guildAPI.leave();
-            toast.success("Left guild.");
-            onLeave();
-        } catch (error) {
-            toast.error("Failed to leave guild.");
+            const data = await guildAPI.get(guildId);
+            setGuild(data);
+        } catch {
+            toast.error("Failed to load Guild data.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    if (isLoading) return <div className="text-center py-20 text-blue-400 animate-pulse">Establishing secure connection...</div>;
+    useEffect(() => {
+        loadGuild();
+    }, [guildId]);
+
+    const handleLeave = () => {
+        setConfirmModal({ isOpen: true, type: 'leave' });
+    };
+
+    const handleKick = (userId: number, name: string) => {
+        setConfirmModal({ isOpen: true, type: 'kick', targetUserId: userId, targetName: name });
+    };
+
+    const handleDeleteGuild = () => {
+        setConfirmModal({ isOpen: true, type: 'delete' });
+    };
+
+    const handleConfirm = async () => {
+        try {
+            if (confirmModal.type === 'leave') {
+                await guildAPI.leave();
+                toast.success("Left guild.");
+                onLeave();
+            } else if (confirmModal.type === 'kick' && confirmModal.targetUserId && guild) {
+                await guildAPI.kickMember(guild.id, confirmModal.targetUserId);
+                toast.success(`Removed ${confirmModal.targetName} from the guild.`);
+                loadGuild();
+            } else if (confirmModal.type === 'delete' && guild) {
+                await guildAPI.deleteGuild(guild.id);
+                toast.success("Guild disbanded.");
+                onLeave();
+            }
+        } catch {
+            toast.error(`Failed to ${confirmModal.type}.`);
+        }
+    };
+
+    const copyInviteCode = () => {
+        if (guild?.inviteCode) {
+            navigator.clipboard.writeText(guild.inviteCode);
+            toast.success('Invite code copied!');
+        }
+    };
+
+    if (isLoading) return (
+        <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+                <div className="w-12 h-12 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-blue-400 font-mono text-sm animate-pulse">Establishing secure connection...</p>
+            </div>
+        </div>
+    );
     if (!guild) return <div className="text-center py-20 text-red-500">Guild not found.</div>;
+
+    const sortedMembers = [...guild.members].sort((a, b) => b.role - a.role);
 
     return (
         <div className="p-6 h-full overflow-y-auto custom-scrollbar">
             {/* Header */}
-            <div className="flex justify-between items-start mb-8 border-b border-blue-900/30 pb-6">
+            <div className="flex justify-between items-start mb-6 border-b border-system-blue/30 pb-6">
                 <div>
-                    <div className="flex items-center gap-3">
-                        <UserGroupIcon className="w-8 h-8 text-blue-500" />
-                        <h1 className="text-4xl font-bold font-rajdhani text-white tracking-wide uppercase">{guild.name}</h1>
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-system-blue to-cyan-500 flex items-center justify-center">
+                            <UserGroupIcon className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-black font-rajdhani text-white tracking-wide uppercase">{guild.name}</h1>
+                            <div className="flex items-center gap-3">
+                                <span className="text-xs font-mono text-system-blue bg-system-blue/10 px-2 py-0.5 rounded border border-system-blue/20">
+                                    LVL {guild.level}
+                                </span>
+                                {guild.isPrivate && (
+                                    <span className="text-xs font-mono text-system-gold bg-system-gold/10 px-2 py-0.5 rounded border border-system-gold/20">
+                                        🔒 PRIVATE
+                                    </span>
+                                )}
+                                {isLeader && (
+                                    <span className="text-xs font-mono text-system-green bg-system-green/10 px-2 py-0.5 rounded border border-system-green/20 flex items-center gap-1">
+                                        <ShieldCheckIcon className="w-3 h-3" /> LEADER
+                                    </span>
+                                )}
+                            </div>
+                        </div>
                     </div>
-                    <p className="text-gray-400 mt-2 max-w-2xl">{guild.description}</p>
+                    {guild.description && <p className="text-gray-400 mt-2 max-w-2xl text-sm">{guild.description}</p>}
                 </div>
 
-                <div className="flex flex-col items-end gap-2">
-                    <div className="text-right">
-                        <div className="text-sm text-gray-400 font-mono">LEVEL</div>
-                        <div className="text-3xl font-bold text-blue-400 leading-none">{guild.level}</div>
+                <div className="flex flex-col items-end gap-3">
+                    <div className="text-right bg-black/30 rounded-lg border border-gray-800/50 p-3">
+                        <div className="text-[10px] text-gray-500 font-mono">GUILD XP</div>
+                        <div className="text-xl font-black text-system-blue font-rajdhani">{guild.xp.toLocaleString()}</div>
                     </div>
                 </div>
             </div>
 
+            {/* Invite Code Section (Leader Only) */}
+            {isLeader && guild.isPrivate && guild.inviteCode && (
+                <div className="mb-6 bg-system-gold/5 border border-system-gold/20 rounded-lg p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <span className="text-xs text-system-gold font-mono uppercase">Invite Code:</span>
+                        <code className="text-system-gold font-mono font-bold text-lg tracking-[0.3em] bg-black/30 px-3 py-1 rounded">{guild.inviteCode}</code>
+                    </div>
+                    <button
+                        onClick={copyInviteCode}
+                        className="p-2 hover:bg-system-gold/10 rounded-lg text-system-gold hover:text-system-gold transition-all"
+                        title="Copy invite code"
+                    >
+                        <ClipboardIcon className="w-5 h-5" />
+                    </button>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left Column: Members & Info */}
+                {/* Left Column: Members & Management */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* Members List */}
-                    <div className="bg-[#0a1120] border border-blue-900/30 rounded-lg p-6">
-                        <h3 className="text-xl font-bold font-rajdhani text-white mb-4 flex justify-between items-center">
+                    <div className="bg-[#0a1120] border border-system-blue/30 rounded-xl p-6">
+                        <h3 className="text-lg font-bold font-rajdhani text-white mb-4 flex justify-between items-center tracking-wider">
                             <span>MEMBERS ROSTER</span>
-                            <span className="text-sm font-mono text-gray-500">{guild.members.length} / {guild.capacity}</span>
+                            <span className="text-xs font-mono text-gray-500 bg-black/30 px-2 py-1 rounded">
+                                {guild.members.length} / {guild.capacity}
+                            </span>
                         </h3>
 
-                        <div className="space-y-3">
-                            {guild.members.map(member => (
-                                <div key={member.id} className="flex items-center justify-between bg-[#050914] p-3 rounded border border-gray-800 hover:border-blue-500/30 transition-all">
+                        <div className="space-y-2">
+                            {sortedMembers.map(member => (
+                                <div key={member.id} className="flex items-center justify-between bg-[#050914] p-3 rounded-lg border border-gray-800/50 hover:border-system-blue/20 transition-all group">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded bg-gray-800 flex items-center justify-center text-gray-400 font-bold overflow-hidden">
+                                        <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 font-bold overflow-hidden text-sm">
                                             {member.user.avatarUrl ? (
                                                 <img src={member.user.avatarUrl} alt={member.user.name} className="w-full h-full object-cover" />
                                             ) : (
@@ -88,40 +168,114 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
                                         <div>
                                             <div className="text-white font-medium flex items-center gap-2">
                                                 {member.user.name}
-                                                {member.role === 2 && <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-1 rounded border border-yellow-500/30">LEADER</span>}
+                                                {member.role === GuildRole.Leader && (
+                                                    <span className="text-[9px] bg-system-gold/15 text-system-gold px-1.5 py-0.5 rounded font-mono font-bold border border-system-gold/20">
+                                                        👑 LEADER
+                                                    </span>
+                                                )}
+                                                {member.role === GuildRole.Officer && (
+                                                    <span className="text-[9px] bg-system-blue/15 text-system-blue px-1.5 py-0.5 rounded font-mono font-bold border border-system-blue/20">
+                                                        OFFICER
+                                                    </span>
+                                                )}
                                             </div>
-                                            <div className="text-xs text-blue-400">Level {member.user.level}</div>
+                                            <div className="text-xs text-gray-500">
+                                                Level {member.user.level} · {member.contributionXP} XP contributed
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="text-right">
-                                        <div className="text-xs text-gray-500">Contribution</div>
-                                        <div className="text-sm text-gray-300 font-mono">{member.contributionXP} XP</div>
+
+                                    <div className="flex items-center gap-2">
+                                        {/* Kick button — only leader can kick, and can't kick self */}
+                                        {isLeader && member.userId !== user?.id && (
+                                            <button
+                                                onClick={() => handleKick(member.userId, member.user.name)}
+                                                className="opacity-0 group-hover:opacity-100 p-2 text-gray-600 hover:text-system-red hover:bg-system-red/10 rounded-lg transition-all"
+                                                title={`Remove ${member.user.name}`}
+                                            >
+                                                <XMarkIcon className="w-4 h-4" />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    <button
-                        onClick={handleLeave}
-                        className="flex items-center gap-2 text-red-500 hover:text-red-400 transition-colors text-sm font-bold opacity-80 hover:opacity-100"
-                    >
-                        <ArrowLeftOnRectangleIcon className="w-4 h-4" />
-                        LEAVE GUILD
-                    </button>
+                    {/* Actions */}
+                    <div className="flex items-center justify-between">
+                        <button
+                            onClick={handleLeave}
+                            className="flex items-center gap-2 text-system-red hover:text-red-400 transition-colors text-sm font-bold opacity-70 hover:opacity-100 px-3 py-2 rounded-lg hover:bg-system-red/5"
+                        >
+                            <ArrowLeftOnRectangleIcon className="w-4 h-4" />
+                            {isLeader ? 'LEAVE & TRANSFER LEADERSHIP' : 'LEAVE GUILD'}
+                        </button>
+
+                        {isLeader && (
+                            <button
+                                onClick={handleDeleteGuild}
+                                className="flex items-center gap-2 text-system-red hover:text-red-500 transition-all text-sm font-bold opacity-60 hover:opacity-100 px-3 py-2 rounded-lg hover:bg-system-red/5 border border-transparent hover:border-system-red/20"
+                            >
+                                <TrashIcon className="w-4 h-4" />
+                                DISBAND GUILD
+                            </button>
+                        )}
+                    </div>
                 </div>
 
-                {/* Right Column: Chat & Activities */}
+                {/* Right Column: Chat & Info */}
                 <div className="space-y-6">
                     <GuildChat guildId={guild.id} />
 
-                    {/* Placeholder for Guild Quests/Raids (Future) */}
-                    <div className="bg-[#0a1120] border border-blue-900/30 rounded-lg p-6 opacity-70">
-                        <h3 className="text-lg font-bold font-rajdhani text-white mb-2">GUILD RAIDS</h3>
-                        <p className="text-sm text-gray-500">No active raids available.</p>
+                    {/* Guild Stats */}
+                    <div className="bg-[#0a1120] border border-system-blue/30 rounded-xl p-6">
+                        <h3 className="text-sm font-bold font-rajdhani text-white mb-3 tracking-wider">GUILD INFO</h3>
+                        <div className="space-y-3 text-sm">
+                            <div className="flex justify-between">
+                                <span className="text-gray-500 font-mono text-xs">Created</span>
+                                <span className="text-gray-300">{new Date(guild.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500 font-mono text-xs">Members</span>
+                                <span className="text-gray-300">{guild.members.length} / {guild.capacity}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500 font-mono text-xs">Total XP</span>
+                                <span className="text-system-blue font-mono">{guild.xp.toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500 font-mono text-xs">Access</span>
+                                <span className={guild.isPrivate ? 'text-system-gold' : 'text-system-green'}>{guild.isPrivate ? '🔒 Private' : '🌐 Public'}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            {/* Confirm Modal */}
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal({ isOpen: false, type: 'leave' })}
+                onConfirm={handleConfirm}
+                title={
+                    confirmModal.type === 'kick' ? `Remove ${confirmModal.targetName}?`
+                        : confirmModal.type === 'delete' ? 'Disband Guild?'
+                            : 'Leave Guild?'
+                }
+                message={
+                    confirmModal.type === 'kick' ? `${confirmModal.targetName} will be removed from the guild immediately.`
+                        : confirmModal.type === 'delete' ? 'This will permanently disband the guild and remove all members. This action cannot be undone.'
+                            : isLeader ? 'As the leader, leaving will transfer leadership to the oldest member. If you are the only member, the guild will be disbanded.'
+                                : 'Are you sure you want to leave this guild?'
+                }
+                confirmText={
+                    confirmModal.type === 'kick' ? 'Remove'
+                        : confirmModal.type === 'delete' ? 'Disband'
+                            : 'Leave'
+                }
+                isDestructive={true}
+            />
         </div>
     );
 }

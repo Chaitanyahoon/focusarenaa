@@ -32,43 +32,63 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<ShopItem>().HasData(
             new ShopItem 
             { 
-                Id = 1, 
-                Name = "Health Potion", 
-                Description = "Restores 50% HP. Essential for survival.", 
-                Price = 100, 
-                Type = "Consumable", 
-                EffectData = "{\"effect\":\"restore_hp\",\"value\":50}",
-                ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=potion1"
-            },
-            new ShopItem 
-            { 
-                Id = 2, 
-                Name = "Mana Crystal", 
-                Description = "Restores 50% MP. Boosts mental clarity.", 
-                Price = 100, 
-                Type = "Consumable", 
-                EffectData = "{\"effect\":\"restore_mp\",\"value\":50}",
-                ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=crystal1"
-            },
-            new ShopItem 
-            { 
-                Id = 3, 
-                Name = "Streak Repair", 
-                Description = "Restores your streak if you missed a day.", 
+                Id = 5, 
+                Name = "Shadow Extract", 
+                Description = "A mysterious box containing random rewards (Gold, Items, or Jackpot).", 
                 Price = 500, 
                 Type = "Consumable", 
-                EffectData = "{\"effect\":\"repair_streak\",\"value\":1}",
-                ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=repair"
+                EffectData = "{\"effect\":\"random_reward\",\"pool\":\"standard\"}",
+                ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=box"
             },
             new ShopItem 
             { 
-                Id = 4, 
-                Name = "XP Boost (1hr)", 
-                Description = "Doubles XP gain for 1 hour.", 
-                Price = 300, 
-                Type = "Consumable", 
-                EffectData = "{\"effect\":\"xp_boost\",\"duration\":3600,\"multiplier\":2}",
-                ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=xp"
+                Id = 6, 
+                Name = "Guild Charter", 
+                Description = "Official license required to establish a new Guild.", 
+                Price = 5000, 
+                Type = "KeyItem", 
+                EffectData = "{\"effect\":\"unlock_feature\",\"feature\":\"create_guild\"}",
+                ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=charter"
+            },
+            new ShopItem 
+            { 
+                Id = 7, 
+                Name = "Blood Red Crystal", 
+                Description = "Unlock the Blood Red system theme. Paint your interface in crimson.", 
+                Price = 1000, 
+                Type = "Theme", 
+                EffectData = "{\"effect\":\"unlock_theme\",\"theme\":\"red\"}",
+                ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=red"
+            },
+            new ShopItem 
+            { 
+                Id = 8, 
+                Name = "Void Purple Crystal", 
+                Description = "Unlock the Void Purple system theme. Embrace the darkness.", 
+                Price = 1500, 
+                Type = "Theme", 
+                EffectData = "{\"effect\":\"unlock_theme\",\"theme\":\"purple\"}",
+                ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=purple"
+            },
+            new ShopItem 
+            { 
+                Id = 9, 
+                Name = "Royal Gold Crystal", 
+                Description = "Unlock the Royal Gold system theme. A king's interface.", 
+                Price = 2000, 
+                Type = "Theme", 
+                EffectData = "{\"effect\":\"unlock_theme\",\"theme\":\"gold\"}",
+                ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=gold"
+            },
+            new ShopItem 
+            { 
+                Id = 10, 
+                Name = "Necromancer Green Crystal", 
+                Description = "Unlock the Necromancer Green theme. Toxic power awaits.", 
+                Price = 2500, 
+                Type = "Theme", 
+                EffectData = "{\"effect\":\"unlock_theme\",\"theme\":\"green\"}",
+                ImageUrl = "https://api.dicebear.com/9.x/glass/svg?seed=green"
             }
         );
 

@@ -29,6 +29,7 @@ export interface AuthResponse {
     userId: number
     xp: number
     level: number
+    guildId?: number
 }
 
 export interface LoginDto {
@@ -118,6 +119,7 @@ export interface UserProfile {
     totalTasksCompleted: number
     badgesEarned: number
     gold: number
+    theme?: string
     guildId?: number
 }
 

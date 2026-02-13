@@ -36,8 +36,12 @@ export default function GuildChat({ guildId }: Props) {
     useEffect(() => {
         if (!token || !guildId) return;
 
+        const hubUrl = import.meta.env.VITE_API_URL
+            ? `${import.meta.env.VITE_API_URL}/gamehub`
+            : '/gamehub'
+
         const newConnection = new HubConnectionBuilder()
-            .withUrl('http://localhost:5134/gamehub', {
+            .withUrl(hubUrl, {
                 accessTokenFactory: () => token
             })
             .configureLogging(LogLevel.Information)
@@ -57,14 +61,14 @@ export default function GuildChat({ guildId }: Props) {
         if (connection) {
             connection.start()
                 .then(() => {
-                    console.log('Connected to Guild Chat');
+                    // Connected to Guild Chat
                     connection.invoke('JoinGuildGroup', guildId);
 
                     connection.on('ReceiveGuildMessage', (msg: any) => {
                         setMessages(prev => [...prev, { ...msg, id: Date.now().toString() + Math.random() }]);
                     });
                 })
-                .catch(e => console.log('Connection failed: ', e));
+                .catch(() => { /* Connection failed, will retry */ });
         }
     }, [connection, guildId]);
 

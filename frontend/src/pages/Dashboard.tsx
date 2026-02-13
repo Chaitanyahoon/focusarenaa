@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuthStore } from '../stores/authStore'
 import { profileAPI } from '../services/api'
+import { shopService } from '../services/shop'
 import toast from 'react-hot-toast'
 import DailyQuestWidget from '../components/dashboard/DailyQuestWidget';
 import DailyQuestModal from '../components/dashboard/DailyQuestModal';
@@ -18,8 +19,44 @@ const DEFAULT_AVATARS = [
 export default function Dashboard() {
     const { user, setUser } = useAuthStore()
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
+    const [isThemeModalOpen, setIsThemeModalOpen] = useState(false)
     const [avatarUrlInput, setAvatarUrlInput] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+    const [ownedThemes, setOwnedThemes] = useState<string[]>(['blue'])
+
+    // Theme Presets (Stored in User Profile)
+    const [themeColor, setThemeColor] = useState('blue')
+
+    // Sync local state with user profile on load
+    useEffect(() => {
+        if (user?.theme) {
+            setThemeColor(user.theme)
+        }
+    }, [user?.theme])
+
+    // Fetch owned themes when modal opens
+    useEffect(() => {
+        if (isThemeModalOpen) {
+            shopService.getOwnedThemes().then(setOwnedThemes).catch(() => setOwnedThemes(['blue']))
+        }
+    }, [isThemeModalOpen])
+
+    const handleThemeUpdate = async (color: string) => {
+        if (!user) return
+        if (color !== 'blue' && !ownedThemes.includes(color)) {
+            toast.error('Purchase this theme from the Shop first!')
+            return
+        }
+        setThemeColor(color)
+        try {
+            await profileAPI.update({ theme: color })
+            setUser({ ...user, theme: color })
+            toast.success('System: Theme Color Re-calibrated')
+        } catch (error: any) {
+            setThemeColor(user.theme || 'blue')
+            toast.error(error.response?.data?.message || 'System Error: Theme Update Failed')
+        }
+    }
 
     const handleAvatarUpdate = async (url: string) => {
         if (!user) return
@@ -89,9 +126,9 @@ export default function Dashboard() {
                 {/* LEFT COLUMN: CHARACTER & BASICS */}
                 <div className="md:col-span-5 p-8 border-b md:border-b-0 md:border-r border-blue-500/20 flex flex-col items-center text-center relative bg-gradient-to-b from-blue-900/10 to-transparent">
 
-                    {/* Avatar Section - Hexagon Style or Glowing Circle */}
+                    {/* Avatar Section - Holofoil Upgrade */}
                     <div
-                        className="w-48 h-48 bg-black/60 border-2 border-blue-500/50 rounded-full mb-6 relative overflow-hidden shadow-[0_0_30px_rgba(0,234,255,0.2)] group cursor-pointer transition-all hover:border-blue-400 hover:shadow-[0_0_50px_rgba(0,234,255,0.4)]"
+                        className="w-48 h-48 rounded-full mb-6 relative group cursor-pointer transition-all holofoil-border avatar-s-rank"
                         onClick={() => setIsAvatarModalOpen(true)}
                     >
                         {user.avatarUrl ? (
@@ -110,9 +147,12 @@ export default function Dashboard() {
                         {user.name}
                     </h2>
                     <div className="flex items-center gap-3 mb-8">
-                        <span className="px-3 py-1 bg-blue-500/10 border border-blue-500/40 text-blue-400 text-sm font-bold tracking-wider shadow-[0_0_10px_rgba(59,130,246,0.2)]">
-                            PLAYER
-                        </span>
+                        <button
+                            onClick={() => setIsThemeModalOpen(true)}
+                            className="px-3 py-1 bg-blue-500/10 border border-blue-500/40 text-blue-400 text-sm font-bold tracking-wider shadow-[0_0_10px_rgba(59,130,246,0.2)] hover:bg-blue-500/30 transition-all"
+                        >
+                            CUSTOMIZE
+                        </button>
                         <span className="text-gray-400 text-sm tracking-widest uppercase font-mono">
                             {user.level < 10 ? 'E-RANK HUNTER' : 'SHADOW MONARCH'}
                         </span>
@@ -295,6 +335,53 @@ export default function Dashboard() {
             )}
 
             <DailyQuestModal />
+
+            {/* THEME MODAL */}
+            {isThemeModalOpen && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+                    <div className="glass-panel-heavy w-full max-w-md p-6 animate-in zoom-in-95 duration-300">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-display font-bold text-white tracking-widest">SYSTEM THEME</h2>
+                            <button onClick={() => setIsThemeModalOpen(false)} className="text-gray-500 hover:text-white">[X]</button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            {[
+                                { id: 'blue', name: 'SHADOW BLUE', price: 0, activeClass: 'border-blue-400 bg-blue-500/20 text-blue-300', ownedClass: 'border-blue-500/50 bg-blue-900/20 hover:bg-blue-500/20 text-blue-300' },
+                                { id: 'red', name: 'BLOOD RED', price: 1000, activeClass: 'border-red-400 bg-red-500/20 text-red-300', ownedClass: 'border-red-500/50 bg-red-900/20 hover:bg-red-500/20 text-red-300' },
+                                { id: 'purple', name: 'VOID PURPLE', price: 1500, activeClass: 'border-purple-400 bg-purple-500/20 text-purple-300', ownedClass: 'border-purple-500/50 bg-purple-900/20 hover:bg-purple-500/20 text-purple-300' },
+                                { id: 'gold', name: 'ROYAL GOLD', price: 2000, activeClass: 'border-yellow-400 bg-yellow-500/20 text-yellow-300', ownedClass: 'border-yellow-500/50 bg-yellow-900/20 hover:bg-yellow-500/20 text-yellow-300' },
+                                { id: 'green', name: 'NECRO GREEN', price: 2500, activeClass: 'border-emerald-400 bg-emerald-500/20 text-emerald-300', ownedClass: 'border-emerald-500/50 bg-emerald-900/20 hover:bg-emerald-500/20 text-emerald-300' },
+                            ].map((t) => {
+                                const isOwned = ownedThemes.includes(t.id)
+                                const isActive = themeColor === t.id
+                                return (
+                                    <button
+                                        key={t.id}
+                                        onClick={() => handleThemeUpdate(t.id)}
+                                        className={`p-4 border relative transition-all font-mono tracking-widest ${isActive
+                                            ? t.activeClass
+                                            : isOwned
+                                                ? t.ownedClass
+                                                : 'border-gray-700 bg-gray-900/40 text-gray-600 cursor-not-allowed'
+                                            }`}
+                                    >
+                                        {t.name}
+                                        {!isOwned && (
+                                            <span className="block text-[10px] mt-1 text-gray-600">🔒 {t.price}G</span>
+                                        )}
+                                        {isActive && (
+                                            <span className="absolute top-1 right-1 text-[8px] text-green-400">●</span>
+                                        )}
+                                    </button>
+                                )
+                            })}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-4 text-center font-mono">
+                            Purchase theme crystals from the Shop to unlock new themes.
+                        </p>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

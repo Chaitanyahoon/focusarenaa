@@ -1,22 +1,43 @@
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { gateAPI, Gate, GateRank, GateStatus } from '../services/gate';
 import { toast } from 'react-hot-toast';
-import { ArrowLeftIcon, CheckCircleIcon, ExclamationTriangleIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, ExclamationTriangleIcon, PlusIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import { Dialog, Transition } from '@headlessui/react';
 import { useForm } from 'react-hook-form';
 import { TaskDifficulty, TaskCategory } from '../types';
 import { taskAPI } from '../services/api';
 import ConfirmModal from '../components/ConfirmModal';
 import { useAuthStore } from '../stores/authStore';
+import BossHpBar from '../components/raid/BossHpBar';
 
-// Reusing Task creation logic, simplified for Raid
 interface CreateTaskDto {
     title: string;
     description?: string;
     difficulty: TaskDifficulty;
     category: TaskCategory;
 }
+
+// Different DiceBear styles for each rank to give variety
+const BOSS_AVATAR_STYLES = [
+    'bottts-neutral',  // E - Simple robot
+    'bottts',          // D - More detailed robot
+    'shapes',          // C - Abstract shapes
+    'identicon',       // B - Geometric patterns
+    'rings',           // A - Ring patterns
+    'glass',           // S - Glass avatars
+];
+
+const RANK_ATMOSPHERE: Record<number, { bg: string; particle: string; aura: string; label: string }> = {
+    0: { bg: 'from-gray-900/50 to-gray-950', particle: 'bg-gray-500', aura: 'shadow-[0_0_60px_rgba(156,163,175,0.15)]', label: 'E-RANK DUNGEON' },
+    1: { bg: 'from-green-950/40 to-gray-950', particle: 'bg-green-500', aura: 'shadow-[0_0_60px_rgba(74,222,128,0.15)]', label: 'D-RANK DUNGEON' },
+    2: { bg: 'from-blue-950/40 to-gray-950', particle: 'bg-blue-500', aura: 'shadow-[0_0_80px_rgba(96,165,250,0.2)]', label: 'C-RANK DUNGEON' },
+    3: { bg: 'from-purple-950/40 to-gray-950', particle: 'bg-purple-500', aura: 'shadow-[0_0_80px_rgba(192,132,252,0.25)]', label: 'B-RANK DUNGEON' },
+    4: { bg: 'from-red-950/40 to-gray-950', particle: 'bg-red-500', aura: 'shadow-[0_0_100px_rgba(248,113,113,0.3)]', label: 'A-RANK DUNGEON' },
+    5: { bg: 'from-yellow-950/40 to-amber-950/30', particle: 'bg-yellow-500', aura: 'shadow-[0_0_120px_rgba(250,204,21,0.35)]', label: 'S-RANK DUNGEON' },
+};
+
+const RANK_TEXT_COLORS = ['text-gray-400', 'text-green-400', 'text-blue-400', 'text-purple-400', 'text-red-400', 'text-yellow-400'];
 
 export default function RaidPage() {
     const { id } = useParams<{ id: string }>();
@@ -33,8 +54,7 @@ export default function RaidPage() {
         try {
             const data = await gateAPI.getGate(Number(id));
             setGate(data);
-        } catch (error) {
-            console.error(error);
+        } catch {
             toast.error("Failed to load Dungeon data.");
             navigate('/gates');
         } finally {
@@ -50,14 +70,12 @@ export default function RaidPage() {
         try {
             await taskAPI.complete(taskId);
             toast.success("Monster defeated!", { icon: '⚔️' });
-            loadGate(); // Refresh to check progress
+            loadGate();
 
-            // Check if all done
             if (gate && gate.tasks.every(t => t.id === taskId || t.status === 2)) {
-                // Trigger completion check or celebration
                 toast.success("DUNGEON CLEARED!", { duration: 5000, icon: '🏆' });
             }
-        } catch (error) {
+        } catch {
             toast.error("Attack failed.");
         }
     };
@@ -66,10 +84,10 @@ export default function RaidPage() {
         if (!gate) return;
         try {
             await gateAPI.claimRewards(gate.id);
-            toast.success(`Rewards Claimed: ${gate.xpReward} XP, ${gate.goldReward} Gold!`);
+            toast.success(`Rewards Claimed: ${gate.xpReward} XP, ${gate.goldReward} Gold!`, { icon: '💰' });
             await fetchProfile();
             loadGate();
-        } catch (error) {
+        } catch {
             toast.error("Failed to claim rewards.");
         }
     };
@@ -84,152 +102,258 @@ export default function RaidPage() {
             await taskAPI.delete(confirmModal.taskId);
             toast.success("Quest abandoned.");
             loadGate();
-        } catch (error) {
+        } catch {
             toast.error("Failed to abandon quest.");
         }
     };
 
-    if (isLoading) return <div className="p-8 text-blue-400 animate-pulse">Scanning dungeon structure...</div>;
-    if (!gate) return <div className="p-8 text-red-500">Dungeon collapsed.</div>;
+    if (isLoading) return (
+        <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+                <div className="w-12 h-12 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-blue-400 font-mono text-sm animate-pulse">Scanning dungeon structure...</p>
+            </div>
+        </div>
+    );
 
-    const progress = gate.tasks.length > 0
-        ? (gate.tasks.filter(t => t.status === 2).length / gate.tasks.length) * 100
-        : 0;
+    if (!gate) return (
+        <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+                <p className="text-red-500 font-rajdhani text-xl mb-2">⚠ DUNGEON COLLAPSED</p>
+                <button onClick={() => navigate('/gates')} className="text-blue-400 hover:text-blue-300 font-mono text-sm">
+                    ← Return to Gate Selection
+                </button>
+            </div>
+        </div>
+    );
 
     const isCleared = gate.status === GateStatus.Cleared;
     const isAllDone = gate.tasks.length > 0 && gate.tasks.every(t => t.status === 2);
+    const totalXp = gate.tasks.reduce((sum, t) => sum + t.xpReward, 0);
+    const completedXp = gate.tasks.filter(t => t.status === 2).reduce((sum, t) => sum + t.xpReward, 0);
+    const bossCurrentHp = Math.max(0, totalXp - completedXp);
+    const bossMaxHp = totalXp > 0 ? totalXp : 1000;
+    const completedTasks = gate.tasks.filter(t => t.status === 2).length;
+    const totalTasks = gate.tasks.length;
+
+    const atmosphere = RANK_ATMOSPHERE[gate.rank] || RANK_ATMOSPHERE[0];
+    const avatarStyle = BOSS_AVATAR_STYLES[gate.rank] || BOSS_AVATAR_STYLES[0];
+    const bossAvatarUrl = `https://api.dicebear.com/9.x/${avatarStyle}/svg?seed=${gate.bossName || gate.title}&scale=80`;
+    const rankTextColor = RANK_TEXT_COLORS[gate.rank] || RANK_TEXT_COLORS[0];
 
     return (
         <div className="p-6 h-full overflow-y-auto custom-scrollbar relative">
-            {/* Header */}
-            <button onClick={() => navigate('/gates')} className="flex items-center text-gray-400 hover:text-white mb-6 transition-colors">
-                <ArrowLeftIcon className="w-5 h-5 mr-1" />
+            {/* Retreat Button */}
+            <button
+                onClick={() => navigate('/gates')}
+                className="flex items-center text-gray-500 hover:text-white mb-4 transition-colors text-sm font-mono group"
+            >
+                <ArrowLeftIcon className="w-4 h-4 mr-1.5 group-hover:-translate-x-1 transition-transform" />
                 RETREAT
             </button>
 
-            <div className="flex justify-between items-start mb-8 border-b border-blue-900/30 pb-6">
+            {/* Gate Title Header */}
+            <div className="flex justify-between items-start mb-6">
                 <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <span className={`px-2 py-0.5 rounded text-sm font-bold bg-black/50 border ${getRankColor(gate.rank)}`}>
-                            {GateRank[gate.rank]}-RANK
-                        </span>
-                        <h1 className="text-3xl font-bold font-rajdhani text-white tracking-wide">
-                            {gate.title}
-                        </h1>
+                    <div className={`text-[10px] font-mono ${rankTextColor} tracking-[0.3em] mb-1`}>
+                        {atmosphere.label}
                     </div>
-                    <p className="text-gray-400 max-w-2xl">{gate.description}</p>
+                    <h1 className="text-3xl font-black font-rajdhani text-white tracking-wide">{gate.title}</h1>
+                    {gate.description && <p className="text-gray-500 text-sm mt-1 max-w-md">{gate.description}</p>}
                 </div>
-
-                <div className="text-right">
-                    <div className="text-sm text-gray-500 mb-1">REWARDS</div>
-                    <div className="text-blue-400 font-mono font-bold">{gate.xpReward} XP</div>
-                    <div className="text-yellow-400 font-mono font-bold">{gate.goldReward} GOLD</div>
+                <div className="text-right bg-black/30 rounded-lg border border-gray-800/50 p-3">
+                    <div className="text-[10px] text-gray-500 font-mono mb-1">BOUNTY</div>
+                    <div className="text-cyan-400 font-black font-rajdhani text-lg">{gate.xpReward.toLocaleString()} XP</div>
+                    <div className="text-yellow-400 font-bold font-rajdhani">{gate.goldReward.toLocaleString()} G</div>
                 </div>
             </div>
 
-            {/* Raid Progress */}
-            <div className="mb-8 bg-[#0a1120] p-4 rounded-lg border border-blue-900/30">
-                <div className="flex justify-between text-sm mb-2 text-gray-400 font-mono">
-                    <span>DUNGEON CLEAR PROGRESS</span>
-                    <span>{Math.round(progress)}%</span>
-                </div>
-                <div className="h-4 bg-gray-900 rounded-full overflow-hidden relative">
-                    <div
-                        className="h-full bg-gradient-to-r from-blue-600 to-purple-500 transition-all duration-1000 ease-out relative"
-                        style={{ width: `${progress}%` }}
-                    >
-                        <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
-                    </div>
-                </div>
+            <div className="flex flex-col lg:flex-row gap-6">
+                {/* Left Column: Boss Arena */}
+                <div className="lg:w-2/5 flex flex-col gap-4">
+                    {/* Boss Card */}
+                    <div className={`bg-gradient-to-b ${atmosphere.bg} rounded-xl border border-blue-900/20 p-6 relative overflow-hidden ${atmosphere.aura}`}>
+                        {/* Atmospheric particles */}
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            {[...Array(6)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className={`absolute w-1 h-1 rounded-full ${atmosphere.particle} opacity-20`}
+                                    style={{
+                                        left: `${15 + i * 15}%`,
+                                        top: `${20 + (i % 3) * 25}%`,
+                                        animation: `float ${3 + i * 0.5}s ease-in-out infinite ${i * 0.3}s`,
+                                    }}
+                                />
+                            ))}
+                        </div>
 
-                {isAllDone && !isCleared && (
-                    <div className="mt-4 flex justify-center">
-                        <button
-                            onClick={handleClaimRewards}
-                            className="px-8 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded shadow-[0_0_20px_rgba(234,179,8,0.4)] animate-pulse transition-all"
-                        >
-                            CLAIM CLEAR REWARDS
-                        </button>
-                    </div>
-                )}
-                {isCleared && (
-                    <div className="mt-4 text-center text-green-400 font-bold font-rajdhani text-xl flex items-center justify-center gap-2">
-                        <CheckCircleIcon className="w-6 h-6" />
-                        DUNGEON CLEARED
-                    </div>
-                )}
-            </div>
-
-            {/* Tasks (Monsters) */}
-            <div className="space-y-4">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold font-rajdhani text-white">ENCOUNTERS</h2>
-                    {!isCleared && (
-                        <button
-                            onClick={() => setIsAddTaskOpen(true)}
-                            className="px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 rounded text-sm flex items-center gap-1 transition-all"
-                        >
-                            <PlusIcon className="w-4 h-4" />
-                            ADD TASK
-                        </button>
-                    )}
-                </div>
-
-                {gate.tasks.length === 0 ? (
-                    <div className="text-center py-10 text-gray-500 border border-dashed border-gray-800 rounded">
-                        No monsters detected. Add tasks to populate the dungeon.
-                    </div>
-                ) : (
-                    gate.tasks.map(task => (
-                        <div
-                            key={task.taskId || task.id}
-                            className={`p-4 rounded-lg border transition-all flex items-center gap-4 ${task.status === 2
-                                ? 'bg-gray-900/50 border-gray-800 opacity-50'
-                                : 'bg-[#0a1120] border-blue-900/30 hover:border-blue-500/50'
-                                }`}
-                        >
-                            <button
-                                onClick={() => task.status !== 2 && handleTaskComplete(task.taskId || task.id)}
-                                disabled={task.status === 2 || isCleared}
-                                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${task.status === 2
-                                    ? 'bg-green-500/20 border-green-500 text-green-500'
-                                    : 'border-gray-500 hover:border-blue-500 text-transparent hover:text-blue-500'
-                                    }`}
-                            >
-                                <CheckCircleIcon className="w-4 h-4" />
-                            </button>
-
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2">
-                                    <h3 className={`font-semibold ${task.status === 2 ? 'text-gray-500 line-through' : 'text-white'}`}>
-                                        {task.title}
-                                    </h3>
-                                    {!isCleared && (
-                                        <button
-                                            onClick={() => handleDeleteTask(task.taskId || task.id)}
-                                            className="p-1 text-gray-600 hover:text-red-400 transition-colors"
-                                            title="Abandon Quest"
-                                        >
-                                            <ExclamationTriangleIcon className="w-4 h-4" />
-                                        </button>
-                                    )}
-                                </div>
-                                {task.description && (
-                                    <p className="text-sm text-gray-500">{task.description}</p>
-                                )}
-                            </div>
-
-                            <div className="flex items-center gap-4">
-                                <span className={`text-xs px-2 py-0.5 rounded border ${getContentColor(task.difficulty)}`}>
-                                    {TaskDifficulty[task.difficulty]}
-                                </span>
-                                <span className="text-xs text-blue-400 font-mono">+{task.xpReward} XP</span>
+                        {/* Boss Sprite */}
+                        <div className={`flex justify-center mb-6 relative ${isCleared ? 'opacity-20 grayscale blur-sm' : ''} transition-all duration-1000`}>
+                            <div className="relative">
+                                {/* Aura glow behind boss */}
+                                <div className={`absolute inset-0 rounded-full blur-3xl ${atmosphere.particle} opacity-10 scale-150`} />
+                                <img
+                                    src={bossAvatarUrl}
+                                    alt={gate.bossName || "Boss"}
+                                    className="w-44 h-44 object-contain relative z-10 drop-shadow-2xl"
+                                    style={{ filter: isCleared ? '' : `drop-shadow(0 0 30px ${RANK_ATMOSPHERE[gate.rank]?.particle === 'bg-yellow-500' ? 'rgba(250,204,21,0.3)' : 'rgba(248,113,113,0.2)'})` }}
+                                />
                             </div>
                         </div>
-                    ))
-                )}
+
+                        {/* Boss HP Bar */}
+                        <BossHpBar
+                            currentHp={bossCurrentHp}
+                            maxHp={bossMaxHp}
+                            bossName={gate.bossName || "Unknown Entity"}
+                            rank={gate.rank}
+                        />
+
+                        {/* Cleared Overlay */}
+                        {isCleared && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/70 z-20 rounded-xl">
+                                <div className="text-center">
+                                    <SparklesIcon className="w-10 h-10 text-yellow-500 mx-auto mb-3 animate-bounce" />
+                                    <h2 className="text-3xl font-black text-yellow-500 font-rajdhani tracking-wider mb-1">CLEARED</h2>
+                                    <p className="text-gray-400 text-xs font-mono">All threats neutralized</p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Progress Stats */}
+                    <div className="grid grid-cols-3 gap-3">
+                        <div className="bg-black/30 rounded-lg border border-gray-800/30 p-3 text-center">
+                            <div className="text-[10px] text-gray-500 font-mono mb-1">TASKS</div>
+                            <div className="text-white font-black font-rajdhani text-lg">{completedTasks}/{totalTasks}</div>
+                        </div>
+                        <div className="bg-black/30 rounded-lg border border-gray-800/30 p-3 text-center">
+                            <div className="text-[10px] text-gray-500 font-mono mb-1">DMG DEALT</div>
+                            <div className="text-red-400 font-black font-rajdhani text-lg">{completedXp.toLocaleString()}</div>
+                        </div>
+                        <div className="bg-black/30 rounded-lg border border-gray-800/30 p-3 text-center">
+                            <div className="text-[10px] text-gray-500 font-mono mb-1">PROGRESS</div>
+                            <div className={`font-black font-rajdhani text-lg ${totalTasks > 0 ? (completedTasks === totalTasks ? 'text-green-400' : 'text-blue-400') : 'text-gray-500'}`}>
+                                {totalTasks > 0 ? `${Math.round((completedTasks / totalTasks) * 100)}%` : '—'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Column: Task Battle Log */}
+                <div className="lg:w-3/5 flex flex-col">
+                    {/* Battle Log Header */}
+                    <div className="flex justify-between items-center mb-4">
+                        <div>
+                            <h3 className="font-bold text-white font-rajdhani text-lg tracking-wider">BATTLE LOG</h3>
+                            <p className="text-[10px] text-gray-500 font-mono">Complete tasks to damage the boss</p>
+                        </div>
+                        {!isCleared && (
+                            <button
+                                onClick={() => setIsAddTaskOpen(true)}
+                                className="px-4 py-2.5 bg-gradient-to-r from-red-600/20 to-red-800/20 hover:from-red-600/30 hover:to-red-800/30 text-red-400 border border-red-500/30 rounded-lg text-xs flex items-center gap-2 transition-all font-bold tracking-wider"
+                            >
+                                <PlusIcon className="w-4 h-4" />
+                                ADD TASK
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Task List */}
+                    <div className="flex-1 space-y-2.5 overflow-y-auto pr-1 custom-scrollbar">
+                        {gate.tasks.length === 0 ? (
+                            <div className="text-center py-16 border border-dashed border-gray-800/50 rounded-xl text-gray-600 bg-black/20">
+                                <div className="text-3xl mb-3">👻</div>
+                                <p className="font-rajdhani text-lg">No Encounters</p>
+                                <p className="text-xs font-mono mt-1">Add tasks to begin the battle</p>
+                            </div>
+                        ) : (
+                            gate.tasks.map((task, index) => {
+                                const isDone = task.status === 2;
+                                return (
+                                    <div
+                                        key={task.id}
+                                        className={`p-4 rounded-xl border transition-all relative overflow-hidden group ${isDone
+                                                ? 'bg-gray-900/20 border-gray-800/30 opacity-60'
+                                                : 'bg-[#0a1120] border-gray-800/40 hover:border-blue-500/30 hover:bg-blue-950/10'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            {/* Action Button */}
+                                            <button
+                                                onClick={() => !isDone && handleTaskComplete(task.id)}
+                                                disabled={isDone || isCleared}
+                                                className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center transition-all flex-shrink-0 ${isDone
+                                                        ? 'bg-green-500/10 border-green-500/40 text-green-500'
+                                                        : 'border-red-500/30 hover:bg-red-500 hover:border-red-500 text-red-500/60 hover:text-white'
+                                                    }`}
+                                            >
+                                                {isDone ? (
+                                                    <span className="text-sm">✓</span>
+                                                ) : (
+                                                    <span className="text-[10px] font-black font-mono">ATK</span>
+                                                )}
+                                            </button>
+
+                                            {/* Task Info */}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex justify-between items-center gap-3">
+                                                    <h4 className={`font-bold font-rajdhani truncate ${isDone ? 'text-gray-500 line-through' : 'text-white'}`}>
+                                                        {task.title}
+                                                    </h4>
+                                                    <span className={`text-[10px] font-mono flex-shrink-0 px-2 py-0.5 rounded ${isDone ? 'text-gray-600 bg-gray-800/30' : 'text-red-400 bg-red-500/10'}`}>
+                                                        {task.xpReward} DMG
+                                                    </span>
+                                                </div>
+                                                {task.description && (
+                                                    <p className="text-xs text-gray-500 mt-0.5 truncate">{task.description}</p>
+                                                )}
+                                            </div>
+
+                                            {/* Delete */}
+                                            {!isCleared && !isDone && (
+                                                <button
+                                                    onClick={() => handleDeleteTask(task.id)}
+                                                    className="opacity-0 group-hover:opacity-100 p-1.5 text-gray-600 hover:text-red-400 transition-all flex-shrink-0"
+                                                >
+                                                    <ExclamationTriangleIcon className="w-4 h-4" />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        )}
+                    </div>
+
+                    {/* Claim Button */}
+                    {isAllDone && !isCleared && (
+                        <div className="mt-4 pt-4 border-t border-gray-800/30">
+                            <button
+                                onClick={handleClaimRewards}
+                                className="w-full py-4 bg-gradient-to-r from-yellow-600 via-yellow-500 to-amber-500 hover:from-yellow-500 hover:via-yellow-400 hover:to-amber-400 text-black font-black text-lg rounded-xl shadow-[0_0_30px_rgba(234,179,8,0.3)] hover:shadow-[0_0_40px_rgba(234,179,8,0.5)] uppercase tracking-[0.2em] font-rajdhani transition-all relative overflow-hidden group"
+                            >
+                                <span className="relative z-10 flex items-center justify-center gap-2">
+                                    <SparklesIcon className="w-6 h-6" />
+                                    CLAIM REWARDS
+                                </span>
+                                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
 
+            {/* Floating particles CSS */}
+            <style>{`
+                @keyframes float {
+                    0%, 100% { transform: translateY(0) scale(1); opacity: 0.2; }
+                    50% { transform: translateY(-20px) scale(1.5); opacity: 0.4; }
+                }
+            `}</style>
+
+            {/* Modals */}
             <AddTaskModal
                 isOpen={isAddTaskOpen}
                 onClose={() => setIsAddTaskOpen(false)}
@@ -242,7 +366,7 @@ export default function RaidPage() {
                 onClose={() => setConfirmModal({ isOpen: false, taskId: null })}
                 onConfirm={confirmAbandon}
                 title="Abandon Quest"
-                message="Are you sure you want to give up on this task? This action cannot be undone."
+                message="Are you sure? Abandoning will heal the boss."
                 confirmText="Abandon"
                 isDestructive={true}
             />
@@ -250,28 +374,7 @@ export default function RaidPage() {
     );
 }
 
-// Helper Functions & Sub-components
-function getRankColor(rank: GateRank) {
-    switch (rank) {
-        case GateRank.E: return "text-gray-400 border-gray-400";
-        case GateRank.D: return "text-green-400 border-green-400";
-        case GateRank.C: return "text-blue-400 border-blue-400";
-        case GateRank.B: return "text-purple-400 border-purple-400";
-        case GateRank.A: return "text-red-400 border-red-400";
-        case GateRank.S: return "text-yellow-400 border-yellow-400";
-        default: return "text-gray-400";
-    }
-}
-
-function getContentColor(diff: number) {
-    // reusing from previously known logic or just simpler logic
-    if (diff === 0) return "text-green-400 border-green-500/30 bg-green-500/10";
-    if (diff === 1) return "text-blue-400 border-blue-500/30 bg-blue-500/10";
-    if (diff === 2) return "text-red-400 border-red-500/30 bg-red-500/10";
-    return "text-gray-400";
-}
-
-// Simple Add Task Modal specifically for Gate
+// --- Add Task Modal ---
 function AddTaskModal({ isOpen, onClose, gateId, onTaskAdded }: { isOpen: boolean, onClose: () => void, gateId: number, onTaskAdded: () => void }) {
     const { register, handleSubmit, reset } = useForm<CreateTaskDto>();
     const [isLoading, setIsLoading] = useState(false);
@@ -279,21 +382,16 @@ function AddTaskModal({ isOpen, onClose, gateId, onTaskAdded }: { isOpen: boolea
     const onSubmit = async (data: CreateTaskDto) => {
         setIsLoading(true);
         try {
-            // First create task
             const newTask = await taskAPI.create({
                 ...data,
                 dueDate: undefined
             });
-
-            // Then link to gate
             await gateAPI.addTaskToGate(gateId, newTask.id);
-
-            toast.success("Encounter added!");
+            toast.success("Encounter added!", { icon: '👾' });
             reset();
             onTaskAdded();
             onClose();
-        } catch (error) {
-            console.error(error);
+        } catch {
             toast.error("Failed to summon task.");
         } finally {
             setIsLoading(false);
@@ -312,33 +410,52 @@ function AddTaskModal({ isOpen, onClose, gateId, onTaskAdded }: { isOpen: boolea
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" />
+                    <div className="fixed inset-0 bg-black/85 backdrop-blur-sm" />
                 </Transition.Child>
 
                 <div className="fixed inset-0 overflow-y-auto">
                     <div className="flex min-h-full items-center justify-center p-4">
-                        <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-[#0a1120] border border-blue-500/30 p-6 shadow-xl transition-all">
-                            <h3 className="text-xl font-bold font-rajdhani text-white mb-4">ADD DUNGEON TASK</h3>
-                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                                <input {...register('title', { required: true })} placeholder="Task Name" className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white" />
-                                <div className="grid grid-cols-2 gap-4">
-                                    <select {...register('difficulty', { valueAsNumber: true })} className="bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white">
-                                        <option value={TaskDifficulty.Easy}>Easy</option>
-                                        <option value={TaskDifficulty.Medium}>Medium</option>
-                                        <option value={TaskDifficulty.Hard}>Hard</option>
-                                    </select>
-                                    <select {...register('category', { valueAsNumber: true })} className="bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white">
-                                        <option value={TaskCategory.Work}>Work</option>
-                                        <option value={TaskCategory.Personal}>Personal</option>
-                                        <option value={TaskCategory.Fitness}>Fitness</option>
-                                        {/* Simplified categories */}
-                                    </select>
-                                </div>
-                                <button type="submit" disabled={isLoading} className="w-full py-2 bg-blue-600 text-white rounded font-bold hover:bg-blue-500">
-                                    {isLoading ? 'Summoning...' : 'ADD'}
-                                </button>
-                            </form>
-                        </Dialog.Panel>
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0 scale-95"
+                            enterTo="opacity-100 scale-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100 scale-100"
+                            leaveTo="opacity-0 scale-95"
+                        >
+                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-gradient-to-b from-[#0c1527] to-[#060d1a] border border-blue-500/20 p-6 shadow-2xl transition-all">
+                                <h3 className="text-xl font-black font-rajdhani text-white mb-1 tracking-wider">ADD ENCOUNTER</h3>
+                                <p className="text-xs text-gray-500 font-mono mb-5">Each task deals damage to the boss</p>
+
+                                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                                    <input
+                                        {...register('title', { required: true })}
+                                        placeholder="Task Name"
+                                        className="w-full bg-black/40 border border-gray-700/50 rounded-lg px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/50 transition-all"
+                                    />
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <select {...register('difficulty', { valueAsNumber: true })} className="bg-black/40 border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500/50 transition-all">
+                                            <option value={TaskDifficulty.Easy}>⚡ Easy</option>
+                                            <option value={TaskDifficulty.Medium}>🔥 Medium</option>
+                                            <option value={TaskDifficulty.Hard}>💀 Hard</option>
+                                        </select>
+                                        <select {...register('category', { valueAsNumber: true })} className="bg-black/40 border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500/50 transition-all">
+                                            <option value={TaskCategory.Work}>💼 Work</option>
+                                            <option value={TaskCategory.Personal}>🏠 Personal</option>
+                                            <option value={TaskCategory.Fitness}>💪 Fitness</option>
+                                        </select>
+                                    </div>
+                                    <button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className="w-full py-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white rounded-lg font-bold tracking-wider transition-all disabled:opacity-50 shadow-lg shadow-red-900/30"
+                                    >
+                                        {isLoading ? 'Summoning...' : '⚔️ SUMMON ENCOUNTER'}
+                                    </button>
+                                </form>
+                            </Dialog.Panel>
+                        </Transition.Child>
                     </div>
                 </div>
             </Dialog>

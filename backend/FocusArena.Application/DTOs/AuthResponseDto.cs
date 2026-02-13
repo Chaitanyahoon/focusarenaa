@@ -8,4 +8,5 @@ public class AuthResponseDto
     public int UserId { get; set; }
     public int XP { get; set; }
     public int Level { get; set; }
+    public int? GuildId { get; set; }
 }

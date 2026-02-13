@@ -1,35 +1,38 @@
-# ⚔️ Focus Arena: Awaken Your Inner Hunter
-> *"I alone level up."* — **Turn your daily tasks into a Solo Leveling RPG experience.**
+# ⚔️ Focus Arena: S-Rank Productivity Platform
+> *"I alone level up."* — **Turn your daily work into a Massively Multiplayer RPG.**
 
-Focus Arena is a gamified productivity application inspired by "Solo Leveling". It turns your daily tasks into quests, awarding XP, badges, and ranks (E to S) as you complete them.
+**Focus Arena** is a full-stack gamified productivity application inspired by "Solo Leveling". It transforms mundane tasks into interactive Dungeon Raids, Guild Wars, and character progression, built with modern enterprise-grade architecture.
 
-## 🚀 Key Features
+![Project Status](https://img.shields.io/badge/Status-Completed-success) ![License](https://img.shields.io/badge/License-MIT-blue) ![Stack](https://img.shields.io/badge/Stack-React%20%7C%20.NET%208-purple)
 
-### 🎮 Gamification & Progression
-- **Rank System**: Level up from E-Rank to S-Rank Hunter based on XP.
-- **Quest System**: Create, manage, and complete tasks (Quests) to earn rewards.
-- **Badges**: Unlock 7 unique Solo Leveling themed badges (e.g., "Shadow Monarch", "Daily Quest Master").
-- **Streaks**: Maintain daily activity streaks to boost your stats.
-- **Leaderboards**: Compete globally or weekly with other hunters.
+## 🚀 Key Features (Implemented)
 
-### 📊 Analytics & Insights
-- **XP Growth Charts**: Track your progress over time.
-- **Category Distribution**: See where you focus your energy.
-- **Activity Heatmap**: Visual calendar of your daily productivity.
+### 👹 Dungeon Raids (Interactive Projects)
+- **Boss Battles**: Each project is a "Gate". Tasks are monsters. Completing them damages the Gate Boss (E-Rank to S-Rank).
+- **Raid Mechanics**: Live HP bars, enrage timers, and massive loot drops (XP/Gold) upon clearing gates.
+- **Visuals**: Dynamic boss sprites and attack animations.
 
-### ⚡ Real-Time & Social
-- **Live Updates**: Instant notifications for level-ups, badge unlocks, and leaderboard changes via SignalR.
-- **Social**: View other hunters' profiles and stats.
+### 🛡️ Guilds & Real-Time Social
+- **Guild System**: Form guilds, recruit members, and chat in real-time using **SignalR**.
+- **Leaderboards**: Compete globally or weekly. Updates instantly without page reloads.
+- **Shop & Economy**: Earn Gold from tasks. Buy potions, scrolls, and avatar frames in the System Shop.
+
+### 🎮 Gamification Engine
+- **RPG Progression**: Level up your Hunter. Increase stats (Strength, Intelligence, Agility).
+- **Streak System**: Maintain daily activity streaks to unlock "Shadow Army" badges.
+- **Recurring Quests**: Automated daily/weekly tasks that reset at midnight.
+
+### 💻 Modern Tech Stack
+- **Frontend**: React 18 (Vite), TypeScript, Tailwind CSS, Framer Motion, Headless UI.
+- **Backend**: ASP.NET Core 8 Web API, Entity Framework Core, Clean Architecture.
+- **Real-Time**: SignalR Hubs for Chat & Leaderboards.
+- **Database**: PostgreSQL / SQL Server.
+- **Auth**: JWT Authentication with Refresh Tokens & Email Password Reset.
 
 ---
 
-## 🛠️ Technology Stack
-
-- **Backend**: ASP.NET Core 8 Web API
-- **Database**: SQLite (Dev) / SQL Server (Prod) with Entity Framework Core
-- **Real-Time**: SignalR
-- **Security**: JWT Authentication, BCrypt Hashing
-- **Frontend** (Planned): React + TypeScript + Tailwind CSS
+## 📸 Screenshots
+*(Add your screenshots here)*
 
 ---
 
@@ -37,56 +40,43 @@ Focus Arena is a gamified productivity application inspired by "Solo Leveling". 
 
 ### Prerequisites
 - .NET 8.0 SDK
-- Node.js (for frontend)
+- Node.js & npm
+- PostgreSQL or SQL Server
 
-### Backend Setup
-1. Clone the repository:
+### Installation
+
+1. **Clone the Repository**
    ```bash
    git clone https://github.com/Chaitanyahoon/focusarenaa.git
-   cd focusarenaa
    ```
-2. Navigate to the backend directory (if applicable) and restore dependencies:
+
+2. **Backend Setup**
    ```bash
+   cd backend/FocusArena.API
    dotnet restore
-   ```
-3. Update the database:
-   ```bash
    dotnet ef database update
-   ```
-4. Run the API:
-   ```bash
    dotnet run
    ```
-   Server will start at `http://localhost:5134`.
+
+3. **Frontend Setup**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
 
 ---
 
-## 🔒 Environment Variables
-
-Create an `appsettings.json` or configure environment variables for production:
-
-| Variable | Description |
-|----------|-------------|
-| `ConnectionStrings__DefaultConnection` | Database connection string |
-| `JwtSettings__SecretKey` | Secret key for JWT signing (min 32 chars) |
-| `EmailSettings__ApiKey` | API Key for email service (e.g., SendGrid) |
-
----
-
-## 📚 API Documentation
-
-The API documentation is available via Swagger when running locally: `http://localhost:5134/swagger`
-
-**Core Endpoints:**
-- `POST /api/auth/register` - Create a new account
-- `GET /api/tasks` - List all quests
-- `PUT /api/tasks/{id}/complete` - Complete a quest
-- `GET /api/profile` - View hunter profile
+## 🏗️ Architecture
+The project follows **Clean Architecture** principles:
+- **Domain**: Core entities (User, Task, Guild, ShopItem).
+- **Application**: Business logic (CQRS pattern, Services).
+- **Infrastructure**: Database access, SignalR implementation, Email services.
+- **API**: Comparison controllers and endpoints.
 
 ---
 
 ## 📜 License
-
 This project is licensed under the MIT License.
 
 ---

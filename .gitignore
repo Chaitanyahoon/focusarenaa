@@ -1,11 +1,26 @@
-node_modules/
+## Backend
 bin/
 obj/
-.vs/
 *.user
-*.lock.json
-.DS_Store
+*.suo
+.vs/
+TestResults/
+*.log
+
+## Frontend
+node_modules/
 dist/
 build/
-*.log
+.env.local
+.env.production.local
+
+## Secrets — NEVER commit these
+appsettings.Development.json
+.env
+
+## OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
 .gemini/

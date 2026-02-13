@@ -6,17 +6,36 @@ interface Props {
     item: ShopItem;
     userGold: number;
     onPurchase: () => void;
+    isOwned?: boolean;
 }
 
-export default function ShopItemCard({ item, userGold, onPurchase }: Props) {
+const THEME_COLORS: Record<string, string> = {
+    red: 'bg-red-600',
+    purple: 'bg-purple-600',
+    gold: 'bg-yellow-500',
+    green: 'bg-emerald-500',
+};
+
+export default function ShopItemCard({ item, userGold, onPurchase, isOwned = false }: Props) {
     const [isLoading, setIsLoading] = useState(false);
 
-    // Parse effect data to show nicer description if needed, or just use description field.
-    // item.effectData is JSON string.
-
     const canAfford = userGold >= item.price;
+    const isTheme = item.type === 'Theme';
+
+    // Extract theme color from effectData
+    let themeColor = '';
+    if (isTheme) {
+        try {
+            const data = JSON.parse(item.effectData);
+            themeColor = THEME_COLORS[data.theme] || '';
+        } catch { }
+    }
 
     const handleBuy = async () => {
+        if (isOwned) {
+            toast('You already own this!', { icon: '✅' });
+            return;
+        }
         if (!canAfford) {
             toast.error("Not enough Gold!");
             return;
@@ -36,36 +55,49 @@ export default function ShopItemCard({ item, userGold, onPurchase }: Props) {
     };
 
     return (
-        <div className="relative group border border-blue-500/30 bg-gray-900/80 p-4 rounded-lg hover:border-blue-400 transition-all shadow-[0_0_10px_rgba(0,0,0,0.5)] flex flex-col items-center text-center">
+        <div className={`relative group border ${isOwned ? 'border-emerald-500/40' : 'border-system-blue/30'} bg-gray-900/80 p-4 rounded-lg hover:border-system-blue transition-all shadow-[0_0_10px_rgba(0,0,0,0.5)] flex flex-col items-center text-center`}>
             {/* Holographic corner accents */}
-            <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-blue-500 opacity-50"></div>
-            <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-blue-500 opacity-50"></div>
-            <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-blue-500 opacity-50"></div>
-            <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-blue-500 opacity-50"></div>
+            <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-system-blue opacity-50"></div>
+            <div className="absolute top-0 right-0 w-2 h-2 border-t-2 border-r-2 border-system-blue opacity-50"></div>
+            <div className="absolute bottom-0 left-0 w-2 h-2 border-b-2 border-l-2 border-system-blue opacity-50"></div>
+            <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-system-blue opacity-50"></div>
 
-            <div className="w-24 h-24 mb-4 bg-black/40 rounded-full flex items-center justify-center overflow-hidden border border-blue-500/20 group-hover:border-blue-400/50 group-hover:shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-all">
-                <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-contain filter drop-shadow-[0_0_5px_rgba(59,130,246,0.8)]" />
+            {/* Owned badge */}
+            {isOwned && (
+                <div className="absolute top-2 right-2 px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/50 rounded text-xs font-mono text-emerald-400 font-bold">
+                    OWNED
+                </div>
+            )}
+
+            <div className="w-24 h-24 mb-4 bg-black/40 rounded-full flex items-center justify-center overflow-hidden border border-system-blue/20 group-hover:border-system-blue/50 group-hover:shadow-[0_0_15px_rgba(var(--color-system-blue-rgb),0.5)] transition-all">
+                {isTheme && themeColor ? (
+                    <div className={`w-16 h-16 rounded-full ${themeColor} shadow-[0_0_20px_currentColor] animate-pulse`}></div>
+                ) : (
+                    <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-contain filter drop-shadow-[0_0_5px_rgba(var(--color-system-blue-rgb),0.8)]" />
+                )}
             </div>
 
-            <h3 className="text-lg font-bold font-rajdhani text-white mb-1 group-hover:text-blue-300">{item.name}</h3>
+            <h3 className="text-lg font-bold font-rajdhani text-white mb-1 group-hover:text-system-blue">{item.name}</h3>
             <p className="text-xs text-gray-400 font-exo mb-3 h-10 overflow-hidden">{item.description}</p>
 
             <div className="mt-auto w-full">
-                <div className="text-yellow-400 font-bold mb-2 flex items-center justify-center gap-1 font-mono">
+                <div className="text-system-gold font-bold mb-2 flex items-center justify-center gap-1 font-mono">
                     <span>💰</span> {item.price} G
                 </div>
 
                 <button
                     onClick={handleBuy}
-                    disabled={!canAfford || isLoading}
+                    disabled={isOwned || (!canAfford) || isLoading}
                     className={`w-full py-2 px-4 rounded font-bold uppercase text-xs tracking-wider transition-all
-                        ${canAfford
-                            ? "bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_10px_rgba(37,99,235,0.5)] hover:shadow-[0_0_15px_rgba(59,130,246,0.8)]"
-                            : "bg-gray-700 text-gray-400 cursor-not-allowed border border-gray-600"
+                        ${isOwned
+                            ? "bg-emerald-900/30 text-emerald-400 border border-emerald-500/30 cursor-default"
+                            : canAfford
+                                ? "bg-system-blue hover:bg-system-blue/80 text-black shadow-[0_0_10px_rgba(var(--color-system-blue-rgb),0.5)] hover:shadow-[0_0_15px_rgba(var(--color-system-blue-rgb),0.8)]"
+                                : "bg-gray-700 text-gray-400 cursor-not-allowed border border-gray-600"
                         }
                     `}
                 >
-                    {isLoading ? 'Processing...' : canAfford ? 'Purchase' : 'Need Gold'}
+                    {isOwned ? '✓ Owned' : isLoading ? 'Processing...' : canAfford ? 'Purchase' : 'Need Gold'}
                 </button>
             </div>
         </div>
