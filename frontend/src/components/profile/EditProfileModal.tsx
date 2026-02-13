@@ -6,6 +6,10 @@ import { shopService } from '../../services/shop'
 import { toast } from 'react-hot-toast'
 import axios from 'axios'
 
+const API_BASE = import.meta.env.VITE_API_URL
+    ? `${import.meta.env.VITE_API_URL}/api`
+    : '/api'
+
 interface Props {
     isOpen: boolean
     onClose: () => void
@@ -48,10 +52,16 @@ export default function EditProfileModal({ isOpen, onClose }: Props) {
         setIsLoading(true)
 
         try {
-            await axios.put('/api/profile', {
+            const token = localStorage.getItem('token')
+            await axios.put(`${API_BASE}/profile`, {
                 name,
                 bio,
                 theme
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
             })
 
             await fetchProfile() // Refresh local state
@@ -152,10 +162,10 @@ export default function EditProfileModal({ isOpen, onClose }: Props) {
                                                             }
                                                         }}
                                                         className={`flex items-center gap-3 p-2 rounded border transition-all ${isActive
-                                                                ? 'bg-white/5 border-system-blue ring-1 ring-system-blue'
-                                                                : isOwned
-                                                                    ? 'border-transparent hover:bg-white/5 hover:border-gray-700'
-                                                                    : 'border-transparent opacity-50 cursor-not-allowed'
+                                                            ? 'bg-white/5 border-system-blue ring-1 ring-system-blue'
+                                                            : isOwned
+                                                                ? 'border-transparent hover:bg-white/5 hover:border-gray-700'
+                                                                : 'border-transparent opacity-50 cursor-not-allowed'
                                                             }`}
                                                     >
                                                         <div className={`w-4 h-4 rounded-full ${t.color} shadow-[0_0_10px_currentColor]`}></div>
