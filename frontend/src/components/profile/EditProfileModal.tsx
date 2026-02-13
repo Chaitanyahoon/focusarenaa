@@ -9,6 +9,7 @@ import { toast } from 'react-hot-toast'
 interface Props {
     isOpen: boolean
     onClose: () => void
+    onProfileUpdate?: () => Promise<void>
 }
 
 const THEMES = [
@@ -19,7 +20,7 @@ const THEMES = [
     { id: 'green', name: 'Necromancer Green', color: 'bg-emerald-500', price: 2500 },
 ]
 
-export default function EditProfileModal({ isOpen, onClose }: Props) {
+export default function EditProfileModal({ isOpen, onClose, onProfileUpdate }: Props) {
     const { user, fetchProfile } = useAuthStore()
     const [isLoading, setIsLoading] = useState(false)
     const [ownedThemes, setOwnedThemes] = useState<string[]>(['blue'])
@@ -61,6 +62,7 @@ export default function EditProfileModal({ isOpen, onClose }: Props) {
             })
 
             await fetchProfile() // Refresh global state
+            if (onProfileUpdate) await onProfileUpdate()
             toast.success('Profile updated successfully!')
             onClose()
         } catch (error: any) {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { leaderboardAPI } from '../services/api'
 import { TrophyIcon } from '@heroicons/react/24/solid'
+import { Link } from 'react-router-dom'
 
 export default function Leaderboard() {
     const [leaderboard, setLeaderboard] = useState<any[]>([])
@@ -103,18 +104,21 @@ export default function Leaderboard() {
 
                                         {/* Hunter Info */}
                                         <div className="col-span-5 flex items-center gap-4">
-                                            <div className="w-10 h-10 bg-gray-900 rounded-sm border border-blue-500/30 overflow-hidden">
-                                                {entry.avatarUrl ? (
-                                                    <img src={entry.avatarUrl} alt={entry.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <div className="flex items-center justify-center h-full text-xs text-blue-500 bg-blue-900/20">IMG</div>
-                                                )}
-                                            </div>
+                                            <Link to={`/profile/${entry.userId}`} className="block w-10 h-10 rounded-sm border border-blue-500/30 overflow-hidden hover:border-blue-400 transition-colors">
+                                                <div className="w-full h-full bg-gray-900 flex items-center justify-center">
+                                                    {entry.avatarUrl ? (
+                                                        <img src={entry.avatarUrl} alt={entry.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className="text-xs text-blue-500 bg-blue-900/20 w-full h-full flex items-center justify-center">IMG</div>
+                                                    )}
+                                                </div>
+                                            </Link>
                                             <div>
-                                                <div className="font-bold text-white tracking-wide">{entry.name || 'UNKNOWN HUNTER'}</div>
+                                                <Link to={`/profile/${entry.userId}`} className="font-bold text-white tracking-wide hover:text-blue-400 transition-colors">
+                                                    {entry.name || 'UNKNOWN HUNTER'}
+                                                </Link>
                                                 <div className="text-xs text-gray-500 font-mono flex items-center gap-1">
                                                     {rank <= 3 && <TrophyIcon className="w-3 h-3 text-yellow-500" />}
-                                                    {/* Only show ID if name is missing or as secondary info */}
                                                     <span className="text-blue-500/30">ID: {entry.userId.toString().padStart(4, '0')}</span>
                                                 </div>
                                             </div>

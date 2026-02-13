@@ -9,9 +9,10 @@ import {
     Legend,
     Filler,
     RadialLinearScale,
-    ArcElement
+    ArcElement,
+    BarElement
 } from 'chart.js'
-import { Line, Radar, Doughnut } from 'react-chartjs-2'
+import { Line, Radar, Doughnut, Bar } from 'react-chartjs-2'
 import { useEffect, useState } from 'react'
 import { analyticsAPI } from '../services/api'
 import StreakHeatmap from '../components/charts/StreakHeatmap'
@@ -27,7 +28,8 @@ ChartJS.register(
     Legend,
     Filler,
     RadialLinearScale,
-    ArcElement
+    ArcElement,
+    BarElement
 )
 
 // System Theme Colors
@@ -76,16 +78,18 @@ const commonOptions = {
 export default function Analytics() {
     const [xpHistory, setXpHistory] = useState<any>(null)
     const [categoryDist, setCategoryDist] = useState<any>(null)
+    const [weeklyProd, setWeeklyProd] = useState<any>(null)
     const [stats, setStats] = useState<any>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [xpRes, catRes, statsRes] = await Promise.all([
+                const [xpRes, catRes, statsRes, weeklyRes] = await Promise.all([
                     analyticsAPI.getXPHistory(7),
                     analyticsAPI.getCategoryDistribution(),
-                    analyticsAPI.getDashboardStats()
+                    analyticsAPI.getDashboardStats(),
+                    analyticsAPI.getWeeklyProductivity()
                 ])
 
                 // Process XP Data
@@ -118,6 +122,19 @@ export default function Analytics() {
                         ],
                         borderColor: '#0f172a',
                         borderWidth: 2
+                    }]
+                })
+
+                // Process Weekly Data
+                setWeeklyProd({
+                    labels: weeklyRes.weeks.map(w => `Week ${w.weekNumber}`),
+                    datasets: [{
+                        label: 'Productivity Score',
+                        data: weeklyRes.weeks.map(w => w.productivityScore),
+                        backgroundColor: 'rgba(249, 115, 22, 0.6)', // Orange
+                        borderColor: '#ea580c',
+                        borderWidth: 1,
+                        borderRadius: 4
                     }]
                 })
 
@@ -220,6 +237,40 @@ export default function Analytics() {
                                 }
                             }}
                         />
+                    </div>
+                </div>
+
+                {/* Weekly Productivity */}
+                <div className="system-panel p-6 min-h-[400px]">
+                    <h3 className="text-xl font-display font-bold text-orange-400 mb-6">WEEKLY PRODUCTIVITY</h3>
+                    <div className="h-[300px]">
+                        {weeklyProd ? (
+                            <Bar
+                                data={weeklyProd}
+                                options={{
+                                    ...commonOptions,
+                                    plugins: {
+                                        ...commonOptions.plugins,
+                                        legend: { display: false }
+                                    },
+                                    scales: {
+                                        y: {
+                                            ...commonOptions.scales.y,
+                                            beginAtZero: true,
+                                            grid: { color: COLORS.grid }
+                                        },
+                                        x: {
+                                            ...commonOptions.scales.x,
+                                            grid: { display: false }
+                                        }
+                                    }
+                                }}
+                            />
+                        ) : (
+                            <div className="h-full flex items-center justify-center text-gray-500 font-mono text-sm">
+                                NO DATA
+                            </div>
+                        )}
                     </div>
                 </div>
 

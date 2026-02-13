@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import { ArrowLeftOnRectangleIcon, UserGroupIcon, TrashIcon, XMarkIcon, ClipboardIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 import GuildChat from './GuildChat';
 import ConfirmModal from '../ConfirmModal';
+import { Link } from 'react-router-dom';
 
 interface Props {
     guildId: number;
@@ -158,15 +159,15 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
                             {sortedMembers.map(member => (
                                 <div key={member.id} className="flex items-center justify-between bg-[#050914] p-3 rounded-lg border border-gray-800/50 hover:border-system-blue/20 transition-all group">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 font-bold overflow-hidden text-sm">
+                                        <Link to={`/profile/${member.userId}`} className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center text-gray-400 font-bold overflow-hidden text-sm hover:ring-2 hover:ring-blue-500 transition-all">
                                             {member.user.avatarUrl ? (
                                                 <img src={member.user.avatarUrl} alt={member.user.name} className="w-full h-full object-cover" />
                                             ) : (
                                                 member.user.name.substring(0, 2).toUpperCase()
                                             )}
-                                        </div>
+                                        </Link>
                                         <div>
-                                            <div className="text-white font-medium flex items-center gap-2">
+                                            <Link to={`/profile/${member.userId}`} className="text-white font-medium flex items-center gap-2 hover:text-blue-400 transition-colors">
                                                 {member.user.name}
                                                 {member.role === GuildRole.Leader && (
                                                     <span className="text-[9px] bg-system-gold/15 text-system-gold px-1.5 py-0.5 rounded font-mono font-bold border border-system-gold/20">
@@ -178,7 +179,7 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
                                                         OFFICER
                                                     </span>
                                                 )}
-                                            </div>
+                                            </Link>
                                             <div className="text-xs text-gray-500">
                                                 Level {member.user.level} · {member.contributionXP} XP contributed
                                             </div>

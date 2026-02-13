@@ -97,6 +97,7 @@ function App() {
                     <Route path="/quests" element={<Quests />} />
                     <Route path="/leaderboard" element={<Leaderboard />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/profile/:id" element={<Profile />} />
                     <Route path="/analytics" element={<Analytics />} />
                     <Route path="/shop" element={<ShopPage />} />
                     <Route path="/gates" element={<GatePage />} />

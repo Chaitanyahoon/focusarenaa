@@ -3,6 +3,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
 import { HUB_BASE } from '../../config';
+import { Link } from 'react-router-dom';
 
 interface Message {
     id: string; // generated client-side or from server
@@ -98,12 +99,12 @@ export default function GuildChat({ guildId }: Props) {
                     </div>
                 )}
 
-                {messages.map((msg, index) => {
+                {messages.map((msg) => {
                     const isMe = msg.userId === user?.id;
                     return (
-                        <div key={index} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                        <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                             {!isMe && (
-                                <div className="w-8 h-8 rounded-full bg-gray-700 mr-2 overflow-hidden flex-shrink-0 border border-gray-600">
+                                <Link to={`/profile/${msg.userId}`} className="w-8 h-8 rounded-full bg-gray-700 mr-2 overflow-hidden flex-shrink-0 border border-gray-600 hover:ring-2 hover:ring-blue-500 transition-all">
                                     {msg.avatarUrl ? (
                                         <img src={msg.avatarUrl} alt={msg.userName} className="w-full h-full object-cover" />
                                     ) : (
@@ -111,14 +112,18 @@ export default function GuildChat({ guildId }: Props) {
                                             {msg.userName.substring(0, 2).toUpperCase()}
                                         </div>
                                     )}
-                                </div>
+                                </Link>
                             )}
 
                             <div className={`max-w-[70%] rounded-lg p-3 ${isMe
                                 ? 'bg-blue-600/20 border border-blue-500/30 text-white rounded-tr-none'
                                 : 'bg-gray-800 border border-gray-700 text-gray-200 rounded-tl-none'
                                 }`}>
-                                {!isMe && <div className="text-xs text-blue-400 mb-1 font-bold">{msg.userName}</div>}
+                                {!isMe && (
+                                    <Link to={`/profile/${msg.userId}`} className="text-xs text-blue-400 mb-1 font-bold hover:underline">
+                                        {msg.userName}
+                                    </Link>
+                                )}
                                 <p className="text-sm break-words">{msg.message}</p>
                                 <div className="text-[10px] text-gray-500 text-right mt-1">
                                     {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

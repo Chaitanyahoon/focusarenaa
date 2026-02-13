@@ -150,11 +150,18 @@ export interface StreakDay {
     hasActivity: boolean
 }
 
-export interface WeeklyProductivity {
-    week: string
+export interface WeeklyProductivityData {
+    weekNumber: number
+    weekStart: string
+    weekEnd: string
     tasksCompleted: number
     xpEarned: number
-    productivity: number
+    productivityScore: number
+}
+
+export interface WeeklyProductivityResponse {
+    period: string
+    weeks: WeeklyProductivityData[]
 }
 
 export interface DashboardStats {
@@ -212,4 +219,23 @@ export interface PrivateMessage {
     sentAt: string
     isRead: boolean
     isMe: boolean
+}
+
+// Friend Types
+export enum FriendshipStatus {
+    Pending = 0,
+    Accepted = 1,
+    Declined = 2,
+    Blocked = 3
+}
+
+export interface FriendResponseDto {
+    id: number
+    friendId: number
+    name: string
+    avatarUrl?: string
+    level: number
+    status: FriendshipStatus
+    isIncoming: boolean
+    sentAt: string
 }

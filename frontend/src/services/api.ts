@@ -11,8 +11,9 @@ import type {
     XPHistoryData,
     CategoryDistribution,
     StreakDay,
-    WeeklyProductivity,
-    DashboardStats
+    WeeklyProductivityResponse,
+    DashboardStats,
+    FriendResponseDto
 } from '../types'
 
 import { API_BASE } from '../config'
@@ -96,7 +97,12 @@ export const profileAPI = {
         return response.data
     },
 
-    update: async (data: { name?: string; bio?: string; avatarUrl?: string; theme?: string }): Promise<void> => {
+    getById: async (id: number): Promise<UserProfile> => {
+        const response = await api.get<UserProfile>(`/profile/${id}`)
+        return response.data
+    },
+
+    update: async (data: Partial<UserProfile>): Promise<void> => {
         await api.put('/profile', data)
     },
 
@@ -136,7 +142,7 @@ export const analyticsAPI = {
         return response.data
     },
 
-    getWeeklyProductivity: async (): Promise<WeeklyProductivity[]> => {
+    getWeeklyProductivity: async (): Promise<WeeklyProductivityResponse> => {
         const response = await api.get('/analytics/weekly-productivity')
         return response.data
     },
@@ -162,6 +168,31 @@ export const chatAPI = {
     searchUsers: async (query: string): Promise<any[]> => {
         const response = await api.get(`/chat/search?query=${query}`)
         return response.data
+    }
+}
+
+// Friend API
+export const friendAPI = {
+    getFriends: async (): Promise<FriendResponseDto[]> => {
+        const response = await api.get<FriendResponseDto[]>('/friend')
+        return response.data
+    },
+
+    getRequests: async (): Promise<FriendResponseDto[]> => {
+        const response = await api.get<FriendResponseDto[]>('/friend/requests')
+        return response.data
+    },
+
+    sendRequest: async (targetUserId: number): Promise<void> => {
+        await api.post(`/friend/request/${targetUserId}`)
+    },
+
+    respondToRequest: async (requestId: number, accept: boolean): Promise<void> => {
+        await api.post(`/friend/respond/${requestId}?accept=${accept}`)
+    },
+
+    removeFriend: async (friendshipId: number): Promise<void> => {
+        await api.delete(`/friend/${friendshipId}`)
     }
 }
 

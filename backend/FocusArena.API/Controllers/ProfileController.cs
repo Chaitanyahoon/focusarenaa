@@ -3,6 +3,7 @@ using FocusArena.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using FocusArena.API.Controllers; // For ControllerBase
 using System.Security.Claims;
 
 namespace FocusArena.API.Controllers;
@@ -26,13 +27,28 @@ public class ProfileController : ControllerBase
     }
 
     [HttpGet]
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public async Task<ActionResult<UserProfileDto>> GetProfile()
     {
         var userId = GetUserId();
+        return await GetUserProfileInternal(userId, true);
+    }
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult<UserProfileDto>> GetUserProfile(int id)
+    {
+        var currentUserId = GetUserId();
+        // Allow viewing other profiles, but handle privacy in the internal method
+        return await GetUserProfileInternal(id, id == currentUserId);
+    }
+
+    private async Task<ActionResult<UserProfileDto>> GetUserProfileInternal(int userId, bool isMe)
+    {
         var user = await _context.Users
+            .AsNoTracking() // Ensure fresh data
             .Include(u => u.Tasks)
             .Include(u => u.UserBadges)
+            .Include(u => u.Guild)
             .FirstOrDefaultAsync(u => u.Id == userId);
 
         if (user == null)
@@ -46,7 +62,7 @@ public class ProfileController : ControllerBase
         {
             Id = user.Id,
             Name = user.Name,
-            Email = user.Email,
+            Email = isMe ? user.Email : "***", // Hide email for others
             AvatarUrl = user.AvatarUrl,
             Bio = user.Bio,
             XP = user.XP,

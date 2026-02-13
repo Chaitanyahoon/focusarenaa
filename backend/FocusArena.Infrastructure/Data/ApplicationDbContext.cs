@@ -22,6 +22,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Guild> Guilds { get; set; }
     public DbSet<GuildMember> GuildMembers { get; set; }
     public DbSet<PrivateMessage> PrivateMessages { get; set; }
+    public DbSet<Friendship> Friendships { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -200,6 +201,24 @@ public class ApplicationDbContext : DbContext
 
         // Seed initial badges
         SeedBadges(modelBuilder);
+
+        // Friendship configuration
+        modelBuilder.Entity<Friendship>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.RequesterId, e.AddresseeId }).IsUnique(); // Prevent duplicate requests
+            entity.HasIndex(e => e.Status);
+
+            entity.HasOne(e => e.Requester)
+                .WithMany()
+                .HasForeignKey(e => e.RequesterId)
+                .OnDelete(DeleteBehavior.Restrict); // Prevent cycles/cascades
+
+            entity.HasOne(e => e.Addressee)
+                .WithMany()
+                .HasForeignKey(e => e.AddresseeId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 
     private void SeedBadges(ModelBuilder modelBuilder)
