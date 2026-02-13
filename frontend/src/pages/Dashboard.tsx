@@ -113,8 +113,9 @@ export default function Dashboard() {
     return (
         <div className="min-h-screen p-4 md:p-8 flex justify-center items-start pt-12">
 
+
             {/* STATUS WINDOW - Glassmorphism & Neon */}
-            <div className="system-panel w-full max-w-5xl grid grid-cols-1 md:grid-cols-12 gap-0 relative overflow-hidden animate-in fade-in duration-500 backdrop-blur-xl bg-black/40 border border-blue-500/30 shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+            <div className="system-panel w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-0 relative overflow-hidden animate-in fade-in duration-500 backdrop-blur-xl bg-black/40 border border-blue-500/30 shadow-[0_0_50px_rgba(0,0,0,0.8)]">
 
                 {/* Decorative Corner lines */}
                 <div className="absolute top-0 left-0 w-32 h-32 border-l-2 border-t-2 border-blue-500/50 rounded-tl-lg pointer-events-none z-20"></div>
@@ -124,11 +125,11 @@ export default function Dashboard() {
                 <div className="absolute inset-0 pointer-events-none z-10 scanline-overlay opacity-10"></div>
 
                 {/* LEFT COLUMN: CHARACTER & BASICS */}
-                <div className="md:col-span-5 p-8 border-b md:border-b-0 md:border-r border-blue-500/20 flex flex-col items-center text-center relative bg-gradient-to-b from-blue-900/10 to-transparent">
+                <div className="lg:col-span-5 p-8 border-b lg:border-b-0 lg:border-r border-blue-500/20 flex flex-col items-center text-center relative bg-gradient-to-b from-blue-900/10 to-transparent">
 
                     {/* Avatar Section - Holofoil Upgrade */}
                     <div
-                        className="w-48 h-48 rounded-full mb-6 relative group cursor-pointer transition-all holofoil-border avatar-s-rank"
+                        className="w-32 h-32 md:w-48 md:h-48 rounded-full mb-6 relative group cursor-pointer transition-all holofoil-border avatar-s-rank"
                         onClick={() => setIsAvatarModalOpen(true)}
                     >
                         {user.avatarUrl ? (
@@ -142,6 +143,7 @@ export default function Dashboard() {
                             <span className="text-blue-400 font-display tracking-widest text-sm border border-blue-400/50 px-2 py-1">UPDATE</span>
                         </div>
                     </div>
+
 
                     <h2 className="text-4xl font-display font-bold text-white mb-2 tracking-wider uppercase drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
                         {user.name}
@@ -175,7 +177,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* RIGHT COLUMN: STATS & QUESTS */}
-                <div className="md:col-span-7 p-8 bg-black/20">
+                <div className="lg:col-span-7 p-4 md:p-8 bg-black/20">
                     <h3 className="system-header text-xl border-b border-blue-500/30 pb-2 mb-6 flex justify-between items-end">
                         <span className="neon-text-blue">STATUS MONITOR</span>
                         <span className="text-[10px] text-blue-500/50 font-mono tracking-widest animate-pulse">LATEST DATA</span>
