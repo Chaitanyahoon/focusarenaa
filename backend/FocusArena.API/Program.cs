@@ -143,7 +143,7 @@ else
             await context.Response.WriteAsync("{\"message\":\"An internal server error occurred.\"}");
         });
     });
-    app.UseHttpsRedirection();
+    // Note: HTTPS redirection not needed — Render handles SSL at the proxy level
 }
 
 app.UseCors("AllowFrontend");
