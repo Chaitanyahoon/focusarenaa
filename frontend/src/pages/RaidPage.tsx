@@ -1,6 +1,6 @@
-import { useState, useEffect, Fragment, useMemo } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { gateAPI, Gate, GateRank, GateStatus } from '../services/gate';
+import { gateAPI, Gate, GateStatus } from '../services/gate';
 import { toast } from 'react-hot-toast';
 import { ArrowLeftIcon, ExclamationTriangleIcon, PlusIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import { Dialog, Transition } from '@headlessui/react';
@@ -269,14 +269,14 @@ export default function RaidPage() {
                                 <p className="text-xs font-mono mt-1">Add tasks to begin the battle</p>
                             </div>
                         ) : (
-                            gate.tasks.map((task, index) => {
+                            gate.tasks.map((task, _index) => {
                                 const isDone = task.status === 2;
                                 return (
                                     <div
                                         key={task.id}
                                         className={`p-4 rounded-xl border transition-all relative overflow-hidden group ${isDone
-                                                ? 'bg-gray-900/20 border-gray-800/30 opacity-60'
-                                                : 'bg-[#0a1120] border-gray-800/40 hover:border-blue-500/30 hover:bg-blue-950/10'
+                                            ? 'bg-gray-900/20 border-gray-800/30 opacity-60'
+                                            : 'bg-[#0a1120] border-gray-800/40 hover:border-blue-500/30 hover:bg-blue-950/10'
                                             }`}
                                     >
                                         <div className="flex items-center gap-4">
@@ -285,8 +285,8 @@ export default function RaidPage() {
                                                 onClick={() => !isDone && handleTaskComplete(task.id)}
                                                 disabled={isDone || isCleared}
                                                 className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center transition-all flex-shrink-0 ${isDone
-                                                        ? 'bg-green-500/10 border-green-500/40 text-green-500'
-                                                        : 'border-red-500/30 hover:bg-red-500 hover:border-red-500 text-red-500/60 hover:text-white'
+                                                    ? 'bg-green-500/10 border-green-500/40 text-green-500'
+                                                    : 'border-red-500/30 hover:bg-red-500 hover:border-red-500 text-red-500/60 hover:text-white'
                                                     }`}
                                             >
                                                 {isDone ? (
