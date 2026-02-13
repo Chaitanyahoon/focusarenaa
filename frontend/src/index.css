@@ -29,8 +29,8 @@ body {
   overflow-x: hidden;
   /* Subtle grid texture like the anime's digital space */
   background-image:
-    linear-gradient(rgba(0, 234, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 234, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(rgb(var(--color-system-blue-rgb) / 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--color-system-blue-rgb) / 0.03) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
@@ -52,8 +52,8 @@ h6 {
 /* Sharp edges, glowing blue borders, slight transparency */
 .system-panel {
   background: var(--color-system-panel);
-  border: 1px solid rgba(var(--color-system-blue-rgb), 0.3);
-  box-shadow: 0 0 15px rgba(var(--color-system-blue-rgb), 0.1);
+  border: 1px solid rgb(var(--color-system-blue-rgb) / 0.3);
+  box-shadow: 0 0 15px rgb(var(--color-system-blue-rgb) / 0.1);
   position: relative;
   backdrop-filter: blur(8px);
   /* Chamfered corners utilizing clip-path or pseudo-elements would be cool, 
@@ -87,8 +87,8 @@ h6 {
 /* System Text Styles */
 .system-header {
   color: var(--color-system-blue);
-  text-shadow: 0 0 10px rgba(var(--color-system-blue-rgb), 0.5);
-  border-bottom: 1px solid rgba(var(--color-system-blue-rgb), 0.2);
+  text-shadow: 0 0 10px rgb(var(--color-system-blue-rgb) / 0.5);
+  border-bottom: 1px solid rgb(var(--color-system-blue-rgb) / 0.2);
   padding-bottom: 0.5rem;
   margin-bottom: 1rem;
 }
@@ -123,8 +123,8 @@ h6 {
 }
 
 .system-button:hover {
-  background: rgba(var(--color-system-blue-rgb), 0.1);
-  box-shadow: 0 0 20px rgba(var(--color-system-blue-rgb), 0.4);
+  background: rgb(var(--color-system-blue-rgb) / 0.1);
+  box-shadow: 0 0 20px rgb(var(--color-system-blue-rgb) / 0.4);
   text-shadow: 0 0 8px var(--color-system-blue);
 }
 
@@ -146,19 +146,19 @@ h6 {
 .system-input:focus {
   outline: none;
   border-color: var(--color-system-blue);
-  box-shadow: 0 0 10px rgba(var(--color-system-blue-rgb), 0.2);
+  box-shadow: 0 0 10px rgb(var(--color-system-blue-rgb) / 0.2);
 }
 
 /* Notification / Urgent Quest Style */
 .system-notification {
   border: 1px solid var(--color-system-red);
-  background: rgba(var(--color-system-red-rgb), 0.1);
-  box-shadow: 0 0 20px rgba(var(--color-system-red-rgb), 0.2);
+  background: rgb(var(--color-system-red-rgb) / 0.1);
+  box-shadow: 0 0 20px rgb(var(--color-system-red-rgb) / 0.2);
 }
 
 .system-notification h3 {
   color: var(--color-system-red);
-  text-shadow: 0 0 10px rgba(var(--color-system-red-rgb), 0.6);
+  text-shadow: 0 0 10px rgb(var(--color-system-red-rgb) / 0.6);
 }
 
 /* Animations */
@@ -166,11 +166,11 @@ h6 {
 
   0%,
   100% {
-    box-shadow: 0 0 10px rgba(var(--color-system-blue-rgb), 0.2);
+    box-shadow: 0 0 10px rgb(var(--color-system-blue-rgb) / 0.2);
   }
 
   50% {
-    box-shadow: 0 0 20px rgba(var(--color-system-blue-rgb), 0.6);
+    box-shadow: 0 0 20px rgb(var(--color-system-blue-rgb) / 0.6);
   }
 }
 
@@ -213,31 +213,31 @@ h6 {
   background: rgba(5, 9, 20, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(var(--color-system-blue-rgb), 0.1);
+  border: 1px solid rgb(var(--color-system-blue-rgb) / 0.1);
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06),
-    inset 0 0 20px rgba(var(--color-system-blue-rgb), 0.05);
+    inset 0 0 20px rgb(var(--color-system-blue-rgb) / 0.05);
 }
 
 .glass-panel-heavy {
   background: rgba(2, 4, 8, 0.85);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(var(--color-system-blue-rgb), 0.2);
+  border: 1px solid rgb(var(--color-system-blue-rgb) / 0.2);
   box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
 }
 
 /* Neon Glows */
 .neon-text-blue {
   text-shadow:
-    0 0 5px rgba(var(--color-system-blue-rgb), 0.5),
-    0 0 10px rgba(var(--color-system-blue-rgb), 0.3);
+    0 0 5px rgb(var(--color-system-blue-rgb) / 0.5),
+    0 0 10px rgb(var(--color-system-blue-rgb) / 0.3);
 }
 
 .neon-border-blue {
   box-shadow:
-    0 0 5px rgba(var(--color-system-blue-rgb), 0.2),
-    inset 0 0 10px rgba(var(--color-system-blue-rgb), 0.1);
+    0 0 5px rgb(var(--color-system-blue-rgb) / 0.2),
+    inset 0 0 10px rgb(var(--color-system-blue-rgb) / 0.1);
 }
 
 /* Grid Background Animation */
@@ -254,8 +254,8 @@ h6 {
 .bg-grid-animate {
   background-size: 40px 40px;
   background-image:
-    linear-gradient(rgba(var(--color-system-blue-rgb), 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(var(--color-system-blue-rgb), 0.05) 1px, transparent 1px);
+    linear-gradient(rgb(var(--color-system-blue-rgb) / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--color-system-blue-rgb) / 0.05) 1px, transparent 1px);
   animation: grid-scroll 20s linear infinite;
 }
 
@@ -321,10 +321,10 @@ h6 {
   z-index: -1;
   inset: -2px;
   background: linear-gradient(60deg,
-      #00EAFF,
-      #FF003C,
+      var(--color-system-blue),
+      var(--color-system-red),
       #FFD700,
-      #00EAFF,
+      var(--color-system-blue),
       #9d00ff);
   background-size: 300% 300%;
   animation: holographic 4s ease infinite;
@@ -344,19 +344,19 @@ h6 {
 
 /* S-Rank Avatar Container */
 .avatar-s-rank {
-  box-shadow: 0 0 20px rgba(0, 234, 255, 0.4);
+  box-shadow: 0 0 20px rgb(var(--color-system-blue-rgb) / 0.4);
   border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .avatar-s-rank:hover {
   box-shadow:
-    0 0 30px rgba(0, 234, 255, 0.6),
-    inset 0 0 20px rgba(0, 234, 255, 0.4);
+    0 0 30px rgb(var(--color-system-blue-rgb) / 0.6),
+    inset 0 0 20px rgb(var(--color-system-blue-rgb) / 0.4);
 }
 
 /* Theme Gradient Text */
 .text-gradient-system {
-  background: linear-gradient(to right, #00EAFF, #0080ff);
+  background: linear-gradient(to right, var(--color-system-blue), #0080ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -391,7 +391,7 @@ h6 {
   left: 0;
   width: 100%;
   height: 20%;
-  background: linear-gradient(to bottom, transparent, rgba(0, 234, 255, 0.2), transparent);
+  background: linear-gradient(to bottom, transparent, rgb(var(--color-system-blue-rgb) / 0.2), transparent);
   animation: scanline 4s linear infinite;
   pointer-events: none;
 }
@@ -412,5 +412,5 @@ h6 {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #00EAFF;
+  background: var(--color-system-blue);
 }
