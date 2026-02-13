@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuthStore } from '../stores/authStore'
-import { chatAPI, friendAPI } from '../services/api'
+import { chatAPI, friendAPI, profileAPI } from '../services/api'
 import { ChatUser, PrivateMessage, FriendResponseDto } from '../types'
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr'
 import { HUB_BASE } from '../config'
@@ -30,6 +30,8 @@ export default function ChatPage() {
     const [requests, setRequests] = useState<FriendResponseDto[]>([])
     const [showAddFriend, setShowAddFriend] = useState(false)
     const [addFriendId, setAddFriendId] = useState('')
+    const [foundUser, setFoundUser] = useState<any>(null)
+    const [friendSearchError, setFriendSearchError] = useState('')
 
     const [connection, setConnection] = useState<HubConnection | null>(null)
     const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -71,14 +73,29 @@ export default function ChatPage() {
         loadFriendsData()
     }, [])
 
-    const handleAddFriend = async (e: React.FormEvent) => {
+    const handleSearchFriend = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!addFriendId.trim()) return
+        setFriendSearchError('')
+        setFoundUser(null)
 
         try {
-            await friendAPI.sendRequest(parseInt(addFriendId))
+            // Use profile API to find user by ID
+            const user = await profileAPI.getById(parseInt(addFriendId))
+            setFoundUser(user)
+        } catch (error) {
+            setFriendSearchError('Hunter not found with this ID.')
+        }
+    }
+
+    const handleAddFriend = async () => {
+        if (!foundUser) return
+
+        try {
+            await friendAPI.sendRequest(foundUser.id)
             toast.success('Friend request sent!')
             setShowAddFriend(false)
+            setFoundUser(null)
             setAddFriendId('')
             loadFriendsData()
         } catch (error: any) {
@@ -225,6 +242,98 @@ export default function ChatPage() {
                     >
                         FRIENDS
                     </button>
+                    {/* Add Friend Modal */}
+                    {showAddFriend && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                            <div className="bg-[#0a1120] border border-system-blue p-6 rounded-lg max-w-sm w-full shadow-[0_0_30px_rgba(var(--color-system-blue-rgb),0.2)]">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-display font-bold text-white">ADD FRIEND</h3>
+                                    <button onClick={() => {
+                                        setShowAddFriend(false)
+                                        setFoundUser(null)
+                                        setAddFriendId('')
+                                        setFriendSearchError('')
+                                    }} className="text-gray-500 hover:text-white"><XMarkIcon className="w-5 h-5" /></button>
+                                </div>
+
+                                {!foundUser ? (
+                                    <>
+                                        <p className="text-gray-400 text-sm mb-4">
+                                            Enter the Hunter ID of the user you want to add.
+                                        </p>
+                                        <form onSubmit={handleSearchFriend}>
+                                            <div className="flex gap-2 mb-4">
+                                                <input
+                                                    type="number"
+                                                    placeholder="Hunter ID (e.g., 1042)"
+                                                    className="flex-1 bg-black/50 border border-gray-700 rounded px-4 py-2 text-white focus:border-system-blue focus:outline-none"
+                                                    value={addFriendId}
+                                                    onChange={e => {
+                                                        setAddFriendId(e.target.value)
+                                                        setFriendSearchError('')
+                                                    }}
+                                                    autoFocus
+                                                />
+                                                <button
+                                                    type="submit"
+                                                    disabled={!addFriendId.trim()}
+                                                    className="px-4 bg-system-blue/10 border border-system-blue/30 text-blue-300 font-bold rounded hover:bg-system-blue/20 disabled:opacity-50"
+                                                >
+                                                    SEARCH
+                                                </button>
+                                            </div>
+                                            {friendSearchError && <p className="text-red-400 text-xs mb-4">{friendSearchError}</p>}
+                                        </form>
+                                    </>
+                                ) : (
+                                    <div className="text-center mb-6 animate-in fade-in zoom-in duration-300">
+                                        <div className="w-20 h-20 rounded-full bg-gray-800 mx-auto mb-3 overflow-hidden border-2 border-system-blue shadow-[0_0_15px_rgba(var(--color-system-blue-rgb),0.4)]">
+                                            {foundUser.avatarUrl ? (
+                                                <img src={foundUser.avatarUrl} alt={foundUser.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <UserCircleIcon className="p-2 text-gray-500" />
+                                            )}
+                                        </div>
+                                        <h4 className="font-bold text-white text-lg">{foundUser.name}</h4>
+                                        <p className="text-system-blue text-sm font-mono mb-2">Level {foundUser.level}</p>
+
+                                        <div className="flex gap-2 justify-center mb-6">
+                                            <Link
+                                                to={`/profile/${foundUser.id}`}
+                                                onClick={() => setShowAddFriend(false)}
+                                                className="text-gray-400 hover:text-white text-xs underline"
+                                            >
+                                                View Full Profile
+                                            </Link>
+                                        </div>
+
+                                        <div className="flex gap-3">
+                                            <button
+                                                onClick={() => {
+                                                    setFoundUser(null)
+                                                    setAddFriendId('')
+                                                }}
+                                                className="flex-1 py-2 border border-gray-600 rounded text-gray-400 font-bold hover:bg-gray-800 transition-colors"
+                                            >
+                                                CANCEL
+                                            </button>
+                                            <button
+                                                onClick={handleAddFriend}
+                                                className="flex-1 py-2 bg-system-blue hover:bg-blue-500 text-black font-bold rounded transition-colors shadow-lg shadow-blue-900/20"
+                                            >
+                                                SEND REQUEST
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="mt-4 pt-4 border-t border-gray-800 text-center">
+                                    <span className="text-xs text-gray-500 block mb-1">YOUR HUNTER ID</span>
+                                    <span className="font-mono text-xl text-white font-bold tracking-wider">{user?.id}</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* List Content */}
