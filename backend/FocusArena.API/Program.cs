@@ -86,21 +86,18 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        if (allowedOrigins.Length == 1 && allowedOrigins[0] == "*")
+        policy.SetIsOriginAllowed(origin =>
         {
-            // Allow any origin (temporary/dev) — SetIsOriginAllowed works with AllowCredentials
-            policy.SetIsOriginAllowed(_ => true)
-                  .AllowAnyMethod()
-                  .AllowAnyHeader()
-                  .AllowCredentials();
-        }
-        else
-        {
-            policy.WithOrigins(allowedOrigins)
-                  .AllowAnyMethod()
-                  .AllowAnyHeader()
-                  .AllowCredentials();
-        }
+            // Allow any Vercel deployment (production + preview URLs)
+            if (origin.EndsWith(".vercel.app")) return true;
+            // Allow localhost for development
+            if (origin.Contains("localhost") || origin.Contains("127.0.0.1")) return true;
+            // Allow explicit origins from env var
+            return allowedOrigins.Any(o => o == "*" || o == origin);
+        })
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
     });
 });
 
