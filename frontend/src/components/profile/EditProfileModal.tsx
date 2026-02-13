@@ -3,9 +3,8 @@ import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon, PaintBrushIcon, LockClosedIcon } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../../stores/authStore'
 import { shopService } from '../../services/shop'
+import { profileAPI } from '../../services/api'
 import { toast } from 'react-hot-toast'
-import axios from 'axios'
-import { API_BASE } from '../../config'
 
 interface Props {
     isOpen: boolean
@@ -40,7 +39,12 @@ export default function EditProfileModal({ isOpen, onClose }: Props) {
 
     useEffect(() => {
         if (isOpen) {
-            shopService.getOwnedThemes().then(setOwnedThemes).catch(() => setOwnedThemes(['blue']))
+            shopService.getOwnedThemes()
+                .then(setOwnedThemes)
+                .catch((err) => {
+                    console.error('Failed to fetch owned themes:', err)
+                    setOwnedThemes(['blue'])
+                })
         }
     }, [isOpen])
 
@@ -49,23 +53,18 @@ export default function EditProfileModal({ isOpen, onClose }: Props) {
         setIsLoading(true)
 
         try {
-            const token = localStorage.getItem('token')
-            await axios.put(`${API_BASE}/profile`, {
+            // Using the robust profileAPI service instead of raw axios
+            await profileAPI.update({
                 name,
                 bio,
                 theme
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
             })
 
-            await fetchProfile() // Refresh local state
+            await fetchProfile() // Refresh global state
             toast.success('Profile updated successfully!')
             onClose()
         } catch (error: any) {
-            console.error(error)
+            console.error('Profile update failed:', error)
             const msg = error.response?.data?.message || 'Failed to update profile'
             toast.error(msg)
         } finally {
@@ -198,7 +197,7 @@ export default function EditProfileModal({ isOpen, onClose }: Props) {
                                             disabled={isLoading}
                                             className="flex-1 py-2 rounded font-bold bg-system-blue text-black hover:bg-system-blue/90 transition-colors shadow-[0_0_15px_rgba(var(--color-system-blue-rgb),0.3)] text-sm"
                                         >
-                                            {isLoading ? 'UPDATING...' : 'SAVE CHANGES'}
+                                            {isLoading ? 'SAVING...' : 'SAVE CHANGES'}
                                         </button>
                                     </div>
                                 </form>
