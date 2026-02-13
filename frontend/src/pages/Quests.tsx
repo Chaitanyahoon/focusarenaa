@@ -9,6 +9,7 @@ export default function Quests() {
     const { tasks, fetchTasks, createTask, completeTask, deleteTask, isLoading } = useTaskStore()
     const { user } = useAuthStore()
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isCompleting, setIsCompleting] = useState<number | null>(null)
 
     // New Task Form State
     const [newTask, setNewTask] = useState<CreateTaskDto>({
@@ -46,6 +47,8 @@ export default function Quests() {
     }
 
     const handleComplete = async (id: number) => {
+        if (isCompleting) return
+        setIsCompleting(id)
         try {
             const result = await completeTask(id)
             const xpGained = result.xpGained || 0
@@ -55,6 +58,8 @@ export default function Quests() {
             // (The store handles basic task list updates)
         } catch (error) {
             toast.error('System Error: Completion Failed')
+        } finally {
+            setIsCompleting(null)
         }
     }
 
@@ -153,10 +158,17 @@ export default function Quests() {
                                             </button>
                                             <button
                                                 onClick={() => handleComplete(task.id)}
-                                                className="flex items-center gap-2 bg-blue-600/10 border border-blue-500/50 text-blue-400 px-4 py-2 hover:bg-blue-600 hover:text-white transition-all skew-x-[-10deg]"
+                                                disabled={isCompleting === task.id}
+                                                className={`flex items-center gap-2 bg-blue-600/10 border border-blue-500/50 text-blue-400 px-4 py-2 hover:bg-blue-600 hover:text-white transition-all skew-x-[-10deg] ${isCompleting === task.id ? 'opacity-50 cursor-wait' : ''}`}
                                             >
-                                                <CheckIcon className="w-5 h-5 skew-x-[10deg]" />
-                                                <span className="font-bold text-sm skew-x-[10deg] tracking-widest">COMPLETE</span>
+                                                {isCompleting === task.id ? (
+                                                    <ArrowPathIcon className="w-5 h-5 animate-spin skew-x-[10deg]" />
+                                                ) : (
+                                                    <CheckIcon className="w-5 h-5 skew-x-[10deg]" />
+                                                )}
+                                                <span className="font-bold text-sm skew-x-[10deg] tracking-widest">
+                                                    {isCompleting === task.id ? 'PROCESSING' : 'COMPLETE'}
+                                                </span>
                                             </button>
                                         </div>
                                     </div>
