@@ -5,10 +5,7 @@ import { useAuthStore } from '../../stores/authStore'
 import { shopService } from '../../services/shop'
 import { toast } from 'react-hot-toast'
 import axios from 'axios'
-
-const API_BASE = import.meta.env.VITE_API_URL
-    ? `${import.meta.env.VITE_API_URL}/api`
-    : '/api'
+import { API_BASE } from '../../config'
 
 interface Props {
     isOpen: boolean

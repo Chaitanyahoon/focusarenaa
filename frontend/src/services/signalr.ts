@@ -1,12 +1,11 @@
 import * as signalR from '@microsoft/signalr'
 import { useAuthStore } from '../stores/authStore'
 import { systemToast } from '../components/ui/SystemToast'
+import { HUB_BASE } from '../config'
 
 class SignalRService {
     private connection: signalR.HubConnection | null = null
-    private baseUrl = import.meta.env.VITE_API_URL
-        ? `${import.meta.env.VITE_API_URL}/gamehub`
-        : '/gamehub'
+    private baseUrl = `${HUB_BASE}/gamehub`
 
     public async startConnection() {
         const token = useAuthStore.getState().token

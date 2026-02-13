@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '../../stores/authStore';
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
+import { HUB_BASE } from '../../config';
 
 interface Message {
     id: string; // generated client-side or from server
@@ -36,9 +37,7 @@ export default function GuildChat({ guildId }: Props) {
     useEffect(() => {
         if (!token || !guildId) return;
 
-        const hubUrl = import.meta.env.VITE_API_URL
-            ? `${import.meta.env.VITE_API_URL}/gamehub`
-            : '/gamehub'
+        const hubUrl = `${HUB_BASE}/gamehub`
 
         const newConnection = new HubConnectionBuilder()
             .withUrl(hubUrl, {
