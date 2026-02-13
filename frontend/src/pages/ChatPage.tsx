@@ -9,7 +9,6 @@ import {
     MagnifyingGlassIcon,
     UserCircleIcon,
     ChatBubbleLeftRightIcon,
-    UserGroupIcon,
     PlusIcon,
     CheckIcon,
     XMarkIcon
