@@ -15,6 +15,8 @@ public class Guild
     public string? Description { get; set; }
 
     public int LeaderId { get; set; } // UserId of the leader
+    [ForeignKey("LeaderId")]
+    public virtual User? Leader { get; set; }
 
     public int Level { get; set; } = 1;
 

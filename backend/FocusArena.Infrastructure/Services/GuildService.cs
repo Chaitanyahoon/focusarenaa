@@ -194,6 +194,32 @@ public class GuildService : IGuildService
         return true;
     }
 
+    public async Task<bool> ForceDisbandGuildAsync(int guildId)
+    {
+        var guild = await _context.Guilds
+            .Include(g => g.Members)
+            .FirstOrDefaultAsync(g => g.Id == guildId);
+
+        if (guild == null) return false;
+
+        // Clear GuildId for all members
+        var memberUserIds = guild.Members.Select(m => m.UserId).ToList();
+        var users = await _context.Users.Where(u => memberUserIds.Contains(u.Id)).ToListAsync();
+        foreach (var u in users)
+        {
+            u.GuildId = null;
+        }
+
+        // Remove all members
+        _context.GuildMembers.RemoveRange(guild.Members);
+
+        // Remove guild
+        _context.Guilds.Remove(guild);
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
     public async Task<List<Guild>> SearchGuildsAsync(string query)
     {
         if (string.IsNullOrWhiteSpace(query))

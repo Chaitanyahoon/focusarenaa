@@ -196,4 +196,16 @@ export const friendAPI = {
     }
 }
 
+// Admin API
+export const adminAPI = {
+    getGuilds: async (search: string = ''): Promise<any[]> => {
+        const response = await api.get(`/admin/guilds?search=${search}`)
+        return response.data
+    },
+
+    deleteGuild: async (id: number): Promise<void> => {
+        await api.delete(`/admin/guilds/${id}`)
+    }
+}
+
 export { api }

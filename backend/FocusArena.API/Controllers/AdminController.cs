@@ -103,6 +103,49 @@ public class AdminController : ControllerBase
         await _hubContext.Clients.All.SendAsync("ReceiveSystemMessage", request.Message, request.Type);
         return Ok(new { message = "Broadcast sent successfully." });
     }
+
+    [HttpGet("guilds")]
+    public async Task<ActionResult<IEnumerable<object>>> GetAllGuilds([FromQuery] string? search)
+    {
+        var query = _context.Guilds
+            .Include(g => g.Leader)
+            .Include(g => g.Members)
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(g => g.Name.Contains(search));
+        }
+
+        var guilds = await query
+            .OrderByDescending(g => g.Level)
+            .ThenByDescending(g => g.Members.Count)
+            .Select(g => new
+            {
+                g.Id,
+                g.Name,
+                g.Description,
+                LeaderName = g.Leader.Name,
+                MemberCount = g.Members.Count,
+                g.Capacity,
+                g.Level,
+                g.IsPrivate,
+                g.CreatedAt
+            })
+            .ToListAsync();
+
+        return Ok(guilds);
+    }
+
+    [HttpDelete("guilds/{id}")]
+    public async Task<ActionResult> ForceDisbandGuild(int id, [FromServices] FocusArena.Application.Interfaces.IGuildService guildService)
+    {
+        var result = await guildService.ForceDisbandGuildAsync(id);
+        if (!result) return NotFound("Guild not found");
+
+        return Ok(new { message = "Guild has been disbanded by admin." });
+    }
 }
 
 public class BroadcastRequest

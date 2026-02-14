@@ -11,5 +11,6 @@ public interface IGuildService
     Task<bool> LeaveGuildAsync(int userId);
     Task<bool> KickMemberAsync(int leaderId, int targetUserId);
     Task<bool> DeleteGuildAsync(int leaderId, int guildId);
+    Task<bool> ForceDisbandGuildAsync(int guildId);
     Task<List<Guild>> SearchGuildsAsync(string query);
 }
