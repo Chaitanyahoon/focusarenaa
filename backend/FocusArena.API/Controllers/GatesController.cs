@@ -61,9 +61,26 @@ public class GatesController : ControllerBase
         
         return Ok(new { message = "Dungeon Cleared! Rewards claimed." });
     }
+    [Authorize(Roles = "Admin")]
+    [HttpPost("admin/create-global")]
+    public async Task<ActionResult> CreateGlobalGate([FromBody] CreateGlobalGateDto dto)
+    {
+        var gates = await _gateService.CreateGlobalGateAsync(dto.Title, dto.Description, dto.Rank, dto.Deadline, dto.BossName, dto.Type);
+        return Ok(new { message = $"Created Global Gate for {gates.Count} users.", count = gates.Count });
+    }
 }
 
 public class CreateGateDto
+{
+    public string Title { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public string? BossName { get; set; }
+    public string? Type { get; set; }
+    public GateRank Rank { get; set; }
+    public DateTime? Deadline { get; set; }
+}
+
+public class CreateGlobalGateDto
 {
     public string Title { get; set; } = string.Empty;
     public string? Description { get; set; }

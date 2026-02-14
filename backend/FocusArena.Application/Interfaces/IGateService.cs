@@ -10,4 +10,5 @@ public interface IGateService
     Task<bool> AddTaskToGateAsync(int gateId, int taskId);
     Task<bool> CheckGateCompletionAsync(int gateId);
     Task<bool> ClaimGateRewardsAsync(int gateId, int userId);
+    Task<List<Gate>> CreateGlobalGateAsync(string title, string? description, GateRank rank, DateTime? deadline, string? bossName, string? type);
 }

@@ -210,6 +210,9 @@ export const adminAPI = {
 
     createGlobalQuest: async (data: { title: string; description: string; targetCount: number; unit: string; difficulty: number }): Promise<void> => {
         await api.post('/dailyquest/custom', data)
+    },
+    createGlobalGate: async (data: { title: string; description: string; rank: number; deadline?: string; bossName?: string; type?: string }): Promise<void> => {
+        await api.post('/gates/admin/create-global', data)
     }
 }
 

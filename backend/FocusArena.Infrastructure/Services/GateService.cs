@@ -144,4 +144,47 @@ public class GateService : IGateService
 
         return false;
     }
+
+    public async Task<List<Gate>> CreateGlobalGateAsync(string title, string? description, GateRank rank, DateTime? deadline, string? bossName, string? type)
+    {
+        var users = await _context.Users.ToListAsync();
+        var gates = new List<Gate>();
+
+        // Calculate Rewards based on Rank
+        int xpReward = 0;
+        int goldReward = 0;
+
+        switch (rank)
+        {
+            case GateRank.E: xpReward = 200; goldReward = 100; break;
+            case GateRank.D: xpReward = 500; goldReward = 250; break;
+            case GateRank.C: xpReward = 1000; goldReward = 500; break;
+            case GateRank.B: xpReward = 2000; goldReward = 1000; break;
+            case GateRank.A: xpReward = 3500; goldReward = 2000; break;
+            case GateRank.S: xpReward = 5000; goldReward = 5000; break;
+        }
+
+        foreach (var user in users)
+        {
+            var gate = new Gate
+            {
+                UserId = user.Id,
+                Title = title,
+                Description = description,
+                BossName = bossName ?? "Dungeon Boss",
+                Type = type ?? "Dungeon",
+                Rank = rank,
+                Deadline = deadline,
+                Status = GateStatus.Active,
+                CreatedAt = DateTime.UtcNow,
+                XPReward = xpReward,
+                GoldReward = goldReward
+            };
+            gates.Add(gate);
+            _context.Gates.Add(gate);
+        }
+
+        await _context.SaveChangesAsync();
+        return gates;
+    }
 }
