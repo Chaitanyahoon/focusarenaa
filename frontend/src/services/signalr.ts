@@ -81,6 +81,10 @@ class SignalRService {
             this.connection = null
         }
     }
+
+    public getConnection(): signalR.HubConnection | null {
+        return this.connection;
+    }
 }
 
 export const signalRService = new SignalRService()

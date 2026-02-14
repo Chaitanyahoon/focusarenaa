@@ -1,5 +1,5 @@
-import { GuildRaid, GuildRaidStatus } from '../../types';
-import BossHpBar from '../raid/BossHpBar'; // Reusing existing component
+import { GuildRaid, GuildRaidStatus } from '../../../types';
+import BossHpBar from '../../raid/BossHpBar'; // from src/components/raid
 import { SparklesIcon } from '@heroicons/react/24/solid';
 
 interface Props {
