@@ -14,8 +14,16 @@ export default function Login() {
         e.preventDefault()
         try {
             await login({ email, password })
+
+            // Check for admin role
+            const user = useAuthStore.getState().user
             toast.success('🎮 Welcome back, Hunter!')
-            navigate('/dashboard')
+
+            if (user?.role === 'Admin') {
+                navigate('/admin')
+            } else {
+                navigate('/dashboard')
+            }
         } catch (error) {
             toast.error('Failed to login. Check your credentials.')
         }

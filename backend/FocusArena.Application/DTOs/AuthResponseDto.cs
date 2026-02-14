@@ -9,4 +9,5 @@ public class AuthResponseDto
     public int XP { get; set; }
     public int Level { get; set; }
     public int? GuildId { get; set; }
+    public string Role { get; set; } = "User";
 }

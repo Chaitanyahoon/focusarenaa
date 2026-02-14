@@ -18,7 +18,7 @@ public class JwtTokenService
         _audience = audience;
     }
 
-    public string GenerateToken(int userId, string email, string name)
+    public string GenerateToken(int userId, string email, string name, string role)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_secretKey);
@@ -30,6 +30,7 @@ public class JwtTokenService
                 new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
                 new Claim(ClaimTypes.Email, email),
                 new Claim(ClaimTypes.Name, name),
+                new Claim(ClaimTypes.Role, role),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             }),
             Expires = DateTime.UtcNow.AddDays(7), // Token expires in 7 days

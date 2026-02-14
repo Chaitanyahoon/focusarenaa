@@ -155,4 +155,47 @@ public class ShopService : IShopService
         await _context.SaveChangesAsync();
         return message;
     }
+
+    public async Task<ShopItem> AddShopItemAsync(FocusArena.Application.DTOs.CreateShopItemDto dto)
+    {
+        var item = new ShopItem
+        {
+            Name = dto.Name,
+            Description = dto.Description,
+            Price = dto.Price,
+            ImageUrl = dto.ImageUrl,
+            Type = dto.Type,
+            EffectData = dto.EffectData
+        };
+
+        _context.ShopItems.Add(item);
+        await _context.SaveChangesAsync();
+        return item;
+    }
+
+    public async Task<ShopItem?> UpdateShopItemAsync(int id, FocusArena.Application.DTOs.CreateShopItemDto dto)
+    {
+        var item = await _context.ShopItems.FindAsync(id);
+        if (item == null) return null;
+
+        item.Name = dto.Name;
+        item.Description = dto.Description;
+        item.Price = dto.Price;
+        item.ImageUrl = dto.ImageUrl;
+        item.Type = dto.Type;
+        item.EffectData = dto.EffectData;
+
+        await _context.SaveChangesAsync();
+        return item;
+    }
+
+    public async Task<bool> DeleteShopItemAsync(int id)
+    {
+        var item = await _context.ShopItems.FindAsync(id);
+        if (item == null) return false;
+
+        _context.ShopItems.Remove(item);
+        await _context.SaveChangesAsync();
+        return true;
+    }
 }

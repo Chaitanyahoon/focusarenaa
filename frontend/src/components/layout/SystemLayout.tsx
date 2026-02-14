@@ -10,7 +10,8 @@ import {
     ShoppingBagIcon,
     MapIcon,
     UserGroupIcon,
-    ChatBubbleLeftRightIcon
+    ChatBubbleLeftRightIcon,
+    ShieldCheckIcon
 } from '@heroicons/react/24/outline'
 import Logo from '../ui/Logo'
 import LevelUpCelebration from '../effects/LevelUpCelebration'
@@ -29,7 +30,7 @@ const NAVIGATION = [
 
 export default function SystemLayout() {
     const location = useLocation()
-    const { logout } = useAuthStore()
+    const { logout, user } = useAuthStore()
 
     return (
         <div className="flex min-h-screen bg-[#020408] text-blue-100 font-body selection:bg-blue-500/30 overflow-hidden relative">
@@ -80,6 +81,32 @@ export default function SystemLayout() {
                             </Link>
                         )
                     })}
+
+                    {/* Admin Link */}
+                    {user?.role === 'Admin' && (
+                        <Link
+                            to="/admin"
+                            className={`
+              group flex items-center gap-3 px-4 py-3 rounded-sm transition-all duration-300 relative overflow-hidden
+              ${location.pathname === '/admin'
+                                    ? 'bg-red-500/20 border-l-2 border-red-500 text-red-300 shadow-[inset_0_0_20px_rgba(255,0,0,0.1)]'
+                                    : 'text-gray-500 hover:text-red-300 hover:bg-red-500/5'
+                                }
+            `}
+                        >
+                            {location.pathname === '/admin' && (
+                                <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-transparent pointer-events-none"></div>
+                            )}
+                            <ShieldCheckIcon className={`w-6 h-6 shrink-0 transition-transform group-hover:scale-110 ${location.pathname === '/admin' ? 'text-red-500 drop-shadow-[0_0_5px_rgba(255,0,0,0.5)]' : ''}`} />
+                            <span className={`font-display tracking-widest text-sm font-medium ${location.pathname === '/admin' ? 'text-red-200' : ''}`}>
+                                ADMIN
+                            </span>
+
+                            {location.pathname === '/admin' && (
+                                <div className="ml-auto w-1.5 h-1.5 bg-red-500 rounded-full shadow-[0_0_8px_rgba(255,0,0,1)] animate-pulse"></div>
+                            )}
+                        </Link>
+                    )}
                 </nav>
 
                 {/* System Info / Logout */}
@@ -118,6 +145,16 @@ export default function SystemLayout() {
                         </Link>
                     )
                 })}
+                {/* Mobile Admin Link */}
+                {user?.role === 'Admin' && (
+                    <Link
+                        to="/admin"
+                        className={`flex flex-col items-center justify-center p-2 rounded-lg transition-all ${location.pathname === '/admin' ? 'text-red-500' : 'text-gray-500 hover:text-gray-300'}`}
+                    >
+                        <ShieldCheckIcon className={`w-6 h-6 ${location.pathname === '/admin' ? 'drop-shadow-[0_0_8px_rgba(255,0,0,0.8)]' : ''}`} />
+                        <span className="text-[10px] font-display tracking-widest mt-1">ADMIN</span>
+                    </Link>
+                )}
                 {/* Mobile Logout (Icon only) */}
                 <button onClick={logout} className="p-2 text-system-red/70 hover:text-system-red">
                     <ArrowRightOnRectangleIcon className="w-6 h-6" />
@@ -141,4 +178,3 @@ export default function SystemLayout() {
         </div>
     )
 }
-

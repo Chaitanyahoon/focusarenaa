@@ -116,6 +116,28 @@ if (!app.Environment.IsEnvironment("Testing"))
     {
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         db.Database.Migrate();
+
+        // Seed Default Admin User
+        var adminEmail = "focusarenago@gmail.com";
+        if (!db.Users.Any(u => u.Email == adminEmail))
+        {
+            var adminUser = new FocusArena.Domain.Entities.User
+            {
+                Name = "Focus Arena Admin",
+                Email = adminEmail,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("focusarena@123"),
+                Role = "Admin",
+                Level = 100,
+                XP = 0,
+                Gold = 999999,
+                JoinDate = DateTime.UtcNow,
+                IsBanned = false,
+                StreakCount = 0
+            };
+            db.Users.Add(adminUser);
+            db.SaveChanges();
+            Console.WriteLine("--> Seeded Default Admin User: focusarenago@gmail.com");
+        }
     }
 }
 

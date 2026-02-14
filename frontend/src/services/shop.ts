@@ -42,5 +42,20 @@ export const shopService = {
     getOwnedThemes: async (): Promise<string[]> => {
         const response = await api.get<string[]>('/profile/owned-themes');
         return response.data;
+    },
+
+    // Admin Methods
+    addItem: async (item: Omit<ShopItem, 'id'>): Promise<ShopItem> => {
+        const response = await api.post<ShopItem>('/shop/items', item);
+        return response.data;
+    },
+
+    updateItem: async (id: number, item: Omit<ShopItem, 'id'>): Promise<ShopItem> => {
+        const response = await api.put<ShopItem>(`/shop/items/${id}`, item);
+        return response.data;
+    },
+
+    deleteItem: async (id: number): Promise<void> => {
+        await api.delete(`/shop/items/${id}`);
     }
 };

@@ -12,6 +12,7 @@ export interface User {
     gold: number
     theme?: string
     guildId?: number
+    role?: string // 'User' | 'Admin'
 }
 
 // ...
@@ -20,6 +21,7 @@ export interface UserProfile {
     // ...
     gold: number
     guildId?: number
+    role?: string
 }
 
 export interface AuthResponse {
@@ -30,6 +32,7 @@ export interface AuthResponse {
     xp: number
     level: number
     guildId?: number
+    role?: string
 }
 
 export interface LoginDto {

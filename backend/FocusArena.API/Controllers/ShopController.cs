@@ -54,4 +54,29 @@ public class ShopController : ControllerBase
         var message = await _shopService.UseItemAsync(userId, itemId);
         return Ok(new { message });
     }
+    [Authorize(Roles = "Admin")]
+    [HttpPost("items")]
+    public async Task<ActionResult> AddShopItem(CreateShopItemDto dto)
+    {
+        var item = await _shopService.AddShopItemAsync(dto);
+        return CreatedAtAction(nameof(GetShopItems), new { id = item.Id }, item);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPut("items/{id}")]
+    public async Task<ActionResult> UpdateShopItem(int id, CreateShopItemDto dto)
+    {
+        var item = await _shopService.UpdateShopItemAsync(id, dto);
+        if (item == null) return NotFound("Item not found");
+        return Ok(item);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("items/{id}")]
+    public async Task<ActionResult> DeleteShopItem(int id)
+    {
+        var result = await _shopService.DeleteShopItemAsync(id);
+        if (!result) return NotFound("Item not found");
+        return Ok(new { message = "Item deleted successfully" });
+    }
 }

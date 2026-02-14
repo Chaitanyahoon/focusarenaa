@@ -26,6 +26,17 @@ class SignalRService {
             systemToast.info(`SYSTEM ALERT: Hunter ${username} has reached Level ${newLevel}!`)
         })
 
+        this.connection.on('ReceiveSystemMessage', (message: string, type: 'info' | 'warning' | 'error' | 'success') => {
+            const toastType = type === 'warning' ? 'info' : type;
+            // @ts-ignore - dynamic access to toast methods
+            if (systemToast[toastType]) {
+                // @ts-ignore
+                systemToast[toastType](message);
+            } else {
+                systemToast.info(message);
+            }
+        })
+
         try {
             await this.connection.start()
         } catch (_err) {

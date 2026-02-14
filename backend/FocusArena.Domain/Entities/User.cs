@@ -15,6 +15,8 @@ public class User
     public DateTime? LastActiveDate { get; set; }
     public DateTime JoinDate { get; set; } = DateTime.UtcNow;
     public string Theme { get; set; } = "dark";
+    public string Role { get; set; } = "User"; // "User" or "Admin"
+    public bool IsBanned { get; set; } = false;
 
     // Password Reset
     public string? PasswordResetToken { get; set; }

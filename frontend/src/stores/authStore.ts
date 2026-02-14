@@ -41,7 +41,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
                 joinDate: new Date().toISOString(),
                 gold: 0, // Default until profile fetch
                 theme: 'blue', // Default
-                guildId: response.guildId ?? (response as any).GuildId
+                guildId: response.guildId ?? (response as any).GuildId,
+                role: response.role
             }
 
             set({
@@ -66,7 +67,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
                     gold: userProfile.gold ?? 0,
                     theme: userProfile.theme || 'blue',
                     bio: userProfile.bio,
-                    guildId: userProfile.guildId ?? (userProfile as any).GuildId
+                    guildId: userProfile.guildId ?? (userProfile as any).GuildId,
+                    role: userProfile.role
                 }
             })
         } catch (error: any) {
@@ -94,7 +96,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
                 joinDate: new Date().toISOString(),
                 gold: 0,
                 theme: 'blue',
-                guildId: response.guildId ?? (response as any).GuildId
+                guildId: response.guildId ?? (response as any).GuildId,
+                role: response.role
             }
 
             set({
@@ -137,7 +140,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
                 joinDate: userProfile.joinDate,
                 avatarUrl: userProfile.avatarUrl,
                 gold: userProfile.gold ?? 0,
-                guildId: userProfile.guildId ?? (userProfile as any).GuildId
+                guildId: userProfile.guildId ?? (userProfile as any).GuildId,
+                role: userProfile.role
             }
 
             set({ user })
@@ -168,7 +172,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
                 joinDate: userProfile.joinDate,
                 avatarUrl: userProfile.avatarUrl,
                 gold: userProfile.gold ?? 0,
-                guildId: userProfile.guildId ?? (userProfile as any).GuildId
+                guildId: userProfile.guildId ?? (userProfile as any).GuildId,
+                role: userProfile.role
             }
 
             set({

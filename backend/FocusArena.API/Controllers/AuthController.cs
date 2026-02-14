@@ -57,7 +57,7 @@ public class AuthController : ControllerBase
             await _context.SaveChangesAsync();
 
             // Generate JWT token
-            var token = _tokenService.GenerateToken(user.Id, user.Email, user.Name);
+            var token = _tokenService.GenerateToken(user.Id, user.Email, user.Name, user.Role);
 
             return Ok(new AuthResponseDto
             {
@@ -67,7 +67,8 @@ public class AuthController : ControllerBase
                 UserId = user.Id,
                 XP = user.XP,
                 Level = user.Level,
-                GuildId = user.GuildId
+                GuildId = user.GuildId,
+                Role = user.Role
             });
         }
         catch (Exception ex)
@@ -91,6 +92,12 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "Invalid email or password" });
         }
 
+        // Check if banned
+        if (user.IsBanned)
+        {
+            return StatusCode(403, new { message = "Your account has been banned. Please contact support." });
+        }
+
         // Verify password
         if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
         {
@@ -98,7 +105,7 @@ public class AuthController : ControllerBase
         }
 
         // Generate JWT token
-        var token = _tokenService.GenerateToken(user.Id, user.Email, user.Name);
+        var token = _tokenService.GenerateToken(user.Id, user.Email, user.Name, user.Role);
 
         return Ok(new AuthResponseDto
         {
@@ -108,7 +115,8 @@ public class AuthController : ControllerBase
             UserId = user.Id,
             XP = user.XP,
             Level = user.Level,
-            GuildId = user.GuildId
+            GuildId = user.GuildId,
+            Role = user.Role
         });
     }
 
