@@ -23,6 +23,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<GuildMember> GuildMembers { get; set; }
     public DbSet<PrivateMessage> PrivateMessages { get; set; }
     public DbSet<Friendship> Friendships { get; set; }
+    public DbSet<GuildRaid> GuildRaids { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

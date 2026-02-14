@@ -6,6 +6,14 @@ namespace FocusArena.Domain.Entities;
 public class AppTask
 {
     public int TaskId { get; set; }
+    // Guild Raid Integration
+    public bool IsGuildTask { get; set; } = false;
+    
+    public int? GuildRaidId { get; set; }
+    [ForeignKey("GuildRaidId")]
+    public virtual GuildRaid? GuildRaid { get; set; }
+
+    // Navigation
     public int UserId { get; set; }
     public required string Title { get; set; }
     public string? Description { get; set; }

@@ -80,6 +80,7 @@ builder.Services.AddScoped<IDailyQuestService, FocusArena.Infrastructure.Service
 builder.Services.AddScoped<IShopService, FocusArena.Infrastructure.Services.ShopService>();
 builder.Services.AddScoped<IGateService, FocusArena.Infrastructure.Services.GateService>();
 builder.Services.AddScoped<IGuildService, FocusArena.Infrastructure.Services.GuildService>();
+builder.Services.AddScoped<IGuildRaidService, FocusArena.Infrastructure.Services.GuildRaidService>();
 
 // Configure CORS
 builder.Services.AddCors(options =>

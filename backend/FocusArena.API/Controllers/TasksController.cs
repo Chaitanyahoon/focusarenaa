@@ -22,6 +22,7 @@ public class TasksController : ControllerBase
     private readonly ILevelService _levelService;
     private readonly IStreakService _streakService;
     private readonly IBadgeService _badgeService;
+    private readonly IGuildRaidService _raidService;
     private readonly IHubContext<GameHub> _hubContext;
 
     public TasksController(
@@ -30,6 +31,7 @@ public class TasksController : ControllerBase
         ILevelService levelService,
         IStreakService streakService,
         IBadgeService badgeService,
+        IGuildRaidService raidService,
         IHubContext<GameHub> hubContext)
     {
         _context = context;
@@ -37,6 +39,7 @@ public class TasksController : ControllerBase
         _levelService = levelService;
         _streakService = streakService;
         _badgeService = badgeService;
+        _raidService = raidService;
         _hubContext = hubContext;
     }
 
@@ -254,6 +257,30 @@ public class TasksController : ControllerBase
         {
             timestamp = DateTime.UtcNow
         });
+
+        // Guild Raid Integration
+        if (task.IsGuildTask && task.GuildRaidId.HasValue)
+        {
+            var updatedRaid = await _raidService.DamageRaidBossAsync(task.GuildRaidId.Value, task.XPReward);
+            if (updatedRaid != null && updatedRaid.GuildId != 0) // GuildId should be loaded? check if context tracks it or if we need to load it. 
+            // Wait, FindAsync might not include GuildId if not loaded? GuildId is a property, it's always there.
+            
+            // We need to notify the guild group.
+            // Problem: How do we know the GuildId from here if updatedRaid only retrieved by FindAsync? 
+            // GuildId is on the entity, so it is loaded.
+            
+            await _hubContext.Clients.Group($"Guild_{updatedRaid.GuildId}").SendAsync("ReceiveRaidUpdate", updatedRaid.Id, updatedRaid.CurrentHP, updatedRaid.Status == DomainEnums.GuildRaidStatus.Cleared);
+            
+            if (updatedRaid.Status == DomainEnums.GuildRaidStatus.Cleared)
+            {
+               await _hubContext.Clients.Group($"Guild_{updatedRaid.GuildId}").SendAsync("ReceiveSystemMessage", $"🏆 RAID CLEARED: {updatedRaid.Title} defeated!", "success");
+            }
+            else
+            {
+               // Optional: Show damage dealt message
+               // await _hubContext.Clients.Group($"Guild_{updatedRaid.GuildId}").SendAsync("ReceiveSystemMessage", $"{user.Name} dealt {task.XPReward} DMG to {updatedRaid.BossName}!", "info");
+            }
+        }
 
         return Ok(new
         {

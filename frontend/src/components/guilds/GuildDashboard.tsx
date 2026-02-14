@@ -1,11 +1,17 @@
 import { useState, useEffect } from 'react';
 import { guildAPI, Guild, GuildRole } from '../../services/guild';
+import { guildRaidAPI } from '../../services/api';
+import { GuildRaid, GuildRaidStatus } from '../../types';
 import { useAuthStore } from '../../stores/authStore';
 import { toast } from 'react-hot-toast';
-import { ArrowLeftOnRectangleIcon, UserGroupIcon, TrashIcon, XMarkIcon, ClipboardIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftOnRectangleIcon, UserGroupIcon, TrashIcon, XMarkIcon, ClipboardIcon, ShieldCheckIcon, PlayIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
 import GuildChat from './GuildChat';
 import ConfirmModal from '../ConfirmModal';
 import { Link } from 'react-router-dom';
+import GuildRaidSection from './raid/GuildRaidSection';
+import StartRaidModal from './raid/StartRaidModal';
+import AssignTaskModal from './raid/AssignTaskModal';
+import { useSignalR } from '../../hooks/useSignalR';
 
 interface Props {
     guildId: number;
@@ -14,9 +20,15 @@ interface Props {
 
 export default function GuildDashboard({ guildId, onLeave }: Props) {
     const { user } = useAuthStore();
+    const { connection } = useSignalR();
     const [guild, setGuild] = useState<Guild | null>(null);
+    const [activeRaid, setActiveRaid] = useState<GuildRaid | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, type: 'kick' | 'delete' | 'leave', targetUserId?: number, targetName?: string }>({ isOpen: false, type: 'leave' });
+
+    // Raid Modals
+    const [isStartRaidOpen, setIsStartRaidOpen] = useState(false);
+    const [isAssignTaskOpen, setIsAssignTaskOpen] = useState(false);
 
     const isLeader = guild?.leaderId === user?.id;
 
@@ -25,6 +37,10 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
         try {
             const data = await guildAPI.get(guildId);
             setGuild(data);
+
+            // Load active raid
+            const raid = await guildRaidAPI.getActive(guildId);
+            setActiveRaid(raid);
         } catch {
             toast.error("Failed to load Guild data.");
         } finally {
@@ -35,6 +51,30 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
     useEffect(() => {
         loadGuild();
     }, [guildId]);
+
+    // SignalR Listeners for Raid
+    useEffect(() => {
+        if (!connection) return;
+
+        connection.on("ReceiveRaidUpdate", (raidId: number, currentHP: number, isCleared: boolean) => {
+            setActiveRaid(prev => {
+                if (!prev || prev.id !== raidId) return prev;
+                return {
+                    ...prev,
+                    currentHP,
+                    status: isCleared ? GuildRaidStatus.Cleared : prev.status
+                };
+            });
+        });
+
+        // We could also listen for "RaidStarted" if we wanted auto-refresh for members
+        // But system message usually covers notification, reloading is safer
+
+        return () => {
+            connection.off("ReceiveRaidUpdate");
+        };
+    }, [connection]);
+
 
     const handleLeave = () => {
         setConfirmModal({ isOpen: true, type: 'leave' });
@@ -126,6 +166,45 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
                 </div>
             </div>
 
+            {/* Raid Section */}
+            <div className="mb-8">
+                {activeRaid ? (
+                    <div>
+                        <GuildRaidSection raid={activeRaid} />
+                        {isLeader && activeRaid.status === GuildRaidStatus.Active && (
+                            <div className="mt-2 flex justify-end">
+                                <button
+                                    onClick={() => setIsAssignTaskOpen(true)}
+                                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all shadow-lg shadow-blue-900/20"
+                                >
+                                    <PlusCircleIcon className="w-5 h-5" />
+                                    ASSIGN PROJECT TASK
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    isLeader ? (
+                        <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl border border-dashed border-gray-700 p-8 text-center">
+                            <h3 className="text-xl font-bold text-white mb-2">No Active Project</h3>
+                            <p className="text-gray-400 text-sm mb-6">Start a new Guild Raid to collaborate on a project and earn massive XP.</p>
+                            <button
+                                onClick={() => setIsStartRaidOpen(true)}
+                                className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white px-6 py-3 rounded-xl font-black tracking-wider transition-all shadow-lg shadow-purple-900/30 hover:scale-105"
+                            >
+                                <PlayIcon className="w-5 h-5" />
+                                INITIATE PROJECT RAID
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="bg-[#0a1120] rounded-xl border border-gray-800 p-6 text-center">
+                            <p className="text-gray-500 font-mono text-sm">No active projects. Waiting for Leader to initiate.</p>
+                        </div>
+                    )
+                )}
+            </div>
+
+
             {/* Invite Code Section (Leader Only) */}
             {isLeader && guild.isPrivate && guild.inviteCode && (
                 <div className="mb-6 bg-system-gold/5 border border-system-gold/20 rounded-lg p-4 flex items-center justify-between">
@@ -203,26 +282,12 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
                         </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center justify-between">
-                        <button
-                            onClick={handleLeave}
-                            className="flex items-center gap-2 text-system-red hover:text-red-400 transition-colors text-sm font-bold opacity-70 hover:opacity-100 px-3 py-2 rounded-lg hover:bg-system-red/5"
-                        >
-                            <ArrowLeftOnRectangleIcon className="w-4 h-4" />
-                            {isLeader ? 'LEAVE & TRANSFER LEADERSHIP' : 'LEAVE GUILD'}
-                        </button>
-
-                        {isLeader && (
-                            <button
-                                onClick={handleDeleteGuild}
-                                className="flex items-center gap-2 text-system-red hover:text-red-500 transition-all text-sm font-bold opacity-60 hover:opacity-100 px-3 py-2 rounded-lg hover:bg-system-red/5 border border-transparent hover:border-system-red/20"
-                            >
-                                <TrashIcon className="w-4 h-4" />
-                                DISBAND GUILD
-                            </button>
-                        )}
+                    {/* Disband/Leave Buttons */}
+                    <div className="flex items-center justify-between mt-6">
+                        <button onClick={handleLeave} className="flex items-center gap-2 text-system-red hover:text-red-400 transition-colors text-sm font-bold opacity-70 hover:opacity-100 px-3 py-2 rounded-lg hover:bg-system-red/5"><ArrowLeftOnRectangleIcon className="w-4 h-4" />{isLeader ? 'LEAVE & TRANSFER LEADERSHIP' : 'LEAVE GUILD'}</button>
+                        {isLeader && <button onClick={handleDeleteGuild} className="flex items-center gap-2 text-system-red hover:text-red-500 transition-all text-sm font-bold opacity-60 hover:opacity-100 px-3 py-2 rounded-lg hover:bg-system-red/5 border border-transparent hover:border-system-red/20"><TrashIcon className="w-4 h-4" />DISBAND GUILD</button>}
                     </div>
+
                 </div>
 
                 {/* Right Column: Chat & Info */}
@@ -253,6 +318,22 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
                     </div>
                 </div>
             </div>
+
+            {/* Modals */}
+            <StartRaidModal
+                isOpen={isStartRaidOpen}
+                onClose={() => setIsStartRaidOpen(false)}
+                onRaidStarted={loadGuild}
+            />
+
+            {activeRaid && (
+                <AssignTaskModal
+                    isOpen={isAssignTaskOpen}
+                    onClose={() => setIsAssignTaskOpen(false)}
+                    raidId={activeRaid.id}
+                    members={guild.members}
+                />
+            )}
 
             {/* Confirm Modal */}
             <ConfirmModal

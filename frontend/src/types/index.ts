@@ -61,6 +61,28 @@ export interface Task {
     createdAt: string
     recurrence?: RecurrenceType
     recurrenceInterval?: number
+    isGuildTask?: boolean
+    guildRaidId?: number
+}
+
+export enum GuildRaidStatus {
+    Active = 0,
+    Cleared = 1,
+    Failed = 2
+}
+
+export interface GuildRaid {
+    id: number
+    guildId: number
+    title: string
+    description?: string
+    status: GuildRaidStatus
+    totalHP: number
+    currentHP: number
+    createdAt: string
+    clearedAt?: string
+    bossName: string
+    // tasks?: Task[] // Optional if we want to show all tasks
 }
 
 export enum TaskCategory {

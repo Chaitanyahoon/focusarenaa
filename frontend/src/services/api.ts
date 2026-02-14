@@ -216,4 +216,26 @@ export const adminAPI = {
     }
 }
 
+// Guild Raid API
+export const guildRaidAPI = {
+    getActive: async (guildId: number): Promise<any> => {
+        try {
+            const response = await api.get(`/guildraid/${guildId}/active`)
+            return response.data
+        } catch (error) {
+            return null // Return null if not found (404)
+        }
+    },
+
+    start: async (data: { title: string; description?: string; totalHP: number; bossName?: string }): Promise<any> => {
+        const response = await api.post('/guildraid/start', data)
+        return response.data
+    },
+
+    assignTask: async (data: { raidId: number; targetUserId: number; title: string; description?: string; difficulty: number }): Promise<Task> => {
+        const response = await api.post('/guildraid/assign', data)
+        return response.data
+    }
+}
+
 export { api }
