@@ -30,6 +30,7 @@ public class LeaderboardController : ControllerBase
         {
             var users = await _context.Users
                 .AsNoTracking()
+                .Where(u => !u.IsBanned && u.Role != "Admin")
                 .OrderByDescending(u => u.XP)
                 .Take(limit)
                 .ToListAsync();
@@ -65,6 +66,7 @@ public class LeaderboardController : ControllerBase
 
             var weeklyData = await _context.Users
                 .AsNoTracking()
+                .Where(u => !u.IsBanned && u.Role != "Admin")
                 .Select(u => new
                 {
                     User = u,

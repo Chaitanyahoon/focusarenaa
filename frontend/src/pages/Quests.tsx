@@ -29,7 +29,11 @@ export default function Quests() {
     const handleCreateTask = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
-            await createTask(newTask)
+            const taskPayload = {
+                ...newTask,
+                dueDate: newTask.dueDate === '' ? undefined : newTask.dueDate
+            }
+            await createTask(taskPayload)
             toast.success('System: New Quest Acquired')
             setIsModalOpen(false)
             setNewTask({
@@ -41,8 +45,9 @@ export default function Quests() {
                 recurrence: RecurrenceType.None,
                 recurrenceInterval: 1
             })
-        } catch (error) {
-            toast.error('System Error: Quest Creation Failed')
+        } catch (error: any) {
+            console.error(error)
+            toast.error(error.response?.data?.message || 'System Error: Quest Creation Failed')
         }
     }
 
