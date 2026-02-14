@@ -4,12 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FocusArena.Domain.Entities;
 
-public enum GuildRaidStatus
-{
-    Active = 0,
-    Cleared = 1,
-    Failed = 2
-}
 
 public class GuildRaid
 {
