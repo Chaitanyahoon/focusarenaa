@@ -74,7 +74,6 @@ public class ProfileController : ControllerBase
             Gold = user.Gold,
             Theme = user.Theme,
             GuildId = user.GuildId,
-            GuildId = user.GuildId,
             Role = user.Role // Important: Required for Admin session persistence
         };
 

@@ -119,7 +119,9 @@ if (!app.Environment.IsEnvironment("Testing"))
 
         // Seed Default Admin User
         var adminEmail = "focusarenago@gmail.com";
-        if (!db.Users.Any(u => u.Email == adminEmail))
+        var existingAdmin = db.Users.FirstOrDefault(u => u.Email == adminEmail);
+
+        if (existingAdmin == null)
         {
             var adminUser = new FocusArena.Domain.Entities.User
             {
@@ -137,6 +139,13 @@ if (!app.Environment.IsEnvironment("Testing"))
             db.Users.Add(adminUser);
             db.SaveChanges();
             Console.WriteLine("--> Seeded Default Admin User: focusarenago@gmail.com");
+        }
+        else if (existingAdmin.Role != "Admin")
+        {
+            // Ensure existing user is Admin
+            existingAdmin.Role = "Admin";
+            db.SaveChanges();
+            Console.WriteLine("--> Promoted existing user to Admin: focusarenago@gmail.com");
         }
     }
 }
