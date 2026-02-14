@@ -13,10 +13,11 @@ import {
     PlusIcon,
     XMarkIcon,
     ChatBubbleLeftRightIcon,
-    UserGroupIcon
+    UserGroupIcon,
+    SparklesIcon
 } from '@heroicons/react/24/solid'
 import { shopService, ShopItem } from '../services/shop'
-import { adminAPI } from '../services/api' // New Import
+import { adminAPI } from '../services/api'
 
 interface AdminUser {
     id: number
@@ -45,7 +46,7 @@ export default function AdminDashboard() {
     const [users, setUsers] = useState<AdminUser[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [search, setSearch] = useState('')
-    const [activeTab, setActiveTab] = useState<'users' | 'shop' | 'broadcast' | 'guilds'>('users')
+    const [activeTab, setActiveTab] = useState<'users' | 'shop' | 'broadcast' | 'guilds' | 'quests'>('users')
 
     // Shop State
     const [shopItems, setShopItems] = useState<ShopItem[]>([])
@@ -62,6 +63,15 @@ export default function AdminDashboard() {
 
     // Guilds State
     const [guilds, setGuilds] = useState<AdminGuild[]>([])
+
+    // Quest State
+    const [newQuest, setNewQuest] = useState({
+        title: '',
+        description: '',
+        targetCount: 1,
+        unit: 'times',
+        difficulty: 1
+    })
 
     // Fetch Users
     const fetchUsers = async () => {
@@ -221,6 +231,27 @@ export default function AdminDashboard() {
         }
     }
 
+    const handleCreateQuest = async () => {
+        if (!newQuest.title || !newQuest.description) {
+            alert("Title and Description are required")
+            return
+        }
+        try {
+            await adminAPI.createGlobalQuest(newQuest)
+            alert("Global Quest created successfully!")
+            setNewQuest({
+                title: '',
+                description: '',
+                targetCount: 1,
+                unit: 'times',
+                difficulty: 1
+            })
+        } catch (error) {
+            console.error("Failed to create quest", error)
+            alert("Failed to create quest")
+        }
+    }
+
     if (user?.role !== 'Admin') {
         return (
             <div className="flex items-center justify-center h-full text-white">
@@ -284,6 +315,18 @@ export default function AdminDashboard() {
                     </div>
                 </button>
                 <button
+                    onClick={() => setActiveTab('quests')}
+                    className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${activeTab === 'quests'
+                        ? 'bg-yellow-500/20 text-yellow-400 border-b-2 border-yellow-500'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        }`}
+                >
+                    <div className="flex items-center gap-2">
+                        <SparklesIcon className="w-5 h-5" />
+                        Quests
+                    </div>
+                </button>
+                <button
                     onClick={() => setActiveTab('broadcast')}
                     className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${activeTab === 'broadcast'
                         ? 'bg-blue-500/20 text-blue-400 border-b-2 border-blue-500'
@@ -336,6 +379,88 @@ export default function AdminDashboard() {
                                         className="px-6 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-bold text-white transition-all shadow-lg shadow-blue-600/20"
                                     >
                                         Send Broadcast
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === 'quests' && (
+                    <div className="space-y-6">
+                        <div className="bg-[#1a1a1a] p-6 rounded-2xl border border-white/10">
+                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-white font-display">
+                                <SparklesIcon className="w-6 h-6 text-yellow-500" />
+                                Create Global Quest
+                            </h2>
+                            <p className="text-gray-400 text-sm mb-6">
+                                Create a quest that will be instantly assigned to <strong>ALL</strong> users. Great for events or daily challenges.
+                            </p>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Quest Title</label>
+                                    <input
+                                        type="text"
+                                        value={newQuest.title}
+                                        onChange={e => setNewQuest({ ...newQuest, title: e.target.value })}
+                                        className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all placeholder-gray-600"
+                                        placeholder="Ex: Weekend Warrior"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Description</label>
+                                    <textarea
+                                        value={newQuest.description}
+                                        onChange={e => setNewQuest({ ...newQuest, description: e.target.value })}
+                                        className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all placeholder-gray-600 h-20 resize-none"
+                                        placeholder="Ex: Complete 50 pushups to earn bonus XP!"
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Target Count</label>
+                                        <input
+                                            type="number"
+                                            value={newQuest.targetCount}
+                                            onChange={e => setNewQuest({ ...newQuest, targetCount: Number(e.target.value) })}
+                                            className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Unit</label>
+                                        <input
+                                            type="text"
+                                            value={newQuest.unit}
+                                            onChange={e => setNewQuest({ ...newQuest, unit: e.target.value })}
+                                            className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all"
+                                            placeholder="Ex: reps"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-400 mb-1 uppercase tracking-wider">Difficulty (1-5)</label>
+                                        <select
+                                            value={newQuest.difficulty}
+                                            onChange={e => setNewQuest({ ...newQuest, difficulty: Number(e.target.value) })}
+                                            className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 transition-all"
+                                        >
+                                            <option value={1}>1 - Easy</option>
+                                            <option value={2}>2 - Normal</option>
+                                            <option value={3}>3 - Hard</option>
+                                            <option value={4}>4 - Expert</option>
+                                            <option value={5}>5 - Master</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="pt-4">
+                                    <button
+                                        onClick={handleCreateQuest}
+                                        className="w-full py-3 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 rounded-xl font-bold text-white transition-all shadow-lg shadow-yellow-600/20"
+                                    >
+                                        Create Global Quest
                                     </button>
                                 </div>
                             </div>
@@ -542,7 +667,7 @@ export default function AdminDashboard() {
                                     <h3 className="font-bold text-lg text-white mb-1">{item.name}</h3>
                                     <p className="text-xs text-gray-400 mb-3 line-clamp-2">{item.description}</p>
                                     <div className="flex justify-between items-center mt-2">
-                                        <span className="text-yellow-400 font-mono font-bold">{item.price} G</span>
+                                        <span className="text-yellow-400 font-mono font-bold">{item.price} G}</span>
                                         <span className="text-xs px-2 py-1 rounded bg-white/10 text-gray-300 border border-white/5">{item.type}</span>
                                     </div>
                                     <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -639,5 +764,6 @@ export default function AdminDashboard() {
                     </div>
                 )}
             </div>
-            )
+        </div>
+    )
 }

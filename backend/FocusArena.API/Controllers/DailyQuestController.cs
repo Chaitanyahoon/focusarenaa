@@ -60,11 +60,27 @@ public class DailyQuestController : ControllerBase
         var status = await _dailyQuestService.GetDailyStatusAsync(userId);
         return Ok(status);
     }
+    [Authorize(Roles = "Admin")]
+    [HttpPost("custom")]
+    public async Task<ActionResult<IEnumerable<DailyQuest>>> CreateGlobalQuest([FromBody] CreateGlobalQuestDto dto)
+    {
+        var quests = await _dailyQuestService.CreateGlobalQuestAsync(dto.Title, dto.Description, dto.TargetCount, dto.Unit, dto.Difficulty);
+        return Ok(new { message = $"Created quest for {quests.Count()} users.", count = quests.Count() });
+    }
 }
 
 public class CreateDailyQuestDto
 {
     public string Title { get; set; }
+    public int TargetCount { get; set; }
+    public string Unit { get; set; }
+    public int Difficulty { get; set; }
+}
+
+public class CreateGlobalQuestDto
+{
+    public string Title { get; set; }
+    public string Description { get; set; }
     public int TargetCount { get; set; }
     public string Unit { get; set; }
     public int Difficulty { get; set; }

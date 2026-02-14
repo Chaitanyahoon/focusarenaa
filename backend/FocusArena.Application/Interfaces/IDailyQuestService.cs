@@ -7,6 +7,7 @@ public interface IDailyQuestService
     Task<IEnumerable<DailyQuest>> GetDailyQuestsAsync(int userId);
     Task<IEnumerable<DailyQuestDto>> GetDailyQuestsWithProgressAsync(int userId);
     Task<DailyQuest> CreateDailyQuestAsync(int userId, string title, int targetCount, string unit, int difficulty);
+    Task<IEnumerable<DailyQuest>> CreateGlobalQuestAsync(string title, string description, int targetCount, string unit, int difficulty);
     Task<DailyQuestLog> LogProgressAsync(int userId, int dailyQuestId, int count);
     Task<bool> CheckDailyResetAsync(int userId);
     Task<DailyQuestStatus> GetDailyStatusAsync(int userId);

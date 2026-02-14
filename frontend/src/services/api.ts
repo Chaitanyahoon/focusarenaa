@@ -19,6 +19,7 @@ import type {
 import { API_BASE } from '../config'
 
 const API_BASE_URL = API_BASE
+console.log('🔌 API Base URL:', API_BASE_URL, '| Mode:', import.meta.env.MODE)
 
 // Create axios instance
 const api = axios.create({
@@ -205,6 +206,10 @@ export const adminAPI = {
 
     deleteGuild: async (id: number): Promise<void> => {
         await api.delete(`/admin/guilds/${id}`)
+    },
+
+    createGlobalQuest: async (data: { title: string; description: string; targetCount: number; unit: string; difficulty: number }): Promise<void> => {
+        await api.post('/dailyquest/custom', data)
     }
 }
 

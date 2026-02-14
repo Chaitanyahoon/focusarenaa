@@ -70,6 +70,32 @@ public class DailyQuestService : IDailyQuestService
         return quest;
     }
 
+    public async Task<IEnumerable<DailyQuest>> CreateGlobalQuestAsync(string title, string description, int targetCount, string unit, int difficulty)
+    {
+        var users = await _context.Users.ToListAsync();
+        var quests = new List<DailyQuest>();
+
+        foreach (var user in users)
+        {
+            var quest = new DailyQuest
+            {
+                UserId = user.Id,
+                Title = title,
+                Description = description,
+                TargetCount = targetCount,
+                Unit = unit,
+                Difficulty = difficulty,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+            quests.Add(quest);
+            _context.DailyQuests.Add(quest);
+        }
+
+        await _context.SaveChangesAsync();
+        return quests;
+    }
+
     public async Task<DailyQuestLog> LogProgressAsync(int userId, int dailyQuestId, int count)
     {
         var today = DateTime.UtcNow.Date;

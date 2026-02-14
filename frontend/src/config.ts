@@ -3,7 +3,8 @@
 // In production, requests go directly to the Render backend
 const PRODUCTION_API = 'https://focusarenaa.onrender.com'
 
-const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+// Use Vite's built-in environment detection
+const isDev = import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
 
 export const API_BASE = isDev
     ? '/api'
