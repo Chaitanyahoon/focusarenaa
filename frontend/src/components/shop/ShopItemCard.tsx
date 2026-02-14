@@ -10,10 +10,13 @@ interface Props {
 }
 
 const THEME_COLORS: Record<string, string> = {
-    red: 'bg-red-600',
-    purple: 'bg-purple-600',
-    gold: 'bg-yellow-500',
-    green: 'bg-emerald-500',
+    red: 'bg-red-600 text-red-600',
+    purple: 'bg-purple-600 text-purple-600',
+    gold: 'bg-yellow-500 text-yellow-500',
+    green: 'bg-emerald-500 text-emerald-500',
+    orange: 'bg-orange-500 text-orange-500',
+    pink: 'bg-pink-500 text-pink-500',
+    monochrome: 'bg-gray-100 text-gray-100', // White/Gray Glow
 };
 
 export default function ShopItemCard({ item, userGold, onPurchase, isOwned = false }: Props) {
