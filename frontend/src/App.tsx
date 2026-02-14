@@ -72,6 +72,21 @@ function App() {
                 root.style.setProperty('--color-system-blue-rgb', '0 255 157');
                 root.style.setProperty('--color-system-red', '#008F58'); // Darker Green for accents
                 root.style.setProperty('--color-system-red-rgb', '0 143 88');
+            } else if (theme === 'orange') {
+                root.style.setProperty('--color-system-blue', '#FF5E00'); // Blaze Orange
+                root.style.setProperty('--color-system-blue-rgb', '255 94 0');
+                root.style.setProperty('--color-system-red', '#FF003C');
+                root.style.setProperty('--color-system-red-rgb', '255 0 60');
+            } else if (theme === 'pink') {
+                root.style.setProperty('--color-system-blue', '#FF00EA'); // Cyber Pink
+                root.style.setProperty('--color-system-blue-rgb', '255 0 234');
+                root.style.setProperty('--color-system-red', '#00EAFF'); // Cyan accent
+                root.style.setProperty('--color-system-red-rgb', '0 234 255');
+            } else if (theme === 'monochrome') {
+                root.style.setProperty('--color-system-blue', '#FFFFFF'); // Pure White
+                root.style.setProperty('--color-system-blue-rgb', '255 255 255');
+                root.style.setProperty('--color-system-red', '#808080'); // Grey
+                root.style.setProperty('--color-system-red-rgb', '128 128 128');
             }
         }
     }, [user?.theme])

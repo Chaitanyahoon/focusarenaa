@@ -146,8 +146,25 @@ if (!app.Environment.IsEnvironment("Testing"))
             // Ensure existing user is Admin
             existingAdmin.Role = "Admin";
             db.SaveChanges();
-            Console.WriteLine("--> Promoted existing user to Admin: focusarenago@gmail.com");
         }
+
+        // Seed Shop Themes
+        var themes = new List<FocusArena.Domain.Entities.ShopItem>
+        {
+            new() { Name = "Blaze Orange", Description = "A fiery orange theme for the bold.", Price = 1000, Type = "Theme", EffectData = "{\"theme\": \"orange\"}" },
+            new() { Name = "Cyber Pink", Description = "A neon pink aesthetic for the future.", Price = 1000, Type = "Theme", EffectData = "{\"theme\": \"pink\"}" },
+            new() { Name = "Noir Monochrome", Description = "A classic black and white look.", Price = 1500, Type = "Theme", EffectData = "{\"theme\": \"monochrome\"}" }
+        };
+
+        foreach (var theme in themes)
+        {
+            if (!db.ShopItems.Any(i => i.Name == theme.Name))
+            {
+                db.ShopItems.Add(theme);
+            }
+        }
+        db.SaveChanges();
+        Console.WriteLine("--> Seeded Shop Themes");
     }
 }
 
