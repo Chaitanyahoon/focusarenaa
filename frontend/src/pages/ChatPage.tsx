@@ -37,7 +37,7 @@ export default function ChatPage() {
     const [connection, setConnection] = useState<HubConnection | null>(null)
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
-    // 1. Initialize SignalR Connection
+    // 1. Initialize SignalR Connection & Listeners
     useEffect(() => {
         if (!token) return
 
@@ -51,109 +51,76 @@ export default function ChatPage() {
 
         setConnection(newConnection)
 
+        let isMounted = true
+
+        newConnection.start()
+            .then(() => {
+                if (isMounted) {
+                    // Listeners
+                    newConnection.on('ReceivePrivateMessage', (msg: any) => {
+                        // We can't access selectedUser from closure here easily if it changes.
+                        // However, we are setting state updates.
+                        // To handle selectedUser dependency, we might need a Ref or a separate listener effect.
+                        // But separate listener effect needs the connection to be ready.
+                        // Given the complexity, let's keep the connection stable and add listeners in a separate effect
+                        // BUT we must ensure start is finished.
+                        // Actually, separating them caused the race condition.
+                        // To fix "selectedUser" dependency, we can use a Ref for selectedUser.
+                    })
+
+                    newConnection.on('ReceiveFriendRequest', () => {
+                        if (isMounted) loadFriendsData()
+                    })
+
+                    newConnection.on('ReceiveFriendResponse', () => {
+                        if (isMounted) loadFriendsData()
+                    })
+                }
+            })
+            .catch(err => {
+                if (isMounted) console.error('Chat Connection Failed', err)
+            })
+
         return () => {
-            newConnection.stop()
+            isMounted = false
+            newConnection.stop().catch(() => { })
         }
     }, [token])
 
-    // Load Friends & Requests
-    const loadFriendsData = async () => {
-        try {
-            const [friendsData, requestsData] = await Promise.all([
-                friendAPI.getFriends(),
-                friendAPI.getRequests()
-            ])
-            setFriends(friendsData)
-            setRequests(requestsData)
-            setFriendRequests(requestsData.length)
-        } catch (error) {
-            console.error(error)
-        }
-    }
+    // Handle Messages Listener with dynamic selectedUser 
+    // We attach/detach this specific listener when selectedUser changes
+    // OR we use a Ref for selectedUser inside the main listener.
+    // Using a Ref is cleaner than re-attaching listeners.
+    const selectedUserRef = useRef(selectedUser)
 
     useEffect(() => {
-        loadFriendsData()
-    }, [])
+        selectedUserRef.current = selectedUser
+    }, [selectedUser])
 
-    const handleSearchFriend = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!addFriendId.trim()) return
-        setFriendSearchError('')
-        setFoundUser(null)
-
-        try {
-            // Use profile API to find user by ID
-            const user = await profileAPI.getById(parseInt(addFriendId))
-            setFoundUser(user)
-        } catch (error) {
-            setFriendSearchError('Hunter not found with this ID.')
-        }
-    }
-
-    const handleAddFriend = async () => {
-        if (!foundUser) return
-
-        try {
-            await friendAPI.sendRequest(foundUser.id)
-            toast.success('Friend request sent!')
-            setShowAddFriend(false)
-            setFoundUser(null)
-            setAddFriendId('')
-            loadFriendsData()
-        } catch (error: any) {
-            toast.error(error.response?.data || 'Failed to send request')
-        }
-    }
-
-    const handleRespond = async (requestId: number, accept: boolean) => {
-        try {
-            await friendAPI.respondToRequest(requestId, accept)
-            toast.success(accept ? 'Friend added!' : 'Request declined')
-            decrementFriendRequests()
-            loadFriendsData()
-        } catch (error) {
-            toast.error('Operation failed')
-        }
-    }
-
-    const startChat = (friend: FriendResponseDto) => {
-        const chatUser: ChatUser = {
-            id: friend.friendId,
-            name: friend.name,
-            avatarUrl: friend.avatarUrl,
-            unreadCount: 0,
-            isOnline: false
-        }
-        setSelectedUser(chatUser)
-        setViewMode('chats')
-    }
-
-    // 2. Start Connection & Setup Listeners
     useEffect(() => {
-        if (connection && connection.state === HubConnectionState.Disconnected) {
-            connection.start()
-                .then(() => {
+        if (!connection) return;
 
-                    connection.on('ReceivePrivateMessage', (msg: any) => {
-                        // If chat is open with this user (either sender or receiver matches current selected)
-                        if (selectedUser && (msg.senderId === selectedUser.id || msg.receiverId === selectedUser.id)) {
-                            setMessages(prev => [...prev, { ...msg, isMe: msg.senderId === user?.id }])
-                        } else {
-                            loadRecentChats()
-                        }
-                    })
+        // We need to ensure we don't duplicate listeners if connection re-establishes?
+        // HubConnection.on replaces functionality? No, it appends? 
+        // SignalR .on appends. We should use .off first.
 
-                    connection.on('ReceiveFriendRequest', () => {
-                        loadFriendsData()
-                    })
-
-                    connection.on('ReceiveFriendResponse', () => {
-                        loadFriendsData()
-                    })
-                })
-                .catch(err => console.error('Chat Connection Failed', err))
+        const handleMessage = (msg: any) => {
+            const currentSelected = selectedUserRef.current
+            if (currentSelected && (msg.senderId === currentSelected.id || msg.receiverId === currentSelected.id)) {
+                setMessages(prev => [...prev, { ...msg, isMe: msg.senderId === user?.id }])
+            } else {
+                loadRecentChats()
+            }
         }
-    }, [connection, selectedUser, user])
+
+        connection.off('ReceivePrivateMessage')
+        connection.on('ReceivePrivateMessage', handleMessage)
+
+        return () => {
+            connection.off('ReceivePrivateMessage', handleMessage)
+        }
+    }, [connection, user]) // Re-bind if connection changes (re-created)
+
 
     // 3. Load Recent Chats
     const loadRecentChats = async () => {

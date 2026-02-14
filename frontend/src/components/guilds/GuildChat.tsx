@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '../../stores/authStore';
-import { HubConnection, HubConnectionBuilder, LogLevel, HubConnectionState } from '@microsoft/signalr';
+import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
 import { HUB_BASE } from '../../config';
 import { Link } from 'react-router-dom';
@@ -38,8 +38,7 @@ export default function GuildChat({ guildId }: Props) {
     useEffect(() => {
         if (!token || !guildId) return;
 
-        const hubUrl = `${HUB_BASE}/gamehub`
-
+        const hubUrl = `${HUB_BASE}/gamehub`;
         const newConnection = new HubConnectionBuilder()
             .withUrl(hubUrl, {
                 accessTokenFactory: () => token
@@ -50,27 +49,30 @@ export default function GuildChat({ guildId }: Props) {
 
         setConnection(newConnection);
 
-        return () => {
-            if (newConnection) {
-                newConnection.stop();
-            }
-        };
-    }, [token, guildId]); // Reconnect if guild changes (unlikely)
+        let isMounted = true;
 
-    useEffect(() => {
-        if (connection && connection.state === HubConnectionState.Disconnected) {
-            connection.start()
-                .then(() => {
-                    // Connected to Guild Chat
-                    connection.invoke('JoinGuildGroup', guildId);
+        newConnection.start()
+            .then(() => {
+                if (isMounted) {
+                    newConnection.invoke('JoinGuildGroup', guildId);
 
-                    connection.on('ReceiveGuildMessage', (msg: any) => {
-                        setMessages(prev => [...prev, { ...msg, id: Date.now().toString() + Math.random() }]);
+                    newConnection.on('ReceiveGuildMessage', (msg: any) => {
+                        if (isMounted) {
+                            setMessages(prev => [...prev, { ...msg, id: Date.now().toString() + Math.random() }]);
+                        }
                     });
-                })
-                .catch(() => { /* Connection failed, will retry */ });
-        }
-    }, [connection, guildId]);
+                }
+            })
+            .catch(err => {
+                // Catch error if start was cancelled by stop() or failed
+                if (isMounted) console.error("Guild Chat Connection Failed", err);
+            });
+
+        return () => {
+            isMounted = false;
+            newConnection.stop().catch(() => { }); // Suppress errors if stop fails
+        };
+    }, [token, guildId]);
 
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
