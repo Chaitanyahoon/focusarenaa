@@ -73,7 +73,8 @@ public class ProfileController : ControllerBase
             BadgesEarned = user.UserBadges.Count,
             Gold = user.Gold,
             Theme = user.Theme,
-            GuildId = user.GuildId
+            GuildId = user.GuildId,
+            Role = user.Role
         };
 
         return Ok(profile);

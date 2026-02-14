@@ -16,4 +16,5 @@ public class UserProfileDto
     public int Gold { get; set; }
     public string? Theme { get; set; }
     public int? GuildId { get; set; }
+    public string Role { get; set; } = "User";
 }
