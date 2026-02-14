@@ -18,6 +18,9 @@ const THEMES = [
     { id: 'purple', name: 'Void Purple', color: 'bg-purple-600', price: 1500 },
     { id: 'gold', name: 'Royal Gold', color: 'bg-yellow-500', price: 2000 },
     { id: 'green', name: 'Necromancer Green', color: 'bg-emerald-500', price: 2500 },
+    { id: 'orange', name: 'Blaze Orange', color: 'bg-orange-500', price: 1000 },
+    { id: 'pink', name: 'Cyber Pink', color: 'bg-pink-500', price: 1000 },
+    { id: 'monochrome', name: 'Noir Monochrome', color: 'bg-gray-100', price: 1500 },
 ]
 
 export default function EditProfileModal({ isOpen, onClose, onProfileUpdate }: Props) {

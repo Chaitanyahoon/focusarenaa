@@ -117,12 +117,26 @@ public class ProfileController : ControllerBase
             else
             {
                 // Check if user owns the theme via inventory
-                var ownsTheme = await _context.InventoryItems
+                var inventoryItems = await _context.InventoryItems
                     .Include(i => i.ShopItem)
-                    .AnyAsync(i => i.UserId == userId 
-                        && i.ShopItem.Type == "Theme" 
-                        && i.ShopItem.EffectData.Contains($"\"theme\":\"{dto.Theme}\"")
-                        && i.Quantity > 0);
+                    .Where(i => i.UserId == userId && i.ShopItem.Type == "Theme" && i.Quantity > 0)
+                    .ToListAsync();
+
+                bool ownsTheme = false;
+                foreach (var item in inventoryItems)
+                {
+                    try
+                    {
+                        using var doc = System.Text.Json.JsonDocument.Parse(item.ShopItem.EffectData);
+                        if (doc.RootElement.TryGetProperty("theme", out var themeProp) && 
+                            themeProp.GetString() == dto.Theme)
+                        {
+                            ownsTheme = true;
+                            break;
+                        }
+                    }
+                    catch { }
+                }
 
                 if (!ownsTheme)
                 {

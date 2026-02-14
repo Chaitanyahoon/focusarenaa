@@ -151,9 +151,9 @@ if (!app.Environment.IsEnvironment("Testing"))
         // Seed Shop Themes
         var themes = new List<FocusArena.Domain.Entities.ShopItem>
         {
-            new() { Name = "Blaze Orange", Description = "A fiery orange theme for the bold.", Price = 1000, Type = "Theme", EffectData = "{\"theme\": \"orange\"}" },
-            new() { Name = "Cyber Pink", Description = "A neon pink aesthetic for the future.", Price = 1000, Type = "Theme", EffectData = "{\"theme\": \"pink\"}" },
-            new() { Name = "Noir Monochrome", Description = "A classic black and white look.", Price = 1500, Type = "Theme", EffectData = "{\"theme\": \"monochrome\"}" }
+            new() { Name = "Blaze Orange", Description = "A fiery orange theme for the bold.", Price = 1000, Type = "Theme", EffectData = "{\"effect\": \"unlock_theme\", \"theme\": \"orange\"}" },
+            new() { Name = "Cyber Pink", Description = "A neon pink aesthetic for the future.", Price = 1000, Type = "Theme", EffectData = "{\"effect\": \"unlock_theme\", \"theme\": \"pink\"}" },
+            new() { Name = "Noir Monochrome", Description = "A classic black and white look.", Price = 1500, Type = "Theme", EffectData = "{\"effect\": \"unlock_theme\", \"theme\": \"monochrome\"}" }
         };
 
         foreach (var theme in themes)

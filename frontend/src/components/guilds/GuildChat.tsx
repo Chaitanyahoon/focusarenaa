@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuthStore } from '../../stores/authStore';
-import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import { HubConnection, HubConnectionBuilder, LogLevel, HubConnectionState } from '@microsoft/signalr';
 import { PaperAirplaneIcon } from '@heroicons/react/24/solid';
 import { HUB_BASE } from '../../config';
 import { Link } from 'react-router-dom';
@@ -44,7 +44,7 @@ export default function GuildChat({ guildId }: Props) {
             .withUrl(hubUrl, {
                 accessTokenFactory: () => token
             })
-            .configureLogging(LogLevel.Information)
+            .configureLogging(LogLevel.Error)
             .withAutomaticReconnect()
             .build();
 
@@ -58,7 +58,7 @@ export default function GuildChat({ guildId }: Props) {
     }, [token, guildId]); // Reconnect if guild changes (unlikely)
 
     useEffect(() => {
-        if (connection) {
+        if (connection && connection.state === HubConnectionState.Disconnected) {
             connection.start()
                 .then(() => {
                     // Connected to Guild Chat

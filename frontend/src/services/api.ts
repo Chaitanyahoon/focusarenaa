@@ -19,7 +19,7 @@ import type {
 import { API_BASE } from '../config'
 
 const API_BASE_URL = API_BASE
-console.log('🔌 API Base URL:', API_BASE_URL, '| Mode:', import.meta.env.MODE)
+const API_BASE_URL = API_BASE
 
 // Create axios instance
 const api = axios.create({

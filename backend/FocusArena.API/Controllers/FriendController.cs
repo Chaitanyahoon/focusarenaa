@@ -8,7 +8,6 @@ using System.Security.Claims;
 
 using FocusArena.Infrastructure.Hubs;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.Authorization;
 
 [Authorize]
 [ApiController]

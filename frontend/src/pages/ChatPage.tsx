@@ -3,7 +3,7 @@ import { useAuthStore } from '../stores/authStore'
 import { useNotificationStore } from '../stores/notificationStore'
 import { chatAPI, friendAPI, profileAPI } from '../services/api'
 import { ChatUser, PrivateMessage, FriendResponseDto } from '../types'
-import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr'
+import { HubConnection, HubConnectionBuilder, LogLevel, HubConnectionState } from '@microsoft/signalr'
 import { HUB_BASE } from '../config'
 import {
     PaperAirplaneIcon,
@@ -45,7 +45,7 @@ export default function ChatPage() {
             .withUrl(`${HUB_BASE}/gamehub`, {
                 accessTokenFactory: () => token
             })
-            .configureLogging(LogLevel.Information)
+            .configureLogging(LogLevel.Error)
             .withAutomaticReconnect()
             .build()
 
@@ -130,10 +130,9 @@ export default function ChatPage() {
 
     // 2. Start Connection & Setup Listeners
     useEffect(() => {
-        if (connection) {
+        if (connection && connection.state === HubConnectionState.Disconnected) {
             connection.start()
                 .then(() => {
-                    console.log('Chat Connected');
 
                     connection.on('ReceivePrivateMessage', (msg: any) => {
                         // If chat is open with this user (either sender or receiver matches current selected)

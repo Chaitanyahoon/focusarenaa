@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
+using FocusArena.Infrastructure.Hubs;
 
 namespace FocusArena.API.Controllers;
 

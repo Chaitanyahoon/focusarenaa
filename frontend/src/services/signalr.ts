@@ -17,6 +17,7 @@ class SignalRService {
                 accessTokenFactory: () => token
             })
             .withAutomaticReconnect()
+            .configureLogging(signalR.LogLevel.Error)
             .build()
 
         this.connection.on('ReceiveXPUpdate', (_userId: string, _xp: number) => {
