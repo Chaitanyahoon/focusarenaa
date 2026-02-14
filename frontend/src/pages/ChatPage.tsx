@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuthStore } from '../stores/authStore'
+import { useNotificationStore } from '../stores/notificationStore'
 import { chatAPI, friendAPI, profileAPI } from '../services/api'
 import { ChatUser, PrivateMessage, FriendResponseDto } from '../types'
 import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr'
@@ -18,6 +19,7 @@ import { Link } from 'react-router-dom'
 
 export default function ChatPage() {
     const { user, token } = useAuthStore()
+    const { setUnreadMessages, setFriendRequests, decrementFriendRequests } = useNotificationStore()
     const [recentChats, setRecentChats] = useState<ChatUser[]>([])
     const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null)
     const [messages, setMessages] = useState<PrivateMessage[]>([])
@@ -63,6 +65,7 @@ export default function ChatPage() {
             ])
             setFriends(friendsData)
             setRequests(requestsData)
+            setFriendRequests(requestsData.length)
         } catch (error) {
             console.error(error)
         }
@@ -106,6 +109,7 @@ export default function ChatPage() {
         try {
             await friendAPI.respondToRequest(requestId, accept)
             toast.success(accept ? 'Friend added!' : 'Request declined')
+            decrementFriendRequests()
             loadFriendsData()
         } catch (error) {
             toast.error('Operation failed')
@@ -135,14 +139,17 @@ export default function ChatPage() {
                         // If chat is open with this user (either sender or receiver matches current selected)
                         if (selectedUser && (msg.senderId === selectedUser.id || msg.receiverId === selectedUser.id)) {
                             setMessages(prev => [...prev, { ...msg, isMe: msg.senderId === user?.id }])
-                            // Mark as read immediately if window open (API call needed normally, but verified by backend on get)
                         } else {
-                            // Update recent chats list to show new message/unread
                             loadRecentChats()
-                            if (msg.senderId !== user?.id) {
-                                toast(`New message from ${msg.senderName}`, { icon: '💬' })
-                            }
                         }
+                    })
+
+                    connection.on('ReceiveFriendRequest', () => {
+                        loadFriendsData()
+                    })
+
+                    connection.on('ReceiveFriendResponse', () => {
+                        loadFriendsData()
                     })
                 })
                 .catch(err => console.error('Chat Connection Failed', err))
@@ -154,6 +161,8 @@ export default function ChatPage() {
         try {
             const data = await chatAPI.getRecent()
             setRecentChats(data)
+            const totalUnread = data.reduce((acc, chat) => acc + chat.unreadCount, 0)
+            setUnreadMessages(totalUnread)
         } catch (error) {
             console.error(error)
         }

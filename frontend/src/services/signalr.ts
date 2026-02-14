@@ -1,5 +1,6 @@
 import * as signalR from '@microsoft/signalr'
 import { useAuthStore } from '../stores/authStore'
+import { useNotificationStore } from '../stores/notificationStore'
 import { systemToast } from '../components/ui/SystemToast'
 import { HUB_BASE } from '../config'
 
@@ -28,12 +29,42 @@ class SignalRService {
 
         this.connection.on('ReceiveSystemMessage', (message: string, type: 'info' | 'warning' | 'error' | 'success') => {
             const toastType = type === 'warning' ? 'info' : type;
-            // @ts-ignore - dynamic access to toast methods
-            if (systemToast[toastType]) {
-                // @ts-ignore
-                systemToast[toastType](message);
-            } else {
-                systemToast.info(message);
+            // @ts-ignore
+            if (systemToast[toastType]) systemToast[toastType](message);
+            else systemToast.info(message);
+        })
+
+        // Global Chat Listener
+        this.connection.on('ReceivePrivateMessage', (msg: any) => {
+            // Check if we are already on the chat page
+            const isChatOpen = window.location.pathname === '/chat'
+            const currentUserId = useAuthStore.getState().user?.id
+
+            // Only notify if we are NOT the sender
+            if (msg.senderId !== currentUserId) {
+                // If not on chat page, or on chat page but maybe defined logic elsewhere handles it?
+                // Actually, ChatPage handles its own state. We just want to notify if NOT on chat page
+                // OR if on chat page but strictly for the badge counter.
+
+                // For now, always increment globally. ChatPage can reset it when opened.
+                useNotificationStore.getState().incrementUnreadMessages()
+
+                if (!isChatOpen) {
+                    systemToast.info(`New message from ${msg.senderName}`)
+                }
+            }
+        })
+
+        // Friend Requests
+        this.connection.on('ReceiveFriendRequest', (req: any) => {
+            useNotificationStore.getState().incrementFriendRequests()
+            systemToast.success(`New Friend Request from ${req.name}`)
+        })
+
+        this.connection.on('ReceiveFriendResponse', (data: any) => {
+            if (data.accepted) {
+                systemToast.success(`${data.friendName} accepted your friend request!`)
+                // Ideally refresh friend list if on chat page, but simple toast is enough globally
             }
         })
 

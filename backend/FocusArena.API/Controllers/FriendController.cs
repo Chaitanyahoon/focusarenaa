@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-namespace FocusArena.API.Controllers;
+using FocusArena.Infrastructure.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Authorization;
 
 [Authorize]
 [ApiController]
@@ -14,10 +16,12 @@ namespace FocusArena.API.Controllers;
 public class FriendController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly IHubContext<GameHub> _hubContext;
 
-    public FriendController(ApplicationDbContext context)
+    public FriendController(ApplicationDbContext context, IHubContext<GameHub> hubContext)
     {
         _context = context;
+        _hubContext = hubContext;
     }
 
     private int GetUserId()
@@ -128,6 +132,30 @@ public class FriendController : ControllerBase
         _context.Friendships.Add(friendship);
         await _context.SaveChangesAsync();
 
+        // Notify Target User
+        var requestDto = new FriendResponseDto
+        {
+            Id = friendship.Id,
+            FriendId = userId,
+            Name = User.Identity?.Name ?? "Unknown Hunter", // Context user name
+            AvatarUrl = null, // Could fetch if needed, but for now null or optimistic
+            Level = 0, // Would need to fetch requester's level
+            Status = FriendshipStatus.Pending,
+            IsIncoming = true,
+            SentAt = friendship.CreatedAt
+        };
+
+        // Need to fetch requester details for the notification to be pretty
+        var requester = await _context.Users.FindAsync(userId);
+        if (requester != null)
+        {
+            requestDto.Name = requester.Name;
+            requestDto.AvatarUrl = requester.AvatarUrl;
+            requestDto.Level = requester.Level;
+        }
+
+        await _hubContext.Clients.User(targetUserId.ToString()).SendAsync("ReceiveFriendRequest", requestDto);
+
         return Ok(new { message = "Friend request sent." });
     }
 
@@ -160,6 +188,18 @@ public class FriendController : ControllerBase
         }
 
         await _context.SaveChangesAsync();
+
+        // Notify Requester if accepted
+        if (accept)
+        {
+            await _hubContext.Clients.User(friendship.RequesterId.ToString()).SendAsync("ReceiveFriendResponse", new
+            {
+                friendId = userId,
+                friendName = User.Identity?.Name ?? "Hunter",
+                accepted = true
+            });
+        }
+
         return Ok(new { message = accept ? "Friend request accepted." : "Friend request declined." });
     }
 

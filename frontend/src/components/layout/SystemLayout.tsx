@@ -1,5 +1,6 @@
 import { Link, useLocation, Outlet } from 'react-router-dom'
 import { useAuthStore } from '../../stores/authStore'
+import { useNotificationStore } from '../../stores/notificationStore'
 import {
     Squares2X2Icon,
     ClipboardDocumentListIcon,
@@ -31,6 +32,7 @@ const NAVIGATION = [
 export default function SystemLayout() {
     const location = useLocation()
     const { logout, user } = useAuthStore()
+    const { unreadMessages, friendRequests } = useNotificationStore()
 
     return (
         <div className="flex min-h-screen bg-[#020408] text-blue-100 font-body selection:bg-blue-500/30 overflow-hidden relative">
@@ -54,6 +56,12 @@ export default function SystemLayout() {
                 <nav className="flex-1 py-8 flex flex-col gap-2 px-2 overflow-y-auto custom-scrollbar">
                     {NAVIGATION.map((item) => {
                         const isActive = location.pathname === item.path
+
+                        let badgeCount = 0
+                        if (item.path === '/chat') {
+                            badgeCount = unreadMessages + friendRequests
+                        }
+
                         return (
                             <Link
                                 key={item.name}
@@ -74,8 +82,15 @@ export default function SystemLayout() {
                                     {item.name}
                                 </span>
 
+                                {/* Notification Badge */}
+                                {badgeCount > 0 && (
+                                    <div className="ml-auto bg-system-red text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-[#020408] shadow-sm animate-pulse">
+                                        {badgeCount > 9 ? '9+' : badgeCount}
+                                    </div>
+                                )}
+
                                 {/* Active Indicator (Right side) */}
-                                {isActive && (
+                                {isActive && !badgeCount && (
                                     <div className="ml-auto w-1.5 h-1.5 bg-system-blue rounded-full shadow-[0_0_8px_rgb(var(--color-system-blue-rgb))] animate-pulse"></div>
                                 )}
                             </Link>
@@ -132,15 +147,50 @@ export default function SystemLayout() {
 
             {/* BOTTOM NAVIGATION - MOBILE ONLY */}
             <nav className="md:hidden fixed bottom-0 left-0 w-full bg-[#0a1120]/95 backdrop-blur-xl border-t border-system-blue/30 z-50 px-2 py-2 flex justify-around items-center overflow-x-auto no-scrollbar pb-safe">
-                {NAVIGATION.slice(0, 5).map((item) => {
+                {NAVIGATION.slice(0, 6).map((item) => {
                     const isActive = location.pathname === item.path
+
+                    // For mobile, we only show top 5 items. If Chat is not in top 5, user might catch it.
+                    // But Chat IS in top 5 items?
+                    // NAVIGATION index: 5 is Chat. slice(0, 5) covers 0,1,2,3,4. 
+                    // 0: Status
+                    // 1: Quests
+                    // 2: Gates
+                    // 3: Guilds
+                    // 4: Ranking
+                    // Chat is 5. It is hidden on mobile nav bottom bar? 
+                    // Current code: NAVIGATION.slice(0, 5). Chat is NOT in the bottom bar!
+                    // This is a UX issue if users want to chat on mobile.
+                    // I should probably replace Ranking or Guilds with Chat if it has unread? 
+                    // Or just extend the slice?
+                    // 5 items fit well. 6 might update layout.
+                    // Let's check the user request. "make it refresh there only". 
+                    // If I add Chat to mobile nav it solves the access issue too.
+                    // For now, I will just add badge logic, but I suspect Chat is missing from mobile nav.
+                    // Wait, NAVIGATION[5] is Chat. slice(0,5) excludes it.
+                    // I will change it to include Chat (item 5) instead of Guilds (item 3) or Gates (item 2)?
+                    // Or just add Chat as a 6th item and see if it fits (overflow-x-auto handles it).
+                    // I'll change slice(0, 6).
+
+                    let badgeCount = 0
+                    if (item.path === '/chat') {
+                        badgeCount = unreadMessages + friendRequests
+                    }
+
                     return (
                         <Link
                             key={item.name}
                             to={item.path}
-                            className={`flex flex-col items-center justify-center p-2 rounded-lg transition-all ${isActive ? 'text-system-blue' : 'text-gray-500 hover:text-gray-300'}`}
+                            className={`relative flex flex-col items-center justify-center p-2 rounded-lg transition-all ${isActive ? 'text-system-blue' : 'text-gray-500 hover:text-gray-300'}`}
                         >
-                            <item.icon className={`w-6 h-6 ${isActive ? 'drop-shadow-[0_0_8px_rgba(var(--color-system-blue-rgb),0.8)]' : ''}`} />
+                            <div className="relative">
+                                <item.icon className={`w-6 h-6 ${isActive ? 'drop-shadow-[0_0_8px_rgba(var(--color-system-blue-rgb),0.8)]' : ''}`} />
+                                {badgeCount > 0 && (
+                                    <div className="absolute -top-1 -right-1 bg-system-red text-white text-[9px] font-bold px-1 rounded-full border border-[#0a1120] animate-pulse">
+                                        {badgeCount > 9 ? '!' : badgeCount}
+                                    </div>
+                                )}
+                            </div>
                             <span className="text-[10px] font-display tracking-widest mt-1">{item.name}</span>
                         </Link>
                     )
