@@ -25,13 +25,17 @@ export default function ShopItemCard({ item, userGold, onPurchase, isOwned = fal
     const canAfford = userGold >= item.price;
     const isTheme = item.type === 'Theme';
 
-    // Extract theme color from effectData
+    // Extract theme color from effectData with case-insensitivity
     let themeColor = '';
     if (isTheme) {
         try {
             const data = JSON.parse(item.effectData);
-            themeColor = THEME_COLORS[data.theme] || '';
-        } catch { }
+            // Handle both "theme" and "Theme" keys, and normalize value
+            const themeKey = (data.theme || data.Theme || '').toLowerCase();
+            themeColor = THEME_COLORS[themeKey] || 'bg-slate-700 text-slate-700'; // Fallback color
+        } catch {
+            themeColor = 'bg-slate-700 text-slate-700';
+        }
     }
 
     const handleBuy = async () => {
@@ -73,10 +77,12 @@ export default function ShopItemCard({ item, userGold, onPurchase, isOwned = fal
             )}
 
             <div className="w-24 h-24 mb-4 bg-black/40 rounded-full flex items-center justify-center overflow-hidden border border-system-blue/20 group-hover:border-system-blue/50 group-hover:shadow-[0_0_15px_rgba(var(--color-system-blue-rgb),0.5)] transition-all">
-                {isTheme && themeColor ? (
+                {isTheme ? (
                     <div className={`w-16 h-16 rounded-full ${themeColor} shadow-[0_0_20px_currentColor] animate-pulse`}></div>
-                ) : (
+                ) : item.imageUrl ? (
                     <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-contain filter drop-shadow-[0_0_5px_rgba(var(--color-system-blue-rgb),0.8)]" />
+                ) : (
+                    <div className="text-4xl">📦</div> // Fallback for non-theme items with no image
                 )}
             </div>
 
