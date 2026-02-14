@@ -3,15 +3,20 @@ using FocusArena.Domain.Entities;
 using FocusArena.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
+using FocusArena.Infrastructure.Hubs;
+using Microsoft.AspNetCore.SignalR;
+
 namespace FocusArena.Infrastructure.Services;
 
 public class GuildService : IGuildService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IHubContext<GameHub> _hubContext;
 
-    public GuildService(ApplicationDbContext context)
+    public GuildService(ApplicationDbContext context, IHubContext<GameHub> hubContext)
     {
         _context = context;
+        _hubContext = hubContext;
     }
 
     public async Task<Guild?> CreateGuildAsync(int userId, string name, string? description, bool isPrivate = false, string? inviteCode = null)
@@ -93,6 +98,17 @@ public class GuildService : IGuildService
         user.GuildId = guildId;
 
         await _context.SaveChangesAsync();
+
+        // Broadcast to guild
+        await _hubContext.Clients.Group($"Guild_{guildId}").SendAsync("ReceiveGuildMemberJoined", new 
+        { 
+            userId, 
+            name = user.Name,
+            avatarUrl = user.AvatarUrl,
+            role = GuildRole.Member,
+            joinedAt = member.JoinedAt
+        });
+
         return true;
     }
 
@@ -135,6 +151,10 @@ public class GuildService : IGuildService
         user.GuildId = null;
 
         await _context.SaveChangesAsync();
+
+        // Broadcast to guild (even though user left, others need to know)
+        await _hubContext.Clients.Group($"Guild_{member.GuildId}").SendAsync("ReceiveGuildMemberLeft", userId);
+
         return true;
     }
 
@@ -165,6 +185,13 @@ public class GuildService : IGuildService
 
         _context.GuildMembers.Remove(targetMember);
         await _context.SaveChangesAsync();
+
+        // Broadcast to guild
+        if (leader.GuildId.HasValue)
+        {
+            await _hubContext.Clients.Group($"Guild_{leader.GuildId.Value}").SendAsync("ReceiveGuildMemberLeft", targetUserId);
+        }
+
         return true;
     }
 
@@ -189,6 +216,9 @@ public class GuildService : IGuildService
 
         // Remove guild
         _context.Guilds.Remove(guild);
+
+        // Notify all members
+        await _hubContext.Clients.Group($"Guild_{guildId}").SendAsync("ReceiveGuildDeleted");
 
         await _context.SaveChangesAsync();
         return true;
@@ -215,6 +245,9 @@ public class GuildService : IGuildService
 
         // Remove guild
         _context.Guilds.Remove(guild);
+
+        // Notify all members
+        await _hubContext.Clients.Group($"Guild_{guildId}").SendAsync("ReceiveGuildDeleted");
 
         await _context.SaveChangesAsync();
         return true;

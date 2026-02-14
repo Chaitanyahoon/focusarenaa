@@ -75,6 +75,44 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
         };
     }, [connection]);
 
+    // SignalR Listeners for Guild Updates
+    useEffect(() => {
+        if (!connection || !guild) return;
+
+        const handleGuildDeleted = () => {
+            toast.error("This guild has been disbanded.");
+            onLeave();
+        };
+
+        const handleMemberJoined = (member: any) => {
+            toast.success(`${member.name} joined the guild!`);
+            loadGuild();
+        };
+
+        const handleMemberLeft = (userId: number) => {
+            if (userId === user?.id) {
+                toast.error("You have been removed from the guild.");
+                onLeave();
+            } else {
+                const member = guild.members.find(m => m.userId === userId);
+                const name = member?.user.name || "A member";
+                toast.info(`${name} left the guild.`);
+                loadGuild();
+            }
+        };
+
+        connection.on("ReceiveGuildDeleted", handleGuildDeleted);
+        connection.on("ReceiveGuildMemberJoined", handleMemberJoined);
+        connection.on("ReceiveGuildMemberLeft", handleMemberLeft);
+
+        return () => {
+            connection.off("ReceiveGuildDeleted", handleGuildDeleted);
+            connection.off("ReceiveGuildMemberJoined", handleMemberJoined);
+            connection.off("ReceiveGuildMemberLeft", handleMemberLeft);
+        };
+    }, [connection, guild, user?.id]);
+
+
 
     const handleLeave = () => {
         setConfirmModal({ isOpen: true, type: 'leave' });
