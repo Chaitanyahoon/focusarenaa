@@ -28,7 +28,7 @@ public class ShopController : ControllerBase
     [HttpGet("inventory")]
     public async Task<IActionResult> GetInventory()
     {
-        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
         var inventory = await _shopService.GetInventoryAsync(userId);
         return Ok(inventory);
     }
@@ -36,7 +36,7 @@ public class ShopController : ControllerBase
     [HttpPost("buy/{itemId}")]
     public async Task<IActionResult> BuyItem(int itemId)
     {
-        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
         var result = await _shopService.BuyItemAsync(userId, itemId);
 
         if (!result)
@@ -50,7 +50,7 @@ public class ShopController : ControllerBase
     [HttpPost("use/{itemId}")]
     public async Task<IActionResult> UseItem(int itemId)
     {
-        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
         var message = await _shopService.UseItemAsync(userId, itemId);
         return Ok(new { message });
     }

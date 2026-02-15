@@ -22,7 +22,7 @@ public class DailyQuestController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<DailyQuestDto>>> GetDailyQuests()
     {
-        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
         // Check for reset before returning
         await _dailyQuestService.CheckDailyResetAsync(userId);
         
@@ -33,7 +33,7 @@ public class DailyQuestController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<DailyQuest>> CreateDailyQuest(CreateDailyQuestDto dto)
     {
-        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
         var quest = await _dailyQuestService.CreateDailyQuestAsync(userId, dto.Title, dto.TargetCount, dto.Unit, dto.Difficulty);
         return CreatedAtAction(nameof(GetDailyQuests), new { }, quest);
     }
@@ -41,7 +41,7 @@ public class DailyQuestController : ControllerBase
     [HttpPost("{id}/progress")]
     public async Task<ActionResult<DailyQuestLog>> LogProgress(int id, [FromBody] int count)
     {
-        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
         try
         {
             var log = await _dailyQuestService.LogProgressAsync(userId, id, count);
@@ -56,7 +56,7 @@ public class DailyQuestController : ControllerBase
     [HttpGet("status")]
     public async Task<ActionResult<DailyQuestStatus>> GetStatus()
     {
-        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
         var status = await _dailyQuestService.GetDailyStatusAsync(userId);
         return Ok(status);
     }
@@ -71,17 +71,17 @@ public class DailyQuestController : ControllerBase
 
 public class CreateDailyQuestDto
 {
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
     public int TargetCount { get; set; }
-    public string Unit { get; set; }
+    public string Unit { get; set; } = string.Empty;
     public int Difficulty { get; set; }
 }
 
 public class CreateGlobalQuestDto
 {
-    public string Title { get; set; }
-    public string Description { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
     public int TargetCount { get; set; }
-    public string Unit { get; set; }
+    public string Unit { get; set; } = string.Empty;
     public int Difficulty { get; set; }
 }

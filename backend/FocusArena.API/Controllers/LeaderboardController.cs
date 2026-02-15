@@ -26,7 +26,7 @@ public class LeaderboardController : ControllerBase
     {
         string cacheKey = $"global_leaderboard_{limit}";
         
-        if (!_cache.TryGetValue(cacheKey, out List<LeaderboardEntryDto> leaderboard))
+        if (!_cache.TryGetValue(cacheKey, out List<LeaderboardEntryDto>? leaderboard) || leaderboard == null)
         {
             var users = await _context.Users
                 .AsNoTracking()
@@ -60,7 +60,7 @@ public class LeaderboardController : ControllerBase
     {
         string cacheKey = $"weekly_leaderboard_{limit}";
 
-        if (!_cache.TryGetValue(cacheKey, out List<LeaderboardEntryDto> result))
+        if (!_cache.TryGetValue(cacheKey, out List<LeaderboardEntryDto>? result) || result == null)
         {
             var weekAgo = DateTime.UtcNow.AddDays(-7);
 

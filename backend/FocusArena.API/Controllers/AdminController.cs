@@ -126,7 +126,7 @@ public class AdminController : ControllerBase
                 g.Id,
                 g.Name,
                 g.Description,
-                LeaderName = g.Leader.Name,
+                LeaderName = g.Leader != null ? g.Leader.Name : "Unknown",
                 MemberCount = g.Members.Count,
                 g.Capacity,
                 g.Level,

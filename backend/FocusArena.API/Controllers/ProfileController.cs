@@ -127,6 +127,7 @@ public class ProfileController : ControllerBase
                 {
                     try
                     {
+                        if (string.IsNullOrEmpty(item.ShopItem?.EffectData)) continue;
                         using var doc = System.Text.Json.JsonDocument.Parse(item.ShopItem.EffectData);
                         if (doc.RootElement.TryGetProperty("theme", out var themeProp) && 
                             themeProp.GetString() == dto.Theme)
@@ -161,13 +162,14 @@ public class ProfileController : ControllerBase
 
         var themeItems = await _context.InventoryItems
             .Include(i => i.ShopItem)
-            .Where(i => i.UserId == userId && i.ShopItem.Type == "Theme" && i.Quantity > 0)
+            .Where(i => i.UserId == userId && i.ShopItem != null && i.ShopItem.Type == "Theme" && i.Quantity > 0)
             .ToListAsync();
 
         foreach (var item in themeItems)
         {
             try
             {
+                if (string.IsNullOrEmpty(item.ShopItem?.EffectData)) continue;
                 using var doc = System.Text.Json.JsonDocument.Parse(item.ShopItem.EffectData);
                 var themeName = doc.RootElement.GetProperty("theme").GetString();
                 if (!string.IsNullOrEmpty(themeName))
