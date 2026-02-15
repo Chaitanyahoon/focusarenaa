@@ -9,6 +9,7 @@ export interface DailyQuest {
     difficulty: number;
     currentCount: number;
     isCompleted: boolean;
+    createdAt: string;
 }
 
 export interface DailyQuestLog {

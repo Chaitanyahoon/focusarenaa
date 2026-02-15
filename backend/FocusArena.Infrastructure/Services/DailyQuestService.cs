@@ -48,7 +48,8 @@ public class DailyQuestService : IDailyQuestService
                 Unit = q.Unit,
                 Difficulty = q.Difficulty,
                 CurrentCount = log?.CurrentCount ?? 0,
-                IsCompleted = log?.IsCompleted ?? false
+                IsCompleted = log?.IsCompleted ?? false,
+                CreatedAt = q.CreatedAt
             };
         });
     }
@@ -118,6 +119,14 @@ public class DailyQuestService : IDailyQuestService
 
         var quest = await _context.DailyQuests.FindAsync(dailyQuestId);
         if (quest == null) throw new Exception("Quest not found");
+
+        // Anti-cheat: 15-minute cooldown from quest creation
+        var timeSinceCreation = DateTime.UtcNow - quest.CreatedAt;
+        if (timeSinceCreation.TotalMinutes < 15)
+        {
+            var remaining = TimeSpan.FromMinutes(15) - timeSinceCreation;
+            throw new Exception($"Quest is on cooldown. Wait {(int)remaining.TotalMinutes}m {remaining.Seconds}s before logging progress.");
+        }
 
         log.CurrentCount = count;
         if (log.CurrentCount >= quest.TargetCount && !log.IsCompleted)
