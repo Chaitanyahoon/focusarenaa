@@ -198,10 +198,10 @@ export default function ChatPage() {
     }
 
     return (
-        <div className="max-w-6xl mx-auto h-[calc(100vh-120px)] flex gap-4 animate-in fade-in duration-500">
+        <div className="max-w-6xl mx-auto h-[calc(100vh-120px)] flex gap-0 md:gap-4 animate-in fade-in duration-500">
 
             {/* LEFT PANEL: Users List */}
-            <div className="w-1/3 system-panel flex flex-col overflow-hidden">
+            <div className={`${selectedUser ? 'hidden md:flex' : 'flex'} w-full md:w-1/3 system-panel flex-col overflow-hidden`}>
                 {/* View Toggles */}
                 <div className="flex border-b border-system-blue/20">
                     <button
@@ -460,7 +460,7 @@ export default function ChatPage() {
             </div>
 
             {/* RIGHT PANEL: Chat Window */}
-            <div className="w-2/3 system-panel flex flex-col overflow-hidden relative">
+            <div className={`${selectedUser ? 'flex' : 'hidden md:flex'} w-full md:w-2/3 system-panel flex-col overflow-hidden relative`}>
                 {!selectedUser ? (
                     <div className="flex-1 flex flex-col items-center justify-center text-gray-500 opacity-50">
                         <ChatBubbleLeftRightIcon className="w-24 h-24 mb-4 text-system-blue" />
@@ -470,6 +470,15 @@ export default function ChatPage() {
                     <>
                         {/* Chat Header */}
                         <div className="p-4 border-b border-system-blue/30 bg-blue-900/10 flex items-center gap-3">
+                            {/* Back button — mobile only */}
+                            <button
+                                onClick={() => setSelectedUser(null)}
+                                className="md:hidden text-blue-400 hover:text-white transition-colors mr-1 flex-shrink-0"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                            </button>
                             <Link to={`/profile/${selectedUser.id}`} className="w-10 h-10 rounded-full bg-gray-800 overflow-hidden border border-system-blue/30 hover:ring-2 hover:ring-blue-500 transition-all">
                                 {selectedUser.avatarUrl ? (
                                     <img src={selectedUser.avatarUrl} alt={selectedUser.name} className="w-full h-full object-cover" />
@@ -492,7 +501,7 @@ export default function ChatPage() {
                         <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar bg-black/20">
                             {messages.map((msg, index) => (
                                 <div key={index} className={`flex ${msg.isMe ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[70%] rounded-lg p-3 ${msg.isMe
+                                    <div className={`max-w-[85%] md:max-w-[70%] rounded-lg p-3 ${msg.isMe
                                         ? 'bg-system-blue/20 border border-system-blue/30 text-blue-100 rounded-tr-none'
                                         : 'bg-gray-800/80 border border-gray-700 text-gray-200 rounded-tl-none'
                                         }`}>
