@@ -52,6 +52,18 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
         loadGuild();
     }, [guildId]);
 
+    // Join the guild's SignalR group so we receive real-time updates
+    useEffect(() => {
+        if (!connection || !guildId) return;
+
+        // Join the guild group on the shared connection
+        connection.invoke('JoinGuildGroup', guildId).catch(() => { });
+
+        return () => {
+            connection.invoke('LeaveGuildGroup', guildId).catch(() => { });
+        };
+    }, [connection, guildId]);
+
     // SignalR Listeners for Raid
     useEffect(() => {
         if (!connection) return;
