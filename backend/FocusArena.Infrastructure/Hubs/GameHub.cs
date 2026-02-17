@@ -133,14 +133,72 @@ public class GameHub : Hub
         });
     }
 
-    // Connection lifecycle
+    // Presence Tracking
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, HashSet<string>> OnlineUsers = new();
+
     public override async Task OnConnectedAsync()
     {
+        var userIdStr = Context.UserIdentifier;
+        if (int.TryParse(userIdStr, out int userId))
+        {
+            OnlineUsers.AddOrUpdate(userId,
+                _ => new HashSet<string> { Context.ConnectionId },
+                (_, connections) =>
+                {
+                    lock (connections)
+                    {
+                        connections.Add(Context.ConnectionId);
+                    }
+                    return connections;
+                });
+
+            // Broadcast only if this is the first connection for this user
+            if (OnlineUsers.TryGetValue(userId, out var connections))
+            {
+                bool isOnline;
+                lock (connections) { isOnline = connections.Count == 1; }
+                
+                if (isOnline)
+                {
+                    await Clients.All.SendAsync("UserCameOnline", userId);
+                }
+            }
+        }
+
         await base.OnConnectedAsync();
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
+        var userIdStr = Context.UserIdentifier;
+        if (int.TryParse(userIdStr, out int userId))
+        {
+            if (OnlineUsers.TryGetValue(userId, out var connections))
+            {
+                bool isOffline = false;
+                lock (connections)
+                {
+                    connections.Remove(Context.ConnectionId);
+                    if (connections.Count == 0)
+                    {
+                        isOffline = true;
+                        // Clean up empty entry
+                        OnlineUsers.TryRemove(userId, out _);
+                    }
+                }
+
+                if (isOffline)
+                {
+                    await Clients.All.SendAsync("UserWentOffline", userId);
+                }
+            }
+        }
+
         await base.OnDisconnectedAsync(exception);
+    }
+
+    public Task<List<int>> GetOnlineUsers()
+    {
+        return Task.FromResult(OnlineUsers.Keys.ToList());
     }
 }

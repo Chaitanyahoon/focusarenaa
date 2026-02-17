@@ -33,6 +33,7 @@ export default function ChatPage() {
     const [addFriendId, setAddFriendId] = useState('')
     const [foundUser, setFoundUser] = useState<any>(null)
     const [friendSearchError, setFriendSearchError] = useState('')
+    const [onlineUsers, setOnlineUsers] = useState<Set<number>>(new Set())
 
     const [connection, setConnection] = useState<HubConnection | null>(null)
     const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -75,6 +76,29 @@ export default function ChatPage() {
                     newConnection.on('ReceiveFriendResponse', () => {
                         if (isMounted) loadFriendsData()
                     })
+
+                    newConnection.on('UserCameOnline', (userId: number) => {
+                        setOnlineUsers(prev => {
+                            const next = new Set(prev)
+                            next.add(userId)
+                            return next
+                        })
+                    })
+
+                    newConnection.on('UserWentOffline', (userId: number) => {
+                        setOnlineUsers(prev => {
+                            const next = new Set(prev)
+                            next.delete(userId)
+                            return next
+                        })
+                    })
+
+                    // Get initial online users
+                    newConnection.invoke('GetOnlineUsers')
+                        .then((users: number[]) => {
+                            if (isMounted) setOnlineUsers(new Set(users))
+                        })
+                        .catch(err => console.error('Failed to get online users', err))
                 }
             })
             .catch(err => {
@@ -195,6 +219,77 @@ export default function ChatPage() {
         setSelectedUser(u)
         setSearchResults([])
         setSearchQuery('')
+    }
+
+    // Friend Management Functions
+    const loadFriendsData = async () => {
+        try {
+            const [friendsData, requestsData] = await Promise.all([
+                friendAPI.getFriends(),
+                friendAPI.getRequests()
+            ])
+            setFriends(friendsData)
+            setRequests(requestsData)
+        } catch (error) {
+            console.error('Failed to load friends', error)
+        }
+    }
+
+    useEffect(() => {
+        loadFriendsData()
+    }, [])
+
+    const handleSearchFriend = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!addFriendId) return
+        setFriendSearchError('')
+        try {
+            const id = parseInt(addFriendId)
+            if (isNaN(id)) {
+                setFriendSearchError('Invalid Hunter ID')
+                return
+            }
+            const user = await profileAPI.getById(id)
+            setFoundUser(user)
+        } catch (error) {
+            setFriendSearchError('Hunter not found')
+            setFoundUser(null)
+        }
+    }
+
+    const handleAddFriend = async () => {
+        if (!foundUser) return
+        try {
+            await friendAPI.sendRequest(foundUser.id)
+            toast.success('Friend request sent!')
+            setShowAddFriend(false)
+            setFoundUser(null)
+            setAddFriendId('')
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Failed to send request')
+        }
+    }
+
+    const handleRespond = async (requestId: number, accept: boolean) => {
+        try {
+            await friendAPI.respondToRequest(requestId, accept)
+            toast.success(accept ? 'Friend request accepted!' : 'Request declined')
+            loadFriendsData()
+        } catch (error) {
+            toast.error('Failed to respond')
+        }
+    }
+
+    const startChat = (friend: FriendResponseDto) => {
+        const chatUser: ChatUser = {
+            id: friend.friendId,
+            name: friend.name,
+            avatarUrl: friend.avatarUrl,
+            unreadCount: 0,
+            isOnline: false
+        }
+        setSelectedUser(chatUser)
+        setViewMode('chats')
     }
 
     return (
@@ -491,8 +586,10 @@ export default function ChatPage() {
                                     {selectedUser.name}
                                 </Link>
                                 <div className="flex items-center gap-1.5">
-                                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                                    <span className="text-xs text-green-400 font-mono tracking-widest">ONLINE</span>
+                                    <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${onlineUsers.has(selectedUser.id) ? 'bg-green-500' : 'bg-gray-500'}`}></span>
+                                    <span className={`text-xs font-mono tracking-widest ${onlineUsers.has(selectedUser.id) ? 'text-green-400' : 'text-gray-500'}`}>
+                                        {onlineUsers.has(selectedUser.id) ? 'ONLINE' : 'OFFLINE'}
+                                    </span>
                                 </div>
                             </div>
                         </div>

@@ -31,7 +31,8 @@ public class LeaderboardController : ControllerBase
             var users = await _context.Users
                 .AsNoTracking()
                 .Where(u => !u.IsBanned && u.Role != "Admin")
-                .OrderByDescending(u => u.XP)
+                .OrderByDescending(u => u.Level)
+                .ThenByDescending(u => u.XP)
                 .Take(limit)
                 .ToListAsync();
 

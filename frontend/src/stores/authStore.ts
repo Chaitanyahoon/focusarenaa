@@ -140,6 +140,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
                 joinDate: userProfile.joinDate,
                 avatarUrl: userProfile.avatarUrl,
                 gold: userProfile.gold ?? 0,
+                theme: userProfile.theme || 'blue',
                 guildId: userProfile.guildId ?? (userProfile as any).GuildId,
                 role: userProfile.role
             }
@@ -172,6 +173,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
                 joinDate: userProfile.joinDate,
                 avatarUrl: userProfile.avatarUrl,
                 gold: userProfile.gold ?? 0,
+                theme: userProfile.theme || 'blue',
                 guildId: userProfile.guildId ?? (userProfile as any).GuildId,
                 role: userProfile.role
             }
