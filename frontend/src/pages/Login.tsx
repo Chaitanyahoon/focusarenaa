@@ -94,7 +94,7 @@ export default function Login() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="holo-button w-full"
+                        className="holo-button w-full bg-cyan-900/30 border-cyan-400 text-cyan-300 hover:bg-cyan-500/20 hover:text-white transition-all shadow-[0_0_15px_rgba(0,234,255,0.2)] hover:shadow-[0_0_25px_rgba(0,234,255,0.5)] font-bold tracking-widest"
                     >
                         {isLoading ? 'CONNECTING...' : '⚔️ ENTER ARENA'}
                     </button>

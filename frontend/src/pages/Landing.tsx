@@ -5,12 +5,12 @@ export default function Landing() {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        <div className="h-screen w-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
             {/* Background Ambience */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent pointer-events-none"></div>
 
             {/* Main System Window */}
-            <div className="system-panel max-w-4xl w-full p-12 text-center animate-in fade-in zoom-in duration-700">
+            <div className="system-panel max-w-4xl w-full p-8 md:p-12 text-center animate-in fade-in zoom-in duration-700 scale-90 origin-center transform transition-transform">
 
                 <div className="mb-8">
                     <h2 className="text-xl md:text-2xl text-blue-400 tracking-[0.3em] uppercase mb-4 animate-pulse">
@@ -23,7 +23,7 @@ export default function Landing() {
                     <Logo className="h-24 md:h-32 w-auto animate-pulse scale-90" />
                 </div>
 
-                <h1 className="text-6xl md:text-8xl font-bold mb-6 text-white tracking-wider" style={{ textShadow: '0 0 20px rgba(0,234,255,0.4)' }}>
+                <h1 className="text-5xl md:text-7xl font-bold mb-6 text-white tracking-wider" style={{ textShadow: '0 0 20px rgba(0,234,255,0.4)' }}>
                     FOCUS ARENA
                 </h1>
 
@@ -37,10 +37,10 @@ export default function Landing() {
                     </p>
                 </div>
 
-                <div className="flex flex-col md:flex-row gap-8 justify-center items-center mt-12">
+                <div className="flex flex-col md:flex-row gap-8 justify-center items-center mt-8">
                     <button
                         onClick={() => navigate('/register')}
-                        className="system-button text-xl px-12 py-4 hover:bg-blue-500/10"
+                        className="system-button text-xl px-12 py-4 hover:bg-blue-500/20 active:scale-95 transition-all shadow-[0_0_20px_rgba(0,234,255,0.3)] hover:shadow-[0_0_30px_rgba(0,234,255,0.6)]"
                     >
                         Accept
                     </button>
@@ -60,7 +60,7 @@ export default function Landing() {
                 <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-blue-500"></div>
             </div>
 
-            <div className="mt-8 text-gray-600 font-mono text-xs tracking-widest">
+            <div className="mt-4 text-gray-600 font-mono text-xs tracking-widest absolute bottom-4">
                 SYSTEM VER. 2.0 // CONNECTED
             </div>
         </div>
