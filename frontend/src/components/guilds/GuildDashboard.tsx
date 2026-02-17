@@ -108,7 +108,7 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
             } else {
                 const member = guild.members.find(m => m.userId === userId);
                 const name = member?.user.name || "A member";
-                toast.info(`${name} left the guild.`);
+                toast(`${name} left the guild.`, { icon: 'ℹ️' });
                 loadGuild();
             }
         };

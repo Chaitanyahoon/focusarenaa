@@ -262,6 +262,23 @@ export default function AdminDashboard() {
         }
     }
 
+    const handleCreateGate = async () => {
+        try {
+            await adminAPI.createGlobalGate(newGate)
+            alert("Global Gate created successfully!")
+            setNewGate({
+                ...newGate,
+                title: '',
+                description: '',
+                bossName: 'Dungeon Boss',
+                deadline: ''
+            })
+        } catch (error) {
+            console.error("Failed to create gate", error)
+            alert("Failed to create gate")
+        }
+    }
+
     if (user?.role !== 'Admin') {
         return (
             <div className="flex items-center justify-center h-full text-white">

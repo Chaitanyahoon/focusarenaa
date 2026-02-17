@@ -3,7 +3,7 @@ import { useAuthStore } from '../stores/authStore'
 import { useNotificationStore } from '../stores/notificationStore'
 import { chatAPI, friendAPI, profileAPI } from '../services/api'
 import { ChatUser, PrivateMessage, FriendResponseDto } from '../types'
-import { HubConnection, HubConnectionBuilder, LogLevel, HubConnectionState } from '@microsoft/signalr'
+import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr'
 import { HUB_BASE } from '../config'
 import {
     PaperAirplaneIcon,
@@ -19,7 +19,7 @@ import { Link } from 'react-router-dom'
 
 export default function ChatPage() {
     const { user, token } = useAuthStore()
-    const { setUnreadMessages, setFriendRequests, decrementFriendRequests } = useNotificationStore()
+    const { setUnreadMessages, setFriendRequests } = useNotificationStore()
     const [recentChats, setRecentChats] = useState<ChatUser[]>([])
     const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null)
     const [messages, setMessages] = useState<PrivateMessage[]>([])
@@ -130,7 +130,7 @@ export default function ChatPage() {
             .then(() => {
                 if (isMounted) {
                     // Listeners
-                    newConnection.on('ReceivePrivateMessage', (msg: any) => {
+                    newConnection.on('ReceivePrivateMessage', () => {
                         // We can't access selectedUser from closure here easily if it changes.
                         // However, we are setting state updates.
                         // To handle selectedUser dependency, we might need a Ref or a separate listener effect.
