@@ -6,5 +6,6 @@ public enum TaskCategory
     Work = 1,
     Fitness = 2,
     Personal = 3,
-    Learning = 4
+    Learning = 4,
+    Note = 5
 }
