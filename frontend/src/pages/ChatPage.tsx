@@ -38,6 +38,78 @@ export default function ChatPage() {
     const [connection, setConnection] = useState<HubConnection | null>(null)
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
+    // Friend Management Functions
+    const loadFriendsData = async () => {
+        try {
+            const [friendsData, requestsData] = await Promise.all([
+                friendAPI.getFriends(),
+                friendAPI.getRequests()
+            ])
+            setFriends(friendsData)
+            setRequests(requestsData)
+            setFriendRequests(requestsData.filter(r => r.isIncoming).length)
+        } catch (error) {
+            console.error('Failed to load friends', error)
+        }
+    }
+
+    useEffect(() => {
+        loadFriendsData()
+    }, [])
+
+    const handleSearchFriend = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!addFriendId) return
+        setFriendSearchError('')
+        try {
+            const id = parseInt(addFriendId)
+            if (isNaN(id)) {
+                setFriendSearchError('Invalid Hunter ID')
+                return
+            }
+            const user = await profileAPI.getById(id)
+            setFoundUser(user)
+        } catch (error) {
+            setFriendSearchError('Hunter not found')
+            setFoundUser(null)
+        }
+    }
+
+    const handleAddFriend = async () => {
+        if (!foundUser) return
+        try {
+            await friendAPI.sendRequest(foundUser.id)
+            toast.success('Friend request sent!')
+            setShowAddFriend(false)
+            setFoundUser(null)
+            setAddFriendId('')
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Failed to send request')
+        }
+    }
+
+    const handleRespond = async (requestId: number, accept: boolean) => {
+        try {
+            await friendAPI.respondToRequest(requestId, accept)
+            toast.success(accept ? 'Friend request accepted!' : 'Request declined')
+            loadFriendsData()
+        } catch (error) {
+            toast.error('Failed to respond')
+        }
+    }
+
+    const startChat = (friend: FriendResponseDto) => {
+        const chatUser: ChatUser = {
+            id: friend.friendId,
+            name: friend.name,
+            avatarUrl: friend.avatarUrl,
+            unreadCount: 0,
+            isOnline: false
+        }
+        setSelectedUser(chatUser)
+        setViewMode('chats')
+    }
+
     // 1. Initialize SignalR Connection & Listeners
     useEffect(() => {
         if (!token) return
@@ -221,76 +293,7 @@ export default function ChatPage() {
         setSearchQuery('')
     }
 
-    // Friend Management Functions
-    const loadFriendsData = async () => {
-        try {
-            const [friendsData, requestsData] = await Promise.all([
-                friendAPI.getFriends(),
-                friendAPI.getRequests()
-            ])
-            setFriends(friendsData)
-            setRequests(requestsData)
-        } catch (error) {
-            console.error('Failed to load friends', error)
-        }
-    }
 
-    useEffect(() => {
-        loadFriendsData()
-    }, [])
-
-    const handleSearchFriend = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!addFriendId) return
-        setFriendSearchError('')
-        try {
-            const id = parseInt(addFriendId)
-            if (isNaN(id)) {
-                setFriendSearchError('Invalid Hunter ID')
-                return
-            }
-            const user = await profileAPI.getById(id)
-            setFoundUser(user)
-        } catch (error) {
-            setFriendSearchError('Hunter not found')
-            setFoundUser(null)
-        }
-    }
-
-    const handleAddFriend = async () => {
-        if (!foundUser) return
-        try {
-            await friendAPI.sendRequest(foundUser.id)
-            toast.success('Friend request sent!')
-            setShowAddFriend(false)
-            setFoundUser(null)
-            setAddFriendId('')
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Failed to send request')
-        }
-    }
-
-    const handleRespond = async (requestId: number, accept: boolean) => {
-        try {
-            await friendAPI.respondToRequest(requestId, accept)
-            toast.success(accept ? 'Friend request accepted!' : 'Request declined')
-            loadFriendsData()
-        } catch (error) {
-            toast.error('Failed to respond')
-        }
-    }
-
-    const startChat = (friend: FriendResponseDto) => {
-        const chatUser: ChatUser = {
-            id: friend.friendId,
-            name: friend.name,
-            avatarUrl: friend.avatarUrl,
-            unreadCount: 0,
-            isOnline: false
-        }
-        setSelectedUser(chatUser)
-        setViewMode('chats')
-    }
 
     return (
         <div className="max-w-6xl mx-auto h-[calc(100vh-120px)] flex gap-0 md:gap-4 animate-in fade-in duration-500">
