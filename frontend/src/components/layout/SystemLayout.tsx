@@ -127,7 +127,9 @@ export default function SystemLayout() {
                 {/* Desktop Download CTA */}
                 <div className="px-4 pb-4">
                     <a
-                        href="/downloads/focus-arena-setup.exe"
+                        href="https://github.com/Chaitanyahoon/focusarenaa/releases"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="w-full flex items-center gap-3 px-4 py-3 bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 hover:text-blue-100 border border-blue-500/20 hover:border-blue-500/40 rounded-sm transition-all group"
                     >
                         <div className="relative">

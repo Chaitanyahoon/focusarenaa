@@ -60,7 +60,9 @@ export default function Landing() {
                             Available on Desktop
                         </p>
                         <a
-                            href="/downloads/focus-arena-setup.exe"
+                            href="https://github.com/Chaitanyahoon/focusarenaa/releases"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="group flex items-center gap-4 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-blue-500/50 rounded-lg transition-all duration-300"
                         >
                             <svg className="w-8 h-8 text-blue-400 group-hover:text-blue-300 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
