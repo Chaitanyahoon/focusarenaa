@@ -6,6 +6,9 @@ on:
     paths:
       - 'desktop/**'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
