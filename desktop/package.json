@@ -57,11 +57,13 @@
   "build": {
     "appId": "com.focusarena.desktop",
     "productName": "Focus Arena",
+    "compression": "maximum",
     "directories": {
       "output": "release"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "build/icon.png"
     },
     "nsis": {
       "oneClick": false,
