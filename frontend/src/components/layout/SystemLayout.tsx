@@ -124,6 +124,23 @@ export default function SystemLayout() {
                     )}
                 </nav>
 
+                {/* Desktop Download CTA */}
+                <div className="px-4 pb-4">
+                    <a
+                        href="/downloads/focus-arena-setup.exe"
+                        className="w-full flex items-center gap-3 px-4 py-3 bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 hover:text-blue-100 border border-blue-500/20 hover:border-blue-500/40 rounded-sm transition-all group"
+                    >
+                        <div className="relative">
+                            <ArrowRightOnRectangleIcon className="w-5 h-5 rotate-90" />
+                            <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                        </div>
+                        <div className="flex flex-col text-left">
+                            <span className="font-display tracking-widest text-xs font-bold">DESKTOP CLIENT</span>
+                            <span className="text-[9px] text-blue-400/60 font-mono">GET THE APP</span>
+                        </div>
+                    </a>
+                </div>
+
                 {/* System Info / Logout */}
                 <div className="p-4 border-t border-system-blue/20 bg-black/40 backdrop-blur-sm relative">
                     <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-900 to-transparent"></div>

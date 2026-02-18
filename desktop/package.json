@@ -2,6 +2,8 @@
   "name": "desktop",
   "private": true,
   "version": "0.0.0",
+  "description": "Focus Arena Desktop Client",
+  "author": "Chaitanya Patil",
   "type": "module",
   "main": "dist-electron/main.js",
   "scripts": {
@@ -47,5 +49,19 @@
     "typescript-eslint": "^8.48.0",
     "vite": "^7.3.1",
     "wait-on": "^9.0.4"
+  },
+  "build": {
+    "appId": "com.focusarena.desktop",
+    "productName": "Focus Arena",
+    "directories": {
+      "output": "release"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }
