@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "description": "Focus Arena Desktop Client",
   "author": "Chaitanya Patil",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Chaitanyahoon/focusarenaa"
+  },
   "type": "module",
   "main": "dist-electron/main.js",
   "scripts": {
