@@ -238,4 +238,15 @@ export const guildRaidAPI = {
     }
 }
 
+// Focus API
+export const focusAPI = {
+    getActiveSession: async (): Promise<any> => {
+        const response = await api.get('/focus/active')
+        return response.data
+    },
+    sync: async (data: { secondsLeft: number; mode: string; isRunning: boolean }): Promise<void> => {
+        await api.post('/focus/sync', data)
+    }
+}
+
 export { api }

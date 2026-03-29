@@ -1,18 +1,16 @@
-import { app, BrowserWindow, screen, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, screen, shell, ipcMain, globalShortcut, Tray, Menu, nativeImage } from 'electron'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 // Fix for transparent window on Windows (prevents black background)
 app.disableHardwareAcceleration()
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+// Fix GPU disk cache crash on Windows
+app.commandLine.appendSwitch('no-sandbox')
+app.commandLine.appendSwitch('disable-gpu-sandbox') 
+app.commandLine.appendSwitch('disable-software-rasterizer')
 
-// The built directory structure
-//
-// ├─┬ dist-electron
-// │ └── main.js
-// └─┬ dist
-//   └── index.html
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // @ts-ignore
 process.env.DIST = path.join(__dirname, '../dist')
@@ -20,34 +18,78 @@ process.env.DIST = path.join(__dirname, '../dist')
 process.env.VITE_PUBLIC = app.isPackaged ? process.env.DIST : path.join(process.env.DIST, '../public')
 
 let win: BrowserWindow | null
+let tray: Tray | null = null
 
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
 
+function createTray() {
+    const iconPath = path.join(process.env.VITE_PUBLIC || '', 'icon.png')
+    const icon = nativeImage.createFromPath(iconPath)
+    
+    tray = new Tray(icon.resize({ width: 16, height: 16 }))
+    tray.setToolTip('Focus Arena')
+
+    const contextMenu = Menu.buildFromTemplate([
+        { label: 'Focus Arena', enabled: false },
+        { type: 'separator' },
+        { 
+            label: 'Show Dashboard', 
+            click: () => {
+                if (win) {
+                    win.show()
+                    win.webContents.send('toggle-mini-mode', false) // Expand
+                }
+            } 
+        },
+        { 
+            label: 'Minimize to Pill', 
+            click: () => {
+                if (win) {
+                    win.show()
+                    win.webContents.send('toggle-mini-mode', true) // Minimize
+                }
+            } 
+        },
+        { type: 'separator' },
+        { label: 'Quit', click: () => app.quit() }
+    ])
+
+    tray.setContextMenu(contextMenu)
+    tray.on('click', () => {
+        if (win) {
+            if (win.isVisible()) {
+                win.focus()
+            } else {
+                win.show()
+            }
+        }
+    })
+}
+
 function createWindow() {
-    const { width, height } = screen.getPrimaryDisplay().workAreaSize
+    const { width } = screen.getPrimaryDisplay().workAreaSize
 
     win = new BrowserWindow({
-        width: 320, // Initial Width
-        height: 480, // Initial Height
-        x: width - 340, // Margin from right
-        y: 20,
-        icon: path.join(process.env.VITE_PUBLIC || '', 'electron-vite.svg'),
+        width: 320,
+        height: 420,
+        x: width - 340,
+        y: 40,
+        icon: path.join(process.env.VITE_PUBLIC || '', 'icon.png'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: true,
             contextIsolation: true,
         },
-        title: 'Focus Arena Desktop',
+        title: 'Focus Arena',
         alwaysOnTop: true,
         frame: false,
         transparent: true,
-        resizable: true, // Allow resizing (internal or user)
+        resizable: true,
         skipTaskbar: false,
-        minWidth: 50,
+        minWidth: 100,
         minHeight: 40,
     })
 
-    // win.setAlwaysOnTop(true, 'screen-saver')
     win.setSkipTaskbar(false)
 
     // Open urls in the user's browser
@@ -56,49 +98,59 @@ function createWindow() {
         return { action: 'deny' }
     })
 
-    // IPC for resizing with Start-Anchored logic (Default Top-Right)
-    ipcMain.on('resize-window', (event, width, height) => {
+    // IPC for resizing with anchoring to top-right
+    ipcMain.on('resize-window', (_event, width, height) => {
         if (!win) return
         const bounds = win.getBounds()
-        const display = screen.getDisplayMatching(bounds)
-        const workArea = display.workArea
-
-        // Calculate new X (Anchor to right)
-        let newX = bounds.x + bounds.width - width
-
-        // Calculate new Y (Anchor to top default)
-        let newY = bounds.y
-
-        // Check if Y would go off-screen (Bottom overflow)
-        if (newY + height > workArea.y + workArea.height) {
-            // Anchor to Bottom-Right instead
-            newY = bounds.y + bounds.height - height
-        }
-
-        // Clamp to screen (Safety)
-        if (newX < workArea.x) newX = workArea.x
-        if (newY < workArea.y) newY = workArea.y
+        
+        // Anchor to Top-Right: Adjust X to maintain Right edge
+        const rightEdge = bounds.x + bounds.width
+        const newX = rightEdge - width
 
         win.setBounds({
-            x: newX,
-            y: newY,
-            width: width,
-            height: height
-        }, true) // animate: true (Windows support limited)
+            x: Math.round(newX),
+            y: bounds.y, // Maintain current Y
+            width: Math.round(width),
+            height: Math.round(height)
+        }, true) // animate true
     })
+
+    // IPC for taskbar visibility toggling (Stealth Mode)
+    ipcMain.on('update-taskbar-visibility', (_event, shouldSkip) => {
+        if (win) {
+            win.setSkipTaskbar(shouldSkip)
+        }
+    })
+
+    // IPC for application quitting
+    ipcMain.on('quit-app', () => {
+        app.quit()
+    })
+
+    // Register Global Shortcut: Alt+Z (Common for productivity apps)
+    const ret = globalShortcut.register('Alt+Z', () => {
+        if (win) {
+            win.webContents.send('toggle-mini-mode')
+        }
+    })
+
+    if (!ret) {
+        console.warn('Registration failed for Alt+Z')
+    }
 
     if (VITE_DEV_SERVER_URL) {
         win.loadURL(VITE_DEV_SERVER_URL)
     } else {
-        // win.loadFile('dist/index.html')
         win.loadFile(path.join(process.env.DIST || '', 'index.html'))
     }
 }
 
+app.on('will-quit', () => {
+    globalShortcut.unregisterAll()
+})
+
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit()
-    }
+    if (process.platform !== 'darwin') app.quit()
 })
 
 app.on('activate', () => {
@@ -107,4 +159,15 @@ app.on('activate', () => {
     }
 })
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+    try {
+        createWindow()
+    } catch (e) {
+        console.error('Failed to create window:', e)
+    }
+    try {
+        createTray()
+    } catch (e) {
+        console.error('Failed to create tray (non-fatal):', e)
+    }
+})

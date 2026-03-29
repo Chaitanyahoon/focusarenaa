@@ -161,7 +161,12 @@ export const useAuthStore = create<AuthStore>((set) => ({
         set({ isLoading: true })
         try {
             const { profileAPI } = await import('../services/api')
-            const userProfile = await profileAPI.get()
+
+            // 10s timeout — handles Render free-tier cold starts
+            const timeoutPromise = new Promise<never>((_, reject) =>
+                setTimeout(() => reject(new Error('Request timed out')), 10000)
+            )
+            const userProfile = await Promise.race([profileAPI.get(), timeoutPromise])
 
             const user: User = {
                 id: userProfile.id,

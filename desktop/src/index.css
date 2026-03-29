@@ -3,15 +3,18 @@
 
 @theme {
   --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  --shadow-glow-white: 0 0 10px rgba(255, 255, 255, 0.8);
+  --shadow-glow-white: 0 0 20px rgba(255, 255, 255, 0.15);
+  --shadow-glow-accent: 0 0 15px var(--color-accent);
+  
+  /* Custom transitions */
+  --transition-spring: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @layer base {
-
   html,
   body,
   #root {
-    @apply h-full w-full bg-transparent overflow-hidden;
+    @apply h-full w-full bg-transparent overflow-hidden select-none;
   }
 }
 
@@ -23,10 +26,6 @@ body {
   background-color: transparent !important;
 }
 
-#root {
-  background-color: transparent !important;
-}
-
 .app-drag-region {
   -webkit-app-region: drag;
 }
@@ -34,13 +33,29 @@ body {
 .no-drag,
 button,
 input,
-textarea {
+textarea,
+a {
   -webkit-app-region: no-drag;
+}
+
+/* Glassmorphism */
+.glass {
+  background: rgba(10, 10, 10, 0.7);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -48,51 +63,33 @@ textarea {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: rgba(255, 255, 255, 0.2);
 }
 
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-family: 'Space Grotesk', system-ui, sans-serif;
-  color: white;
-  background-color: transparent !important;
+/* Animation utilities */
+.hover-scale {
+  @apply transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98];
+}
+@keyframes focus-glow {
+  0%, 100% { opacity: 0.1; filter: blur(8px); }
+  50% { opacity: 0.3; filter: blur(14px); }
 }
 
-#root {
-  background-color: transparent !important;
+.animate-focus-glow {
+  animation: focus-glow 3s ease-in-out infinite;
 }
 
-.app-drag-region {
-  -webkit-app-region: drag;
+@keyframes timer-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
-.no-drag,
-button,
-input,
-textarea {
-  -webkit-app-region: no-drag;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
+.timer-active {
+  animation: timer-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

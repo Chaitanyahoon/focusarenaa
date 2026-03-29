@@ -14,18 +14,23 @@ const NoteItem = memo(({ item, theme, onDelete, index }: NoteItemProps) => {
     return (
         <motion.div
             layout
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.9, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ delay: index * 0.05 }}
-            className={`break-inside-avoid mb-2 p-3 rounded-lg border ${theme.border} bg-white/5 hover:bg-white/10 transition-colors group relative`}
+            transition={{ delay: index * 0.03 }}
+            className={`mb-2 p-4 rounded-2xl glass-light border border-white/5 hover:border-white/10 transition-all duration-300 group relative overflow-hidden`}
         >
-            <p className={`text-xs ${theme.text} whitespace-pre-wrap font-mono leading-relaxed`}>{item.title}</p>
+            <div className={`absolute top-0 left-0 w-1 h-full ${theme.accentClass} opacity-20`} />
+            
+            <p className={`text-[11px] text-white/70 whitespace-pre-wrap font-medium leading-relaxed tracking-wide`}>
+                {item.title}
+            </p>
+            
             <button
                 onClick={() => onDelete(item.id)}
-                className={`absolute top-1 right-1 opacity-0 group-hover:opacity-100 p-1 rounded-full hover:bg-red-500/20 text-red-400 transition-all`}
+                className={`absolute top-2 right-2 opacity-0 group-hover:opacity-100 p-1.5 rounded-xl hover:bg-red-500/20 text-red-400 transition-all duration-200 no-drag`}
             >
-                <XMarkIcon className="w-3 h-3" />
+                <XMarkIcon className="w-3.5 h-3.5" />
             </button>
         </motion.div>
     )
