@@ -4,5 +4,5 @@ namespace FocusArena.Application.DTOs;
 
 public class UpdateTaskStatusDto
 {
-    public TaskStatus Status { get; set; }
+    public FocusArena.Domain.Enums.TaskStatus Status { get; set; }
 }
