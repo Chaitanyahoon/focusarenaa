@@ -244,6 +244,9 @@ namespace FocusArena.Infrastructure.Migrations
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<DateTime?>("LastProgressAt")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 

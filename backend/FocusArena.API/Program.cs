@@ -81,6 +81,7 @@ builder.Services.AddScoped<IShopService, FocusArena.Infrastructure.Services.Shop
 builder.Services.AddScoped<IGateService, FocusArena.Infrastructure.Services.GateService>();
 builder.Services.AddScoped<IGuildService, FocusArena.Infrastructure.Services.GuildService>();
 builder.Services.AddScoped<IGuildRaidService, FocusArena.Infrastructure.Services.GuildRaidService>();
+builder.Services.AddScoped<IProceduralGenerationService, ProceduralGenerationService>();
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -118,34 +119,34 @@ if (!app.Environment.IsEnvironment("Testing"))
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         db.Database.Migrate();
 
-        // Seed Default Admin User
-        var adminEmail = "focusarenago@gmail.com";
-        var existingAdmin = db.Users.FirstOrDefault(u => u.Email == adminEmail);
+        // Optional admin bootstrap. Only runs when credentials are supplied explicitly.
+        var bootstrapAdminEmail = builder.Configuration["BootstrapAdmin:Email"];
+        var bootstrapAdminPassword = builder.Configuration["BootstrapAdmin:Password"];
 
-        if (existingAdmin == null)
+        if (!string.IsNullOrWhiteSpace(bootstrapAdminEmail) &&
+            !string.IsNullOrWhiteSpace(bootstrapAdminPassword))
         {
-            var adminUser = new FocusArena.Domain.Entities.User
+            var existingAdmin = db.Users.FirstOrDefault(u => u.Email == bootstrapAdminEmail);
+
+            if (existingAdmin == null)
             {
-                Name = "Focus Arena Admin",
-                Email = adminEmail,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("focusarena@123"),
-                Role = "Admin",
-                Level = 100,
-                XP = 0,
-                Gold = 999999,
-                JoinDate = DateTime.UtcNow,
-                IsBanned = false,
-                StreakCount = 0
-            };
-            db.Users.Add(adminUser);
-            db.SaveChanges();
-            Console.WriteLine("--> Seeded Default Admin User: focusarenago@gmail.com");
-        }
-        else if (existingAdmin.Role != "Admin")
-        {
-            // Ensure existing user is Admin
-            existingAdmin.Role = "Admin";
-            db.SaveChanges();
+                var adminUser = new FocusArena.Domain.Entities.User
+                {
+                    Name = "Focus Arena Admin",
+                    Email = bootstrapAdminEmail,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(bootstrapAdminPassword),
+                    Role = "Admin",
+                    Level = 100,
+                    XP = 0,
+                    Gold = 999999,
+                    JoinDate = DateTime.UtcNow,
+                    IsBanned = false,
+                    StreakCount = 0
+                };
+                db.Users.Add(adminUser);
+                db.SaveChanges();
+                Console.WriteLine($"--> Bootstrapped admin user: {bootstrapAdminEmail}");
+            }
         }
 
         // Seed Shop Themes

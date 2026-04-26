@@ -3,6 +3,8 @@ using FocusArena.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using FocusArena.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace FocusArena.API.Controllers;
 
@@ -12,10 +14,14 @@ namespace FocusArena.API.Controllers;
 public class GatesController : ControllerBase
 {
     private readonly IGateService _gateService;
+    private readonly ApplicationDbContext _context;
+    private readonly IProceduralGenerationService _proceduralService;
 
-    public GatesController(IGateService gateService)
+    public GatesController(IGateService gateService, ApplicationDbContext context, IProceduralGenerationService proceduralService)
     {
         _gateService = gateService;
+        _context = context;
+        _proceduralService = proceduralService;
     }
 
     [HttpGet]
@@ -39,6 +45,38 @@ public class GatesController : ControllerBase
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
         var gate = await _gateService.CreateGateAsync(userId, dto.Title, dto.Description, dto.Rank, dto.Deadline, dto.BossName, dto.Type);
+        return CreatedAtAction(nameof(GetGate), new { id = gate.Id }, gate);
+    }
+
+    [HttpPost("procedural")]
+    public async Task<ActionResult<Gate>> CreateProceduralGate([FromQuery] GateRank rank = GateRank.C)
+    {
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+        
+        // Fetch recent tasks to seed the procedural generation
+        var recentTasks = await _context.Tasks
+            .Where(t => t.UserId == userId)
+            .OrderByDescending(t => t.CreatedAt)
+            .Take(10)
+            .Select(t => t.Title)
+            .ToListAsync();
+            
+        // Provide user context
+        var user = await _context.Users.FindAsync(userId);
+        int playerLevel = user?.Level ?? 1;
+
+        // Generate Domain Properties
+        var bossName = _proceduralService.GenerateBossNameFromKeywords(recentTasks);
+        var title = $"Assault: {bossName}";
+        var desc = $"A procedurally generated anomaly has appeared based on your recent activity. Defeat it.";
+
+        // We use GateRank C by default, but it can be specified. Actually, stats are mapped in the Gate entities upon creation but GateService expects XP/Gold to be hardcoded by rank switch-case.
+        // Wait! GateService.CreateGateAsync hardcodes XP/Gold! 
+        // We will just let GateService determine the XP/Gold based on the Rank we feed it. The procedural service determines BossName & dynamic HP if we had HP.
+        // But wait, Gate entity does not track CurrentHp by default, only BossMaxHp if we added it? Let me check Gate.cs again. 
+        // Gate.cs doesn't have HP natively! It has Status, Type, BossName.
+        
+        var gate = await _gateService.CreateGateAsync(userId, title, desc, rank, DateTime.UtcNow.AddDays(1), bossName, "Anomaly");
         return CreatedAtAction(nameof(GetGate), new { id = gate.Id }, gate);
     }
 

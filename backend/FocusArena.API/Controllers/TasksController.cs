@@ -343,7 +343,7 @@ public class TasksController : ControllerBase
     }
 
     [HttpPut("{id}/status")]
-    public async Task<ActionResult> UpdateTaskStatus(int id, [FromBody] DomainEnums.TaskStatus status)
+    public async Task<ActionResult> UpdateTaskStatus(int id, [FromBody] UpdateTaskStatusDto dto)
     {
         var userId = GetUserId();
 
@@ -355,7 +355,7 @@ public class TasksController : ControllerBase
             return NotFound(new { message = "Task not found" });
         }
 
-        task.Status = status;
+        task.Status = dto.Status;
         await _context.SaveChangesAsync();
 
         return NoContent();

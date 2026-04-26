@@ -6,6 +6,9 @@ obj/
 .vs/
 TestResults/
 *.log
+*.db
+registration_errors.log
+backend/FocusArena.API/build_log*.txt
 
 ## Frontend
 node_modules/
@@ -24,3 +27,5 @@ Thumbs.db
 .idea/
 *.swp
 .gemini/
+desktop/dist-electron/
+desktop/release/

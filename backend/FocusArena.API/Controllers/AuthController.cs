@@ -138,12 +138,11 @@ public class AuthController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        // ⚠️ DEMO MODE: Returning token to frontend so EmailJS can send it.
-        // In production, this should NEVER be returned. The backend should send the email.
-        return Ok(new { 
-            message = "Reset token generated.", 
-            token = resetToken, // Returning token for EmailJS
-            email = user.Email 
+        await _emailService.SendPasswordResetEmailAsync(user.Email, resetToken);
+
+        return Ok(new
+        {
+            message = "If that email exists, a reset link has been sent."
         });
     }
 

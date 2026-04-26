@@ -75,25 +75,6 @@ public class AdminController : ControllerBase
 
         return Ok(new { message = $"User {user.Name} has been unbanned." });
     }
-    
-    // ⚠️ DEV TOOL: Promote a user to Admin
-    // In production, this should be removed or strictly protected with a fixed API Key
-    [AllowAnonymous]
-    [HttpPost("promote-dev/{email}")]
-    public async Task<ActionResult> PromoteToAdmin(string email, [FromQuery] string secret)
-    {
-        if (secret != "FocusArenaDevSecret123!") // Simple hardcoded secret for safety
-            return Unauthorized("Invalid secret key.");
-
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-        if (user == null) return NotFound("User not found");
-
-        user.Role = "Admin";
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = $"User {user.Name} is now an Admin. Please re-login." });
-    }
-
     [HttpPost("broadcast")]
     public async Task<IActionResult> Broadcast([FromBody] BroadcastRequest request)
     {

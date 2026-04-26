@@ -19,6 +19,8 @@ namespace FocusArena.Domain.Entities
 
         public bool IsCompleted { get; set; }
 
+        public DateTime? LastProgressAt { get; set; }
+
         public DateTime? CompletedAt { get; set; }
     }
 }
