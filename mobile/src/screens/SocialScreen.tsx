@@ -27,7 +27,13 @@ export default function SocialScreen() {
     setLeaderboardTab,
     fetchLeaderboard,
     fetchRecentChats,
+    initRealtime,
   } = useSocialStore()
+
+  useEffect(() => {
+    const cleanup = initRealtime()
+    return cleanup
+  }, [initRealtime])
 
   useEffect(() => {
     if (activeView === 'leaderboard') {
@@ -35,7 +41,7 @@ export default function SocialScreen() {
     } else {
       fetchRecentChats()
     }
-  }, [activeView])
+  }, [activeView, fetchLeaderboard, fetchRecentChats])
 
   const isLoading = activeView === 'leaderboard' ? leaderboardLoading : chatsLoading
   const onRefresh = activeView === 'leaderboard' ? fetchLeaderboard : fetchRecentChats

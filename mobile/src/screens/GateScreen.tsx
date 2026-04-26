@@ -13,7 +13,7 @@ import { useAppStore } from '../stores/appStore'
 import GateCard from '../components/GateCard'
 
 export default function GateScreen() {
-  const { gate, gateLoading, fetchGate, scanAnomaly, error } = useAppStore()
+  const { gates, gateLoading, fetchGate, scanAnomaly, error } = useAppStore()
 
   useEffect(() => {
     fetchGate()
@@ -23,9 +23,9 @@ export default function GateScreen() {
     await scanAnomaly()
   }
 
-  const handleEnterGate = () => {
+  const handleEnterGate = (gateId: number) => {
     // In a real app, this would navigate to a combat/dungeon view
-    console.log('Entering gate:', gate?.id)
+    console.log('Entering gate:', gateId)
   }
 
   return (
@@ -33,7 +33,7 @@ export default function GateScreen() {
       style={styles.container}
       contentContainerStyle={styles.content}
       refreshControl={
-        <RefreshControl refreshing={gateLoading && !!gate} onRefresh={fetchGate} tintColor="#F4F7FB" />
+        <RefreshControl refreshing={gateLoading && gates.length > 0} onRefresh={fetchGate} tintColor="#F4F7FB" />
       }
     >
       <View style={styles.header}>
@@ -50,7 +50,7 @@ export default function GateScreen() {
         </View>
       ) : null}
 
-      {!gate && !gateLoading && (
+      {gates.length === 0 && !gateLoading && (
         <View style={styles.emptyState}>
           <View style={styles.radarCircle}>
             <Ionicons name="scan-outline" size={48} color="rgba(231, 237, 246, 0.4)" />
@@ -66,7 +66,7 @@ export default function GateScreen() {
         </View>
       )}
 
-      {!gate && gateLoading && (
+      {gates.length === 0 && gateLoading && (
         <View style={styles.loadingState}>
           <ActivityIndicator size="large" color="#F4F7FB" />
           <Text style={styles.loadingText}>Analyzing recent tasks...</Text>
@@ -74,10 +74,18 @@ export default function GateScreen() {
         </View>
       )}
 
-      {gate && (
+      {gates.length > 0 && (
         <View style={styles.gateWrapper}>
-          <Text style={styles.sectionLabel}>Active Threat</Text>
-          <GateCard gate={gate} onAction={handleEnterGate} />
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionLabel}>Active Threats</Text>
+            <Pressable onPress={handleScan} hitSlop={10}>
+               <Ionicons name="scan" size={18} color="#3b82f6" />
+            </Pressable>
+          </View>
+          
+          {gates.map(gate => (
+            <GateCard key={gate.id} gate={gate} onAction={() => handleEnterGate(gate.id)} />
+          ))}
           
           <View style={styles.warningBox}>
             <Ionicons name="warning" size={16} color="#FCA5A5" />
@@ -209,6 +217,12 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     textTransform: 'uppercase',
     marginLeft: 4,
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
   },
   warningBox: {
     flexDirection: 'row',

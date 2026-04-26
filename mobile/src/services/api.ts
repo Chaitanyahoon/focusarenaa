@@ -22,6 +22,10 @@ export const authAPI = {
     const response = await api.post<AuthResponse>('/auth/login', data)
     return response.data
   },
+  async register(data: import('../types').RegisterDto) {
+    const response = await api.post<AuthResponse>('/auth/register', data)
+    return response.data
+  },
 }
 
 export const profileAPI = {
@@ -51,6 +55,11 @@ export const taskAPI = {
 
   async create(data: CreateTaskDto) {
     const response = await api.post<Task>('/tasks', data)
+    return response.data
+  },
+
+  async delete(id: number) {
+    const response = await api.delete(`/tasks/${id}`)
     return response.data
   },
 }
@@ -87,6 +96,33 @@ export const chatAPI = {
 
   async searchUsers(query: string) {
     const response = await api.get<ChatUser[]>(`/chat/search?query=${query}`)
+    return response.data
+  },
+}
+
+export const guildAPI = {
+  async getMyGuild() {
+    const response = await api.get<import('../types').Guild>('/Guilds/my')
+    return response.data
+  },
+
+  async search(query: string = '') {
+    const response = await api.get<import('../types').Guild[]>(`/Guilds?query=${query}`)
+    return response.data
+  },
+
+  async create(data: import('../types').CreateGuildDto) {
+    const response = await api.post<import('../types').Guild>('/Guilds', data)
+    return response.data
+  },
+
+  async join(guildId: number, data?: import('../types').JoinGuildDto) {
+    const response = await api.post(`/Guilds/${guildId}/join`, data || {})
+    return response.data
+  },
+
+  async leave() {
+    const response = await api.post('/Guilds/leave')
     return response.data
   },
 }

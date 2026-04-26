@@ -220,11 +220,24 @@ export default function Dashboard() {
         }
     }, [])
 
-    const filteredItems = tasks.filter(t =>
-        activeTab === 'notes'
-            ? t.category === TaskCategory.Note
-            : t.category !== TaskCategory.Note
-    )
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const filteredItems = tasks.filter(t => {
+        if (activeTab === 'notes') {
+            return t.category === TaskCategory.Note
+        } else {
+            if (t.category === TaskCategory.Note) return false
+            
+            // Daily Reset: if it's a quest and it's done, only show it if completed today
+            if (t.status === TaskStatus.Done && t.completedAt) {
+                const d = new Date(t.completedAt)
+                d.setHours(0, 0, 0, 0)
+                return d.getTime() === today.getTime()
+            }
+            return true
+        }
+    })
 
     const activeTasks = tasks.filter(t => t.category !== TaskCategory.Note && t.status !== TaskStatus.Done)
     const todoCount = activeTasks.length
@@ -566,6 +579,7 @@ export default function Dashboard() {
                                                     item={item}
                                                     theme={theme}
                                                     onComplete={handleComplete}
+                                                    onDelete={handleDelete}
                                                 />
                                             )
                                         ))}
@@ -617,4 +631,5 @@ export default function Dashboard() {
         </div>
     )
 }
+
 

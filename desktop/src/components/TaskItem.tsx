@@ -1,13 +1,14 @@
 import { motion } from 'framer-motion'
 import { type Task, TaskStatus } from '../types'
 import { memo } from 'react'
-import { CheckIcon } from '@heroicons/react/24/outline'
+import { CheckIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { BriefcaseIcon, BookOpenIcon, HeartIcon, SparklesIcon } from '@heroicons/react/24/solid'
 
 interface TaskItemProps {
     item: Task
     theme: any
     onComplete: (id: number) => void
+    onDelete?: (id: number) => void
 }
 
 const CATEGORY_META: Record<number, { label: string; icon: typeof BriefcaseIcon }> = {
@@ -24,7 +25,7 @@ const DIFFICULTY_LABEL: Record<number, string> = {
     2: 'Hard',
 }
 
-const TaskItem = memo(({ item, theme, onComplete }: TaskItemProps) => {
+const TaskItem = memo(({ item, theme, onComplete, onDelete }: TaskItemProps) => {
     const isDone = item.status === TaskStatus.Done
     const categoryMeta = CATEGORY_META[item.category] ?? { label: 'Task', icon: SparklesIcon }
     const CategoryIcon = categoryMeta.icon
@@ -69,8 +70,19 @@ const TaskItem = memo(({ item, theme, onComplete }: TaskItemProps) => {
                         </div>
 
                         <div className="flex flex-col items-end gap-1 pt-0.5">
-                            <div className={`rounded-full border px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.18em] ${isDone ? 'border-white/10 bg-white/[0.04] text-white/35' : `${theme.accentSoft} ${theme.accentBorder} ${theme.accentText}`}`}>
-                                {isDone ? 'Done' : 'Active'}
+                            <div className="flex items-center gap-1">
+                                {onDelete && (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onDelete(item.id) }}
+                                        className="p-1 rounded-full opacity-0 group-hover:opacity-100 text-white/20 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                                        title="Delete"
+                                    >
+                                        <TrashIcon className="w-3 h-3" />
+                                    </button>
+                                )}
+                                <div className={`rounded-full border px-2 py-0.5 text-[8px] font-black uppercase tracking-[0.18em] ${isDone ? 'border-white/10 bg-white/[0.04] text-white/35' : `${theme.accentSoft} ${theme.accentBorder} ${theme.accentText}`}`}>
+                                    {isDone ? 'Done' : 'Active'}
+                                </div>
                             </div>
                             <div className="flex items-center gap-1.5">
                                 {[...Array(item.difficulty + 1)].map((_, i) => (

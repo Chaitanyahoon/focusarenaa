@@ -24,10 +24,11 @@ function getTaskDifficultyTone(difficulty: number) {
 
 interface TaskCardProps {
   task: Task
-  onComplete: (taskId: number) => void
+  onComplete?: (taskId: number) => void
+  onDelete?: (taskId: number) => void
 }
 
-const TaskCard = React.memo(({ task, onComplete }: TaskCardProps) => {
+const TaskCard = React.memo(({ task, onComplete, onDelete }: TaskCardProps) => {
   return (
     <View style={styles.taskCard}>
       <View style={styles.taskHeader}>
@@ -36,16 +37,25 @@ const TaskCard = React.memo(({ task, onComplete }: TaskCardProps) => {
       </View>
       <Text style={styles.taskTitle}>{task.title}</Text>
       <View style={styles.taskFooter}>
-        <Text style={styles.taskMeta}>{task.xpReward} XP</Text>
-        <Pressable 
-          onPress={() => onComplete(task.id)} 
-          style={styles.completeButton}
-          hitSlop={8} // Makes the touch target a bit more forgiving
-          accessibilityRole="button"
-          accessibilityLabel={`Complete task: ${task.title}`}
-        >
-          <Text style={styles.completeButtonLabel}>Complete</Text>
-        </Pressable>
+        <View style={styles.metaRow}>
+          <Text style={styles.taskMeta}>{task.xpReward} XP</Text>
+          {onDelete && (
+            <Pressable onPress={() => onDelete(task.id)} hitSlop={8} style={styles.deleteButton}>
+              <Text style={styles.deleteLabel}>✕</Text>
+            </Pressable>
+          )}
+        </View>
+        {onComplete && (
+          <Pressable 
+            onPress={() => onComplete(task.id)} 
+            style={styles.completeButton}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={`Complete task: ${task.title}`}
+          >
+            <Text style={styles.completeButtonLabel}>Complete</Text>
+          </Pressable>
+        )}
       </View>
     </View>
   )
@@ -92,10 +102,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
   taskMeta: {
     color: 'rgba(231, 237, 246, 0.5)',
     fontSize: 12,
     fontWeight: '700',
+  },
+  deleteButton: {
+    padding: 4,
+  },
+  deleteLabel: {
+    color: 'rgba(255, 100, 100, 0.8)',
+    fontSize: 14,
+    fontWeight: '800',
   },
   completeButton: {
     borderRadius: 14,

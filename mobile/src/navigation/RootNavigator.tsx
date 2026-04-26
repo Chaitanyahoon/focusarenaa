@@ -2,6 +2,7 @@ import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native'
 import LoginScreen from '../screens/LoginScreen'
+import RegisterScreen from '../screens/RegisterScreen'
 import MainTabs from './MainTabs'
 import { useAppStore } from '../stores/appStore'
 
@@ -24,7 +25,10 @@ export default function RootNavigator() {
         {auth ? (
           <Stack.Screen name="Main" component={MainTabs} />
         ) : (
-          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Group>
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Register" component={RegisterScreen} />
+          </Stack.Group>
         )}
       </Stack.Navigator>
     </NavigationContainer>

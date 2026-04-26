@@ -3,6 +3,12 @@ export interface LoginDto {
   password: string
 }
 
+export interface RegisterDto {
+  email: string
+  password: string
+  name: string
+}
+
 export interface AuthResponse {
   token: string
   email: string
@@ -45,6 +51,7 @@ export interface Task {
   difficulty: number
   status: number
   xpReward: number
+  completedAt?: string
 }
 
 export interface CreateTaskDto {
@@ -96,4 +103,39 @@ export interface PrivateMessage {
   sentAt: string
   isRead: boolean
   isMe: boolean
+}
+
+export interface Guild {
+  id: number
+  name: string
+  description?: string
+  leaderId: number
+  level: number
+  xp: number
+  capacity: number
+  createdAt: string
+  isPrivate: boolean
+  inviteCode?: string
+  members?: GuildMember[]
+}
+
+export interface GuildMember {
+  id: number
+  guildId: number
+  userId: number
+  user?: UserProfile
+  role: number // 0: Member, 1: Officer, 2: Leader
+  joinedAt: string
+  contributionXP: number
+}
+
+export interface CreateGuildDto {
+  name: string
+  description?: string
+  isPrivate: boolean
+  inviteCode?: string
+}
+
+export interface JoinGuildDto {
+  inviteCode?: string
 }

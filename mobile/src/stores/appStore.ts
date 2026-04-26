@@ -12,16 +12,18 @@ interface AppState {
   profile: UserProfile | null
   stats: DashboardStats | null
   tasks: Task[]
-  gate: Gate | null
+  gates: Gate[]
   gateLoading: boolean
   error: string
 
   init: () => Promise<void>
   login: (data: LoginDto) => Promise<void>
+  register: (data: import('../types').RegisterDto) => Promise<void>
   logout: () => Promise<void>
   hydrateDashboard: () => Promise<void>
   completeTask: (taskId: number) => Promise<void>
-  createTask: (title: string) => Promise<void>
+  createTask: (data: import('../types').CreateTaskDto) => Promise<void>
+  deleteTask: (taskId: number) => Promise<void>
   fetchGate: () => Promise<void>
   scanAnomaly: () => Promise<void>
   setError: (error: string) => void
@@ -35,7 +37,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   profile: null,
   stats: null,
   tasks: [],
-  gate: null,
+  gates: [],
   gateLoading: false,
   error: '',
 
@@ -71,10 +73,33 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
 
+  register: async (data: import('../types').RegisterDto) => {
+    set({ authLoading: true, error: '' })
+    try {
+      const nextAuth = await authAPI.register(data)
+      setAuthToken(nextAuth.token)
+      await storage.saveAuth(nextAuth)
+      set({ auth: nextAuth })
+      await get().hydrateDashboard()
+    } catch (registerError: any) {
+      set({ error: registerError?.response?.data?.message || 'Registration failed.' })
+      throw registerError
+    } finally {
+      set({ authLoading: false })
+    }
+  },
+
   logout: async () => {
     await storage.clearAuth()
     setAuthToken(null)
     set({ auth: null, profile: null, stats: null, tasks: [], error: '' })
+    
+    try {
+      const { signalRService } = await import('../services/signalr')
+      await signalRService.disconnect()
+    } catch {
+      // Ignore
+    }
   },
 
   hydrateDashboard: async () => {
@@ -86,6 +111,10 @@ export const useAppStore = create<AppState>((set, get) => ({
         taskAPI.getAll(),
       ])
       set({ profile: nextProfile, stats: nextStats, tasks: nextTasks, error: '' })
+      
+      // Connect to real-time services
+      const { signalRService } = await import('../services/signalr')
+      await signalRService.connect()
     } catch (loadError: any) {
       if (loadError?.response?.status === 401) {
         await get().logout()
@@ -106,17 +135,21 @@ export const useAppStore = create<AppState>((set, get) => ({
     }
   },
 
-  createTask: async (title: string) => {
+  createTask: async (data: import('../types').CreateTaskDto) => {
     try {
-      await taskAPI.create({
-        title,
-        category: 3,
-        difficulty: 1,
-        recurrence: 0,
-      })
+      await taskAPI.create(data)
       await get().hydrateDashboard()
     } catch {
       set({ error: 'Task creation failed.' })
+    }
+  },
+
+  deleteTask: async (taskId: number) => {
+    try {
+      await taskAPI.delete(taskId)
+      set((state) => ({ tasks: state.tasks.filter(t => t.id !== taskId) }))
+    } catch {
+      set({ error: 'Task deletion failed.' })
     }
   },
 
@@ -124,14 +157,16 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ gateLoading: true })
     try {
       const gates = await gateAPI.getActive()
-      const activeGate = gates.length > 0 ? gates[0] : null
-      set({ gate: activeGate, error: '' })
-      // Schedule expiry notification
-      if (activeGate?.expiresAt) {
-        notificationService.scheduleGateExpiry(activeGate.name, activeGate.expiresAt)
-      }
+      set({ gates, error: '' })
+      
+      // Schedule expiry notifications
+      gates.forEach(g => {
+        if (g.expiresAt) {
+          notificationService.scheduleGateExpiry(g.name, g.expiresAt)
+        }
+      })
     } catch {
-      set({ error: 'Failed to fetch the active gate.' })
+      set({ error: 'Failed to fetch active gates.' })
     } finally {
       set({ gateLoading: false })
     }
@@ -141,8 +176,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ gateLoading: true })
     try {
       const newGate = await gateAPI.generateProcedural()
-      set({ gate: newGate, error: '' })
-      // Schedule expiry notification for new gate
+      set((state) => ({ gates: [...state.gates, newGate], error: '' }))
       if (newGate?.expiresAt) {
         notificationService.scheduleGateExpiry(newGate.name, newGate.expiresAt)
       }

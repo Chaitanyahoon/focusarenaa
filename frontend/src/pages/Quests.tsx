@@ -70,6 +70,10 @@ export default function Quests() {
             // Trigger a level up check or refresh profile if needed
             // (The store handles basic task list updates)
         } catch (error) {
+
+            // Trigger a level up check or refresh profile if needed
+            // (The store handles basic task list updates)
+        } catch (error) {
             toast.error('System Error: Completion Failed')
         } finally {
             setIsCompleting(null)
@@ -78,7 +82,18 @@ export default function Quests() {
 
     // Group tasks by status
     const pendingTasks = tasks.filter(t => t.status !== TaskStatus.Done)
-    const completedTasks = tasks.filter(t => t.status === TaskStatus.Done)
+    
+    // Filter completed tasks to only show today's completions
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    const completedTasks = tasks.filter(t => {
+        if (t.status !== TaskStatus.Done) return false
+        if (!t.completedAt) return true // Show if date is missing
+        const completedDate = new Date(t.completedAt)
+        completedDate.setHours(0, 0, 0, 0)
+        return completedDate.getTime() === today.getTime()
+    })
 
     // render difficulty badge
     const renderDifficulty = (diff: TaskDifficulty) => {
@@ -206,28 +221,43 @@ export default function Quests() {
 
             {/* Completed Logs */}
             <div className="opacity-60">
-                <h2 className="text-lg text-gray-500 font-display font-bold tracking-widest mb-4">
-                    COMPLETION LOG
-                </h2>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg text-gray-500 font-display font-bold tracking-widest">
+                        TODAY'S COMPLETIONS
+                    </h2>
+                    {completedTasks.length > 0 && (
+                        <span className="text-xs font-mono text-green-500/50">
+                            {completedTasks.reduce((acc, curr) => acc + curr.xpReward, 0)} XP TOTAL
+                        </span>
+                    )}
+                </div>
                 <div className="grid gap-2">
                     {completedTasks.length === 0 ? (
                         <div className="rounded-xl border border-dashed border-gray-800 bg-black/20 p-4 text-center text-xs font-mono uppercase tracking-[0.18em] text-gray-600">
-                            No cleared contracts yet.
+                            No cleared contracts yet today.
                         </div>
                     ) : (
                         completedTasks.map(task => (
-                            <div key={task.id} className="flex justify-between items-center bg-[#050914] border border-gray-800 p-3 px-6">
+                            <div key={task.id} className="group flex justify-between items-center bg-[#050914] border border-gray-800 p-3 px-6 hover:border-gray-600 transition-colors">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                    <span className="text-gray-400 line-through decoration-gray-600">{task.title}</span>
+                                    <div className="w-2 h-2 bg-green-500 rounded-full group-hover:shadow-[0_0_10px_rgba(34,197,94,0.5)] transition-shadow"></div>
+                                    <span className="text-gray-400 line-through decoration-gray-600 group-hover:text-gray-300 transition-colors">{task.title}</span>
                                 </div>
-                                <span className="text-green-500/50 font-mono text-sm">+{task.xpReward} XP</span>
+                                <div className="flex items-center gap-4">
+                                    <span className="text-green-500/50 font-mono text-sm group-hover:text-green-400/80 transition-colors">+{task.xpReward} XP</span>
+                                    <button 
+                                        onClick={() => deleteTask(task.id)}
+                                        className="text-gray-700 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                                        title="Delete Log Entry"
+                                    >
+                                        <TrashIcon className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
                         ))
                     )}
                 </div>
             </div>
-
             {/* NEW QUEST MODAL */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">

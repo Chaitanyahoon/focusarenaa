@@ -12,7 +12,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient'
 import { useAppStore } from '../stores/appStore'
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }: any) {
   const { login, authLoading, error, setError } = useAppStore()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -68,6 +68,10 @@ export default function LoginScreen() {
             ) : (
               <Text style={styles.loginButtonLabel}>Enter arena</Text>
             )}
+          </Pressable>
+
+          <Pressable onPress={() => navigation.navigate('Register')} style={styles.switchModeButton}>
+            <Text style={styles.switchModeText}>Don't have an account? Register</Text>
           </Pressable>
         </View>
       </KeyboardAvoidingView>
@@ -154,5 +158,15 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: 1.8,
     textTransform: 'uppercase',
+  },
+  switchModeButton: {
+    marginTop: 8,
+    alignItems: 'center',
+    padding: 10,
+  },
+  switchModeText: {
+    color: 'rgba(231, 237, 246, 0.6)',
+    fontSize: 13,
+    fontWeight: '600',
   },
 })

@@ -59,7 +59,7 @@
     "productName": "Focus Arena",
     "compression": "maximum",
     "directories": {
-      "output": "release"
+      "output": "C:/Temp/FocusArenaRelease"
     },
     "win": {
       "target": "nsis",
@@ -71,3 +71,4 @@
     }
   }
 }
+
