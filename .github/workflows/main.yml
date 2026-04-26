@@ -82,3 +82,40 @@ jobs:
       
     - name: Run Playwright Tests
       run: npx playwright test
+
+  build-mobile-android:
+    name: Build Android APK (Expo Prebuild)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./mobile
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Expo Prebuild
+      run: npx expo prebuild --platform android --clean
+      
+    - name: Build APK (Gradle)
+      working-directory: ./mobile/android
+      run: ./gradlew assembleRelease
+      
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: focusarena-android-apk
+        path: mobile/android/app/build/outputs/apk/release/app-release.apk
