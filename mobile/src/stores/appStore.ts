@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import { setAuthToken, authAPI, profileAPI, analyticsAPI, taskAPI } from '../services/api'
+import { setAuthToken, authAPI, profileAPI, analyticsAPI, taskAPI, gateAPI } from '../services/api'
 import { storage } from '../utils/storage'
-import type { AuthResponse, UserProfile, DashboardStats, Task, LoginDto } from '../types'
+import type { AuthResponse, UserProfile, DashboardStats, Task, LoginDto, Gate } from '../types'
 
 interface AppState {
   booting: boolean
@@ -11,6 +11,8 @@ interface AppState {
   profile: UserProfile | null
   stats: DashboardStats | null
   tasks: Task[]
+  gate: Gate | null
+  gateLoading: boolean
   error: string
 
   init: () => Promise<void>
@@ -19,6 +21,8 @@ interface AppState {
   hydrateDashboard: () => Promise<void>
   completeTask: (taskId: number) => Promise<void>
   createTask: (title: string) => Promise<void>
+  fetchGate: () => Promise<void>
+  scanAnomaly: () => Promise<void>
   setError: (error: string) => void
 }
 
@@ -30,6 +34,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   profile: null,
   stats: null,
   tasks: [],
+  gate: null,
+  gateLoading: false,
   error: '',
 
   init: async () => {
@@ -110,6 +116,30 @@ export const useAppStore = create<AppState>((set, get) => ({
       await get().hydrateDashboard()
     } catch {
       set({ error: 'Task creation failed.' })
+    }
+  },
+
+  fetchGate: async () => {
+    set({ gateLoading: true })
+    try {
+      const gates = await gateAPI.getActive()
+      set({ gate: gates.length > 0 ? gates[0] : null, error: '' })
+    } catch {
+      set({ error: 'Failed to fetch the active gate.' })
+    } finally {
+      set({ gateLoading: false })
+    }
+  },
+
+  scanAnomaly: async () => {
+    set({ gateLoading: true })
+    try {
+      const newGate = await gateAPI.generateProcedural()
+      set({ gate: newGate, error: '' })
+    } catch {
+      set({ error: 'Failed to scan for an anomaly. The procedural engine might be offline.' })
+    } finally {
+      set({ gateLoading: false })
     }
   },
 

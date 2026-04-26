@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { Ionicons } from '@expo/vector-icons'
 import DashboardScreen from '../screens/DashboardScreen'
 import QuestsScreen from '../screens/QuestsScreen'
+import GateScreen from '../screens/GateScreen'
 
 const Tab = createBottomTabNavigator()
 
@@ -31,6 +32,8 @@ export default function MainTabs() {
 
           if (route.name === 'Dashboard') {
             iconName = focused ? 'compass' : 'compass-outline'
+          } else if (route.name === 'Gate') {
+            iconName = focused ? 'skull' : 'skull-outline'
           } else {
             iconName = focused ? 'list' : 'list-outline'
           }
@@ -40,6 +43,7 @@ export default function MainTabs() {
       })}
     >
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
+      <Tab.Screen name="Gate" component={GateScreen} />
       <Tab.Screen name="Quests" component={QuestsScreen} />
     </Tab.Navigator>
   )

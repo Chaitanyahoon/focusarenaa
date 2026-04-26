@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { API_BASE } from '../config'
-import type { AuthResponse, CreateTaskDto, LoginDto, DashboardStats, Task, UserProfile } from '../types'
+import type { AuthResponse, CreateTaskDto, LoginDto, DashboardStats, Task, UserProfile, Gate } from '../types'
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -51,6 +51,18 @@ export const taskAPI = {
 
   async create(data: CreateTaskDto) {
     const response = await api.post<Task>('/tasks', data)
+    return response.data
+  },
+}
+
+export const gateAPI = {
+  async getActive() {
+    const response = await api.get<Gate[]>('/gates/active')
+    return response.data
+  },
+
+  async generateProcedural() {
+    const response = await api.post<Gate>('/gates/procedural')
     return response.data
   },
 }

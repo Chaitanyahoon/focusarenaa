@@ -54,3 +54,15 @@ export interface CreateTaskDto {
   difficulty: number
   recurrence?: number
 }
+
+export interface Gate {
+  id: number
+  rank: number // 0=E, 1=D, 2=C, 3=B, 4=A, 5=S
+  name: string
+  type: number // 0=Dungeon, 1=RedGate, 2=Anomaly
+  bossName: string
+  status: number // 0=Active, 1=Cleared, 2=Failed
+  requiredLevel: number
+  recommendedPartySize: number
+  expiresAt: string
+}
