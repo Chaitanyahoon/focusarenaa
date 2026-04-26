@@ -9,6 +9,8 @@ namespace FocusArena.IntegrationTests;
 
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
+    private readonly string _databaseName = $"IntegrationTestDb_{Guid.NewGuid():N}";
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         // Provide a dummy connection string so ServerVersion.AutoDetect doesn't crash
@@ -38,7 +40,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             // Add InMemory Database for testing
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseInMemoryDatabase("IntegrationTestDb");
+                options.UseInMemoryDatabase(_databaseName);
             });
 
             // Build the service provider and ensure DB is created

@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
 using FocusArena.Application.DTOs;
+using FocusArena.Infrastructure.Data;
 using Xunit;
 
 namespace FocusArena.IntegrationTests;
@@ -109,5 +110,35 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task RequestPasswordReset_DoesNotExposeTokenInResponse()
+    {
+        var email = $"reset_{Guid.NewGuid()}@focusarena.com";
+        await _client.PostAsJsonAsync("/api/auth/register", new RegisterDto
+        {
+            Name = "Reset User",
+            Email = email,
+            Password = "Password123!"
+        });
+
+        var response = await _client.PostAsJsonAsync("/api/auth/request-password-reset", new PasswordResetRequestDto
+        {
+            Email = email
+        });
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var body = await response.Content.ReadFromJsonAsync<Dictionary<string, object>>();
+        body.Should().NotBeNull();
+        body!.Should().ContainKey("message");
+        body.Should().NotContainKey("token");
+
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var user = db.Users.Single(u => u.Email == email);
+        user.PasswordResetToken.Should().NotBeNullOrEmpty();
+        user.PasswordResetTokenExpiry.Should().NotBeNull();
     }
 }
