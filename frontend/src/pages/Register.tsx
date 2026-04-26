@@ -21,7 +21,7 @@ export default function Register() {
 
         try {
             await register({ name, email, password })
-            toast.success('🎉 Welcome to Focus Arena, Hunter!')
+            toast.success('Welcome to Focus Arena, Hunter.')
             navigate('/dashboard')
         } catch (error) {
             toast.error('Registration failed. Email may already exist.')
@@ -104,7 +104,7 @@ export default function Register() {
 
                     {error && (
                         <div className="bg-red-500/20 border border-red-500 rounded-lg p-3 text-red-400 text-sm font-accent">
-                            ⚠️ {error}
+                            {error}
                         </div>
                     )}
 
@@ -113,7 +113,7 @@ export default function Register() {
                         disabled={isLoading}
                         className="holo-button w-full bg-purple-900/30 border-purple-400 text-purple-300 hover:bg-purple-500/20 hover:text-white transition-all shadow-[0_0_15px_rgba(168,85,247,0.2)] hover:shadow-[0_0_25px_rgba(168,85,247,0.5)] font-bold tracking-widest"
                     >
-                        {isLoading ? 'INITIALIZING...' : '⚡ BECOME A HUNTER'}
+                        {isLoading ? 'INITIALIZING...' : 'BECOME A HUNTER'}
                     </button>
                 </form>
 

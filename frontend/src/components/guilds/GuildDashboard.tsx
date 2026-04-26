@@ -108,7 +108,7 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
             } else {
                 const member = guild.members.find(m => m.userId === userId);
                 const name = member?.user.name || "A member";
-                toast(`${name} left the guild.`, { icon: 'ℹ️' });
+                toast(`${name} left the guild.`);
                 loadGuild();
             }
         };
@@ -194,7 +194,7 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
                                 </span>
                                 {guild.isPrivate && (
                                     <span className="text-xs font-mono text-system-gold bg-system-gold/10 px-2 py-0.5 rounded border border-system-gold/20">
-                                        🔒 PRIVATE
+                                        PRIVATE
                                     </span>
                                 )}
                                 {isLeader && (
@@ -300,7 +300,7 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
                                                 {member.user.name}
                                                 {member.role === GuildRole.Leader && (
                                                     <span className="text-[9px] bg-system-gold/15 text-system-gold px-1.5 py-0.5 rounded font-mono font-bold border border-system-gold/20">
-                                                        👑 LEADER
+                                                        LEADER
                                                     </span>
                                                 )}
                                                 {member.role === GuildRole.Officer && (
@@ -362,7 +362,7 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-gray-500 font-mono text-xs">Access</span>
-                                <span className={guild.isPrivate ? 'text-system-gold' : 'text-system-green'}>{guild.isPrivate ? '🔒 Private' : '🌐 Public'}</span>
+                                <span className={guild.isPrivate ? 'text-system-gold' : 'text-system-green'}>{guild.isPrivate ? 'Private' : 'Public'}</span>
                             </div>
                         </div>
                     </div>

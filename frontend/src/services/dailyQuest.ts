@@ -10,6 +10,7 @@ export interface DailyQuest {
     currentCount: number;
     isCompleted: boolean;
     createdAt: string;
+    lastProgressAt?: string | null;
 }
 
 export interface DailyQuestLog {

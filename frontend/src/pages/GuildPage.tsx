@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import { PlusIcon, UserGroupIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import CreateGuildModal from '../components/guilds/CreateGuildModal';
 import GuildDashboard from '../components/guilds/GuildDashboard';
+import SystemEmptyState from '../components/shared/SystemEmptyState';
 
 export default function GuildPage() {
     const { user, fetchProfile } = useAuthStore();
@@ -65,7 +66,7 @@ export default function GuildPage() {
 
     return (
         <div className="p-6 h-full overflow-y-auto custom-scrollbar relative">
-            <div className="flex justify-between items-center mb-8 border-b border-blue-900/30 pb-6">
+            <div className="flex flex-col justify-between gap-4 mb-8 border-b border-blue-900/30 pb-6 md:flex-row md:items-center">
                 <div>
                     <h1 className="text-3xl font-bold font-rajdhani text-white tracking-wide flex items-center gap-3">
                         <UserGroupIcon className="w-8 h-8 text-blue-500" />
@@ -97,9 +98,21 @@ export default function GuildPage() {
 
             {/* Guild List */}
             {isLoading ? (
-                <div className="text-center py-12 text-blue-400 animate-pulse">Scanning frequencies...</div>
+                <div className="system-card rounded-2xl py-12 text-center text-blue-400 animate-pulse">Scanning guild frequencies...</div>
             ) : guilds.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">No guilds found. Be the first to establish one.</div>
+                <SystemEmptyState
+                    eyebrow="Guild registry empty"
+                    title="No guild signal found."
+                    description="Search again or establish the first squad. Social pressure is one of the strongest reasons to return tomorrow."
+                    action={
+                        <button
+                            onClick={() => setIsCreateOpen(true)}
+                            className="system-button system-button-primary px-5 py-3 text-xs"
+                        >
+                            Create guild
+                        </button>
+                    }
+                />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {guilds.map(guild => (
@@ -127,7 +140,7 @@ export default function GuildPage() {
                                     onClick={() => handleJoin(guild)}
                                     className="w-full py-2 bg-blue-600/10 border border-blue-500/30 text-blue-400 font-bold rounded hover:bg-blue-600 hover:text-white transition-all uppercase tracking-widest text-sm"
                                 >
-                                    {guild.isPrivate ? '🔒 REQUEST JOIN' : 'REQUEST JOIN'}
+                                    {guild.isPrivate ? 'PRIVATE - REQUEST JOIN' : 'REQUEST JOIN'}
                                 </button>
                             </div>
                         </div>

@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 import { profileAPI } from '../services/api'
 import { shopService } from '../services/shop'
 import toast from 'react-hot-toast'
 import DailyQuestWidget from '../components/dashboard/DailyQuestWidget';
 import DailyQuestModal from '../components/dashboard/DailyQuestModal';
+import DailyHomeHub from '../components/dashboard/DailyHomeHub';
+import FirstRunOnboarding from '../components/dashboard/FirstRunOnboarding';
 import { Skeleton } from '../components/shared/Skeleton';
 
 const DEFAULT_AVATARS = [
@@ -110,12 +113,85 @@ export default function Dashboard() {
         )
     }
 
-    return (
-        <div className="min-h-screen p-4 md:p-8 flex justify-center items-start pt-12">
+    const xpPercent = Math.min((user.xp / 100) * 100, 100)
+    const xpToNextLevel = Math.max(100 - user.xp, 0)
+    const rankTitle = user.level < 10 ? 'E-RANK HUNTER' : user.level < 25 ? 'A-RANK HUNTER' : 'SHADOW MONARCH'
+    const streakState = user.streakCount > 0 ? 'Momentum online' : 'Start the chain'
 
+    return (
+        <div className="min-h-screen p-3 md:p-6 flex flex-col items-center gap-6 pt-6 md:pt-10">
+            <FirstRunOnboarding />
+            <div className="w-full max-w-6xl space-y-6">
+                <section className="grid gap-4 lg:grid-cols-[1.4fr_0.8fr]">
+                    <div className="system-card rounded-2xl p-5 md:p-6 float-in">
+                        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+                            <div>
+                                <div className="habit-chip rounded-full px-3 py-1.5 text-[10px]">{streakState}</div>
+                                <h1 className="mt-4 text-3xl font-black tracking-[0.12em] text-white md:text-5xl">
+                                    Today&apos;s arena is open.
+                                </h1>
+                                <p className="mt-3 max-w-2xl text-sm leading-6 text-blue-100/65 md:text-base">
+                                    Clear one daily objective, bank the reward, and keep your profile from feeling idle. The next action should always be obvious.
+                                </p>
+                            </div>
+                            <div className="flex gap-3">
+                                <Link
+                                    to="/quests"
+                                    className="system-button system-button-primary px-5 py-3 text-xs"
+                                >
+                                    Open Quests
+                                </Link>
+                                <Link
+                                    to="/gates"
+                                    className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-xs font-bold uppercase tracking-[0.2em] text-gray-300 transition-all hover:border-blue-400/40 hover:text-white"
+                                >
+                                    Enter Gates
+                                </Link>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+                            {[
+                                ['Rank', rankTitle],
+                                ['Streak', `${user.streakCount} days`],
+                                ['Next level', xpToNextLevel === 0 ? 'Ready' : `${xpToNextLevel} XP`],
+                                ['Gold bank', `${user.gold}G`],
+                            ].map(([label, value]) => (
+                                <div key={label} className="rounded-xl border border-blue-500/10 bg-black/35 px-4 py-3">
+                                    <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-blue-200/45">{label}</div>
+                                    <div className="mt-1 truncate text-lg font-black text-white">{value}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="system-card rounded-2xl p-5 float-in [animation-delay:100ms]">
+                        <div className="flex items-start justify-between gap-3">
+                            <div>
+                                <div className="text-[10px] font-mono uppercase tracking-[0.24em] text-blue-200/50">Comeback trigger</div>
+                                <h2 className="mt-2 text-2xl font-black tracking-[0.12em] text-white">One punch keeps it alive.</h2>
+                            </div>
+                            <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-right">
+                                <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-emerald-200/60">XP</div>
+                                <div className="text-xl font-black text-emerald-300">{Math.round(xpPercent)}%</div>
+                            </div>
+                        </div>
+                        <div className="mt-5 h-2 overflow-hidden rounded-full bg-black/50">
+                            <div
+                                className="h-full bg-gradient-to-r from-system-blue via-cyan-300 to-emerald-300 transition-all duration-700 heartbeat-glow"
+                                style={{ width: `${xpPercent}%` }}
+                            />
+                        </div>
+                        <p className="mt-4 text-xs font-mono uppercase leading-relaxed tracking-[0.16em] text-gray-500">
+                            Take one small win now. XP, streaks, and guild pressure will pull you back tomorrow.
+                        </p>
+                    </div>
+                </section>
+
+                <DailyHomeHub streakCount={user.streakCount} gold={user.gold} />
 
             {/* STATUS WINDOW - Glassmorphism & Neon */}
-            <div className="system-panel w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-0 relative overflow-hidden animate-in fade-in duration-500 backdrop-blur-xl bg-black/40 border border-blue-500/30 shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+            <div className="system-panel w-full grid grid-cols-1 lg:grid-cols-12 gap-0 relative overflow-hidden animate-in fade-in duration-500 backdrop-blur-xl bg-black/40 border border-blue-500/30 shadow-[0_0_50px_rgba(0,0,0,0.8)]">
 
                 {/* Decorative Corner lines */}
                 <div className="absolute top-0 left-0 w-32 h-32 border-l-2 border-t-2 border-blue-500/50 rounded-tl-lg pointer-events-none z-20"></div>
@@ -153,10 +229,10 @@ export default function Dashboard() {
                             onClick={() => setIsThemeModalOpen(true)}
                             className="px-3 py-1 bg-blue-500/10 border border-blue-500/40 text-blue-400 text-sm font-bold tracking-wider shadow-[0_0_10px_rgba(59,130,246,0.2)] hover:bg-blue-500/30 transition-all"
                         >
-                            CUSTOMIZE
+                            THEME VAULT
                         </button>
                         <span className="text-gray-400 text-sm tracking-widest uppercase font-mono">
-                            {user.level < 10 ? 'E-RANK HUNTER' : 'SHADOW MONARCH'}
+                            {rankTitle}
                         </span>
                     </div>
 
@@ -179,7 +255,7 @@ export default function Dashboard() {
                 {/* RIGHT COLUMN: STATS & QUESTS */}
                 <div className="lg:col-span-7 p-4 md:p-8 bg-black/20">
                     <h3 className="system-header text-xl border-b border-blue-500/30 pb-2 mb-6 flex justify-between items-end">
-                        <span className="neon-text-blue">STATUS MONITOR</span>
+                        <span className="neon-text-blue">TODAY&apos;S RUN</span>
                         <span className="text-[10px] text-blue-500/50 font-mono tracking-widest animate-pulse">LATEST DATA</span>
                     </h3>
 
@@ -212,12 +288,12 @@ export default function Dashboard() {
                         <div>
                             <div className="flex justify-between text-xs text-blue-300/70 mb-1 tracking-widest font-mono">
                                 <span>XP</span>
-                                <span>{Math.round((user.xp / 100) * 100)}%</span>
+                                <span>{Math.round(xpPercent)}%</span>
                             </div>
                             <div className="h-2 bg-gray-900/80 border border-gray-700/50 relative overflow-hidden">
                                 <div
                                     className="h-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)] transition-all duration-1000 relative"
-                                    style={{ width: `${Math.min((user.xp / 100) * 100, 100)}%` }}
+                                    style={{ width: `${xpPercent}%` }}
                                 >
                                     <div className="absolute top-0 right-0 h-full w-1 bg-white shadow-[0_0_10px_white]"></div>
                                 </div>
@@ -259,6 +335,7 @@ export default function Dashboard() {
                         <DailyQuestWidget />
                     </div>
                 </div>
+            </div>
             </div>
 
             {/* AVATAR MODAL - Glass Panel */}
@@ -341,46 +418,75 @@ export default function Dashboard() {
             {/* THEME MODAL */}
             {isThemeModalOpen && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-                    <div className="glass-panel-heavy w-full max-w-md p-6 animate-in zoom-in-95 duration-300">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-display font-bold text-white tracking-widest">SYSTEM THEME</h2>
-                            <button onClick={() => setIsThemeModalOpen(false)} className="text-gray-500 hover:text-white">[X]</button>
+                    <div className="glass-panel-heavy w-full max-w-xl overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="relative border-b border-blue-500/20 bg-blue-900/10 p-5">
+                            <div className="absolute right-0 top-0 h-full w-32 bg-gradient-to-l from-blue-500/10 to-transparent" />
+                            <div className="relative flex justify-between gap-4">
+                                <div>
+                                    <div className="habit-chip rounded-full px-2.5 py-1 text-[9px]">Optional reward</div>
+                                    <h2 className="mt-3 text-2xl font-display font-bold text-white tracking-widest">THEME VAULT</h2>
+                                    <p className="mt-2 max-w-md text-xs font-mono uppercase leading-relaxed tracking-[0.16em] text-gray-500">
+                                        Shadow Blue is the core system look. Extra themes are trophy skins earned through play.
+                                    </p>
+                                </div>
+                                <button onClick={() => setIsThemeModalOpen(false)} className="h-fit text-gray-500 hover:text-white">[X]</button>
+                            </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            {[
-                                { id: 'blue', name: 'SHADOW BLUE', price: 0, activeClass: 'border-blue-400 bg-blue-500/20 text-blue-300', ownedClass: 'border-blue-500/50 bg-blue-900/20 hover:bg-blue-500/20 text-blue-300' },
-                                { id: 'red', name: 'BLOOD RED', price: 1000, activeClass: 'border-red-400 bg-red-500/20 text-red-300', ownedClass: 'border-red-500/50 bg-red-900/20 hover:bg-red-500/20 text-red-300' },
-                                { id: 'purple', name: 'VOID PURPLE', price: 1500, activeClass: 'border-purple-400 bg-purple-500/20 text-purple-300', ownedClass: 'border-purple-500/50 bg-purple-900/20 hover:bg-purple-500/20 text-purple-300' },
-                                { id: 'gold', name: 'ROYAL GOLD', price: 2000, activeClass: 'border-yellow-400 bg-yellow-500/20 text-yellow-300', ownedClass: 'border-yellow-500/50 bg-yellow-900/20 hover:bg-yellow-500/20 text-yellow-300' },
-                                { id: 'green', name: 'NECRO GREEN', price: 2500, activeClass: 'border-emerald-400 bg-emerald-500/20 text-emerald-300', ownedClass: 'border-emerald-500/50 bg-emerald-900/20 hover:bg-emerald-500/20 text-emerald-300' },
-                            ].map((t) => {
-                                const isOwned = ownedThemes.includes(t.id)
-                                const isActive = themeColor === t.id
-                                return (
-                                    <button
-                                        key={t.id}
-                                        onClick={() => handleThemeUpdate(t.id)}
-                                        className={`p-4 border relative transition-all font-mono tracking-widest ${isActive
-                                            ? t.activeClass
-                                            : isOwned
-                                                ? t.ownedClass
-                                                : 'border-gray-700 bg-gray-900/40 text-gray-600 cursor-not-allowed'
-                                            }`}
-                                    >
-                                        {t.name}
-                                        {!isOwned && (
-                                            <span className="block text-[10px] mt-1 text-gray-600">🔒 {t.price}G</span>
-                                        )}
-                                        {isActive && (
-                                            <span className="absolute top-1 right-1 text-[8px] text-green-400">●</span>
-                                        )}
-                                    </button>
-                                )
-                            })}
+                        <div className="p-6">
+                            <div className="mb-4 rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
+                                <div className="flex items-center justify-between gap-3">
+                                    <div>
+                                        <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-blue-200/50">Current system skin</div>
+                                        <div className="mt-1 text-lg font-black tracking-[0.16em] text-white">{themeColor.toUpperCase()}</div>
+                                    </div>
+                                    <div className="h-10 w-10 rounded-full border border-blue-300/30 bg-system-blue/30 shadow-[0_0_20px_rgb(var(--color-system-blue-rgb)/0.35)]" />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                {[
+                                    { id: 'blue', name: 'SHADOW BLUE', price: 0, activeClass: 'border-blue-400 bg-blue-500/20 text-blue-300', ownedClass: 'border-blue-500/50 bg-blue-900/20 hover:bg-blue-500/20 text-blue-300' },
+                                    { id: 'red', name: 'BLOOD RED', price: 1000, activeClass: 'border-red-400 bg-red-500/20 text-red-300', ownedClass: 'border-red-500/50 bg-red-900/20 hover:bg-red-500/20 text-red-300' },
+                                    { id: 'purple', name: 'VOID PURPLE', price: 1500, activeClass: 'border-purple-400 bg-purple-500/20 text-purple-300', ownedClass: 'border-purple-500/50 bg-purple-900/20 hover:bg-purple-500/20 text-purple-300' },
+                                    { id: 'gold', name: 'ROYAL GOLD', price: 2000, activeClass: 'border-yellow-400 bg-yellow-500/20 text-yellow-300', ownedClass: 'border-yellow-500/50 bg-yellow-900/20 hover:bg-yellow-500/20 text-yellow-300' },
+                                    { id: 'green', name: 'NECRO GREEN', price: 2500, activeClass: 'border-emerald-400 bg-emerald-500/20 text-emerald-300', ownedClass: 'border-emerald-500/50 bg-emerald-900/20 hover:bg-emerald-500/20 text-emerald-300' },
+                                ].map((t) => {
+                                    const isOwned = ownedThemes.includes(t.id)
+                                    const isActive = themeColor === t.id
+                                    return (
+                                        <button
+                                            key={t.id}
+                                            onClick={() => handleThemeUpdate(t.id)}
+                                            className={`p-4 border relative transition-all font-mono tracking-widest ${isActive
+                                                ? t.activeClass
+                                                : isOwned
+                                                    ? t.ownedClass
+                                                    : 'border-gray-700 bg-gray-900/40 text-gray-600 cursor-not-allowed'
+                                                }`}
+                                        >
+                                            <span className="block text-left text-xs">{t.name}</span>
+                                            {!isOwned && (
+                                                <span className="block text-left text-[10px] mt-2 text-gray-600">LOCKED // {t.price}G</span>
+                                            )}
+                                            {isActive && (
+                                                <span className="absolute top-2 right-2 rounded-full border border-green-400/20 bg-green-400/10 px-2 py-0.5 text-[8px] text-green-300">ACTIVE</span>
+                                            )}
+                                        </button>
+                                    )
+                                })}
+                            </div>
+                            <div className="mt-5 flex flex-col gap-3 rounded-xl border border-yellow-500/10 bg-yellow-500/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+                                <p className="text-xs font-mono uppercase leading-relaxed tracking-[0.16em] text-gray-500">
+                                    Earn gold through quests, then unlock skins in the Shop. The app still works best on Shadow Blue.
+                                </p>
+                                <Link
+                                    to="/shop"
+                                    onClick={() => setIsThemeModalOpen(false)}
+                                    className="shrink-0 rounded-full border border-yellow-400/20 bg-yellow-400/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-yellow-200 transition-all hover:border-yellow-300/50 hover:bg-yellow-400/20"
+                                >
+                                    Open Shop
+                                </Link>
+                            </div>
                         </div>
-                        <p className="text-xs text-gray-500 mt-4 text-center font-mono">
-                            Purchase theme crystals from the Shop to unlock new themes.
-                        </p>
                     </div>
                 </div>
             )}

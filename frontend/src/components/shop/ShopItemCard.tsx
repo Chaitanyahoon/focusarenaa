@@ -40,7 +40,7 @@ export default function ShopItemCard({ item, userGold, onPurchase, isOwned = fal
 
     const handleBuy = async () => {
         if (isOwned) {
-            toast('You already own this!', { icon: '✅' });
+            toast('You already own this item.');
             return;
         }
         if (!canAfford) {
@@ -82,7 +82,9 @@ export default function ShopItemCard({ item, userGold, onPurchase, isOwned = fal
                 ) : item.imageUrl ? (
                     <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-contain filter drop-shadow-[0_0_5px_rgba(var(--color-system-blue-rgb),0.8)]" />
                 ) : (
-                    <div className="text-4xl">📦</div> // Fallback for non-theme items with no image
+                    <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-system-blue/20 bg-system-blue/5 text-[10px] font-mono uppercase tracking-[0.18em] text-system-blue/70">
+                        Item
+                    </div>
                 )}
             </div>
 
@@ -91,7 +93,8 @@ export default function ShopItemCard({ item, userGold, onPurchase, isOwned = fal
 
             <div className="mt-auto w-full">
                 <div className="text-system-gold font-bold mb-2 flex items-center justify-center gap-1 font-mono">
-                    <span>💰</span> {item.price} G
+                    <span className="text-[10px] uppercase tracking-[0.18em] text-yellow-400/60">Cost</span>
+                    <span>{item.price} G</span>
                 </div>
 
                 <button
@@ -106,7 +109,7 @@ export default function ShopItemCard({ item, userGold, onPurchase, isOwned = fal
                         }
                     `}
                 >
-                    {isOwned ? '✓ Owned' : isLoading ? 'Processing...' : canAfford ? 'Purchase' : 'Need Gold'}
+                    {isOwned ? 'Owned' : isLoading ? 'Processing...' : canAfford ? 'Purchase' : 'Need Gold'}
                 </button>
             </div>
         </div>

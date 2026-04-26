@@ -19,9 +19,9 @@ export const SystemToaster = () => {
         >
             {(t) => (
                 <ToastBar toast={t}>
-                    {({ icon, message }) => (
+                    {({ message }) => (
                         <div className="flex items-start gap-3 w-full animate-in slide-in-from-right duration-300">
-                            <div className="mt-1">{icon}</div>
+                            <div className="mt-1 flex h-3 w-3 shrink-0 rotate-45 border border-blue-300/60 bg-blue-400/10" aria-hidden="true" />
                             <div className="flex-1">
                                 <div className="text-[10px] text-blue-400 font-display tracking-widest mb-1 uppercase">
                                     System Notification
@@ -59,7 +59,6 @@ export const systemToast = {
     info: (msg: string) => {
         sfx.play('notification');
         toast(msg, {
-            icon: 'ℹ️',
             style: { borderLeft: '4px solid #3b82f6' }
         });
     },
@@ -69,8 +68,8 @@ export const systemToast = {
             <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full bg-[#050914] border-2 border-blue-500 shadow-[0_0_30px_#3b82f6] pointer-events-auto flex ring-1 ring-black ring-opacity-5`}>
                 <div className="flex-1 w-0 p-4">
                     <div className="flex items-start">
-                        <div className="flex-shrink-0 pt-0.5">
-                            <span className="text-3xl">🆙</span>
+                        <div className="flex-shrink-0 pt-1">
+                            <span className="block h-4 w-4 rotate-45 border border-blue-300 bg-blue-500/20 shadow-[0_0_14px_rgba(59,130,246,0.45)]" />
                         </div>
                         <div className="ml-3 flex-1">
                             <p className="text-sm font-display font-bold text-blue-400 tracking-widest">

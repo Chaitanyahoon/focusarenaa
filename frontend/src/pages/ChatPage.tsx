@@ -608,7 +608,7 @@ export default function ChatPage() {
                                         <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                                         <div className={`text-[10px] mt-1 flex gap-1 ${msg.isMe ? 'justify-end text-blue-400/70' : 'text-gray-500'}`}>
                                             {new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            {msg.isMe && <span>{msg.isRead ? '✓✓' : '✓'}</span>}
+                                            {msg.isMe && <span>{msg.isRead ? 'READ' : 'SENT'}</span>}
                                         </div>
                                     </div>
                                 </div>

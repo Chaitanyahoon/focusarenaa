@@ -4,12 +4,15 @@ import { useAuthStore } from '../stores/authStore'
 import { PlusIcon, CheckIcon, TrashIcon, ClockIcon, ExclamationTriangleIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
 import { TaskStatus, TaskDifficulty, TaskCategory, CreateTaskDto, RecurrenceType } from '../types'
 import toast from 'react-hot-toast'
+import RewardReveal from '../components/effects/RewardReveal'
+import SystemEmptyState from '../components/shared/SystemEmptyState'
 
 export default function Quests() {
     const { tasks, fetchTasks, createTask, completeTask, deleteTask, isLoading } = useTaskStore()
     const { user } = useAuthStore()
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isCompleting, setIsCompleting] = useState<number | null>(null)
+    const [rewardReveal, setRewardReveal] = useState<{ title: string; xp: number; gold: number } | null>(null)
 
     // New Task Form State
     const [newTask, setNewTask] = useState<CreateTaskDto>({
@@ -58,6 +61,11 @@ export default function Quests() {
             const result = await completeTask(id)
             const xpGained = result.xpGained || 0
             toast.success(`QUEST COMPLETE! +${xpGained} XP`)
+            setRewardReveal({
+                title: 'Quest complete',
+                xp: xpGained,
+                gold: Math.max(10, Math.floor(xpGained / 2))
+            })
 
             // Trigger a level up check or refresh profile if needed
             // (The store handles basic task list updates)
@@ -109,11 +117,23 @@ export default function Quests() {
                 </h2>
 
                 {isLoading ? (
-                    <div className="text-blue-500/50 font-mono animate-pulse">Scanning for quests...</div>
-                ) : pendingTasks.length === 0 ? (
-                    <div className="p-8 border border-dashed border-gray-800 text-gray-600 text-center font-mono">
-                        NO ACTIVE QUESTS DETECTED.
+                    <div className="system-card rounded-2xl p-8 text-center text-blue-500/50 font-mono animate-pulse">
+                        Scanning quest contracts...
                     </div>
+                ) : pendingTasks.length === 0 ? (
+                    <SystemEmptyState
+                        eyebrow="Quest log empty"
+                        title="No active contracts."
+                        description="The System cannot reward idle intent. Create one concrete objective and give today a win condition."
+                        action={
+                            <button
+                                onClick={() => setIsModalOpen(true)}
+                                className="system-button system-button-primary px-5 py-3 text-xs"
+                            >
+                                Generate quest
+                            </button>
+                        }
+                    />
                 ) : (
                     <div className="grid gap-4">
                         {pendingTasks.map(task => (
@@ -190,15 +210,21 @@ export default function Quests() {
                     COMPLETION LOG
                 </h2>
                 <div className="grid gap-2">
-                    {completedTasks.map(task => (
-                        <div key={task.id} className="flex justify-between items-center bg-[#050914] border border-gray-800 p-3 px-6">
-                            <div className="flex items-center gap-4">
-                                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                                <span className="text-gray-400 line-through decoration-gray-600">{task.title}</span>
-                            </div>
-                            <span className="text-green-500/50 font-mono text-sm">+{task.xpReward} XP</span>
+                    {completedTasks.length === 0 ? (
+                        <div className="rounded-xl border border-dashed border-gray-800 bg-black/20 p-4 text-center text-xs font-mono uppercase tracking-[0.18em] text-gray-600">
+                            No cleared contracts yet.
                         </div>
-                    ))}
+                    ) : (
+                        completedTasks.map(task => (
+                            <div key={task.id} className="flex justify-between items-center bg-[#050914] border border-gray-800 p-3 px-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    <span className="text-gray-400 line-through decoration-gray-600">{task.title}</span>
+                                </div>
+                                <span className="text-green-500/50 font-mono text-sm">+{task.xpReward} XP</span>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
 
@@ -319,6 +345,16 @@ export default function Quests() {
                     </div>
                 </div>
             )}
+
+            <RewardReveal
+                isOpen={rewardReveal !== null}
+                title={rewardReveal?.title ?? ''}
+                subtitle="The quest log recorded your win. Keep the chain hot while the reward is fresh."
+                xp={rewardReveal?.xp}
+                gold={rewardReveal?.gold}
+                tone="green"
+                onClose={() => setRewardReveal(null)}
+            />
 
         </div>
     )

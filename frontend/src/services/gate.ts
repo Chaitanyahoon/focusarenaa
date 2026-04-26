@@ -58,6 +58,11 @@ export const gateAPI = {
         return response.data
     },
 
+    createProceduralGate: async (rank: GateRank = GateRank.C): Promise<Gate> => {
+        const response = await api.post<Gate>(`/gates/procedural?rank=${rank}`)
+        return response.data
+    },
+
     addTaskToGate: async (gateId: number, taskId: number): Promise<void> => {
         await api.post(`/gates/${gateId}/add-task/${taskId}`)
     },

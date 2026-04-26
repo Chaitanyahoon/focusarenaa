@@ -69,11 +69,11 @@ export default function RaidPage() {
     const handleTaskComplete = async (taskId: number) => {
         try {
             await taskAPI.complete(taskId);
-            toast.success("Monster defeated!", { icon: '⚔️' });
+            toast.success("Monster defeated.");
             loadGate();
 
             if (gate && gate.tasks.every(t => t.id === taskId || t.status === 2)) {
-                toast.success("DUNGEON CLEARED!", { duration: 5000, icon: '🏆' });
+                toast.success("DUNGEON CLEARED!", { duration: 5000 });
             }
         } catch {
             toast.error("Attack failed.");
@@ -84,7 +84,7 @@ export default function RaidPage() {
         if (!gate) return;
         try {
             await gateAPI.claimRewards(gate.id);
-            toast.success(`Rewards Claimed: ${gate.xpReward} XP, ${gate.goldReward} Gold!`, { icon: '💰' });
+            toast.success(`Rewards Claimed: ${gate.xpReward} XP, ${gate.goldReward} Gold!`);
             await fetchProfile();
             loadGate();
         } catch {
@@ -119,9 +119,9 @@ export default function RaidPage() {
     if (!gate) return (
         <div className="flex items-center justify-center h-full">
             <div className="text-center">
-                <p className="text-red-500 font-rajdhani text-xl mb-2">⚠ DUNGEON COLLAPSED</p>
+                <p className="text-red-500 font-rajdhani text-xl mb-2">DUNGEON COLLAPSED</p>
                 <button onClick={() => navigate('/gates')} className="text-blue-400 hover:text-blue-300 font-mono text-sm">
-                    ← Return to Gate Selection
+                    Return to Gate Selection
                 </button>
             </div>
         </div>
@@ -264,7 +264,7 @@ export default function RaidPage() {
                     <div className="flex-1 space-y-2.5 overflow-y-auto pr-1 custom-scrollbar">
                         {gate.tasks.length === 0 ? (
                             <div className="text-center py-16 border border-dashed border-gray-800/50 rounded-xl text-gray-600 bg-black/20">
-                                <div className="text-3xl mb-3">👻</div>
+                                <div className="mx-auto mb-4 h-8 w-8 rounded-full border border-gray-700 bg-gray-800/20" />
                                 <p className="font-rajdhani text-lg">No Encounters</p>
                                 <p className="text-xs font-mono mt-1">Add tasks to begin the battle</p>
                             </div>
@@ -290,7 +290,7 @@ export default function RaidPage() {
                                                     }`}
                                             >
                                                 {isDone ? (
-                                                    <span className="text-sm">✓</span>
+                                                    <span className="text-[10px] font-black font-mono">DONE</span>
                                                 ) : (
                                                     <span className="text-[10px] font-black font-mono">ATK</span>
                                                 )}
@@ -387,7 +387,7 @@ function AddTaskModal({ isOpen, onClose, gateId, onTaskAdded }: { isOpen: boolea
                 dueDate: undefined
             });
             await gateAPI.addTaskToGate(gateId, newTask.id);
-            toast.success("Encounter added!", { icon: '👾' });
+            toast.success("Encounter added.");
             reset();
             onTaskAdded();
             onClose();
@@ -436,14 +436,14 @@ function AddTaskModal({ isOpen, onClose, gateId, onTaskAdded }: { isOpen: boolea
                                     />
                                     <div className="grid grid-cols-2 gap-3">
                                         <select {...register('difficulty', { valueAsNumber: true })} className="bg-black/40 border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500/50 transition-all">
-                                            <option value={TaskDifficulty.Easy}>⚡ Easy</option>
-                                            <option value={TaskDifficulty.Medium}>🔥 Medium</option>
-                                            <option value={TaskDifficulty.Hard}>💀 Hard</option>
+                                            <option value={TaskDifficulty.Easy}>Easy</option>
+                                            <option value={TaskDifficulty.Medium}>Medium</option>
+                                            <option value={TaskDifficulty.Hard}>Hard</option>
                                         </select>
                                         <select {...register('category', { valueAsNumber: true })} className="bg-black/40 border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500/50 transition-all">
-                                            <option value={TaskCategory.Work}>💼 Work</option>
-                                            <option value={TaskCategory.Personal}>🏠 Personal</option>
-                                            <option value={TaskCategory.Fitness}>💪 Fitness</option>
+                                            <option value={TaskCategory.Work}>Work</option>
+                                            <option value={TaskCategory.Personal}>Personal</option>
+                                            <option value={TaskCategory.Fitness}>Fitness</option>
                                         </select>
                                     </div>
                                     <button
@@ -451,7 +451,7 @@ function AddTaskModal({ isOpen, onClose, gateId, onTaskAdded }: { isOpen: boolea
                                         disabled={isLoading}
                                         className="w-full py-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white rounded-lg font-bold tracking-wider transition-all disabled:opacity-50 shadow-lg shadow-red-900/30"
                                     >
-                                        {isLoading ? 'Summoning...' : '⚔️ SUMMON ENCOUNTER'}
+                                        {isLoading ? 'Summoning...' : 'SUMMON ENCOUNTER'}
                                     </button>
                                 </form>
                             </Dialog.Panel>

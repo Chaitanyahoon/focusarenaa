@@ -37,6 +37,8 @@ export default function SystemLayout() {
     return (
         <div className="flex min-h-screen bg-[#020408] text-blue-100 font-body selection:bg-blue-500/30 overflow-hidden relative">
             <LevelUpCelebration />
+            <div className="ambient-orb -left-32 top-24 z-0 opacity-40" />
+            <div className="ambient-orb -right-32 bottom-10 z-0 opacity-30 [animation-delay:3s]" />
 
             {/* SIDEBAR NAVIGATION - DESKTOP ONLY */}
             <aside className="hidden md:flex fixed left-0 top-0 h-full w-64 glass-panel z-50 flex-col transition-all duration-300 border-r border-system-blue/30">
@@ -123,6 +125,31 @@ export default function SystemLayout() {
                         </Link>
                     )}
                 </nav>
+
+                <div className="px-4 pb-4">
+                    <div className="system-card rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                            <span className="habit-chip rounded-full px-2.5 py-1 text-[9px]">Daily Loop</span>
+                            <span className="text-[10px] font-mono text-emerald-300/80">ACTIVE</span>
+                        </div>
+                        <div className="mt-4 grid grid-cols-2 gap-2">
+                            <div>
+                                <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-blue-200/50">Streak</div>
+                                <div className="mt-1 text-2xl font-black text-white">{user?.streakCount ?? 0}</div>
+                            </div>
+                            <div>
+                                <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-blue-200/50">Gold</div>
+                                <div className="mt-1 text-2xl font-black text-yellow-300">{user?.gold ?? 0}</div>
+                            </div>
+                        </div>
+                        <div className="mt-3 h-1 overflow-hidden rounded-full bg-black/50">
+                            <div className="h-full w-2/3 bg-gradient-to-r from-system-blue via-cyan-300 to-emerald-300 heartbeat-glow" />
+                        </div>
+                        <p className="mt-3 text-[10px] font-mono uppercase leading-relaxed tracking-[0.16em] text-gray-500">
+                            Clear one objective today to keep the arena warm.
+                        </p>
+                    </div>
+                </div>
 
                 {/* Desktop Download CTA */}
                 <div className="px-4 pb-4">
@@ -234,12 +261,13 @@ export default function SystemLayout() {
             <main className="flex-1 md:ml-64 relative min-h-screen bg-[#020408] pb-24 md:pb-8">
                 {/* Background Grid repeating - Animated */}
                 <div className="absolute inset-0 z-0 bg-grid-animate opacity-30 pointer-events-none"></div>
+                <div className="absolute inset-x-0 top-0 z-0 h-64 bg-[radial-gradient(circle_at_50%_0%,rgb(var(--color-system-blue-rgb)/0.18),transparent_64%)] pointer-events-none"></div>
 
                 {/* Vignette */}
                 <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)] pointer-events-none"></div>
 
                 {/* Content */}
-                <div className="relative z-10 p-4 md:p-8 max-w-[95%] mx-auto">
+                <div key={location.pathname} className="relative z-10 p-4 md:p-8 max-w-[95%] mx-auto float-in">
                     <Outlet />
                 </div>
             </main>

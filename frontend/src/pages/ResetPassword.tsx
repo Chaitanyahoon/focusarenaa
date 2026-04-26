@@ -111,12 +111,12 @@ export default function ResetPassword() {
                         disabled={isLoading}
                         className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded uppercase tracking-widest transition-all disabled:opacity-50 text-sm mb-4"
                     >
-                        {isLoading ? 'PROCESSING...' : '🔒 RESET PASSWORD'}
+                        {isLoading ? 'PROCESSING...' : 'RESET PASSWORD'}
                     </button>
 
                     <div className="text-center">
                         <Link to="/login" className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
-                            ← Back to Login
+                            Back to Login
                         </Link>
                     </div>
                 </form>

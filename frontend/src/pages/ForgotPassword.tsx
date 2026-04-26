@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api } from '../services/api';
+import { authAPI } from '../services/api';
 import { toast } from 'react-hot-toast';
 import { EnvelopeIcon } from '@heroicons/react/24/outline';
-import emailjs from '@emailjs/browser';
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState('');
@@ -15,45 +14,12 @@ export default function ForgotPassword() {
         setIsLoading(true);
 
         try {
-            // 1. Request token from backend
-            const response = await api.post('/auth/request-password-reset', { email });
-
-            // 2. If successful, backend returns token (DEMO MODE)
-            if (response.data.token) {
-                const resetLink = `${window.location.origin}/reset-password?token=${response.data.token}`;
-
-                // 3. Send email via EmailJS
-                // SERVICE ID: service_jemwzc1
-                // TEMPLATE ID: You need to create this in EmailJS dashboard
-                // PUBLIC KEY: You need to get this from Account > API Keys
-
-                try {
-                    await emailjs.send(
-                        'service_jemwzc1',
-                        'template_af0erue', // ✅ Configured
-                        {
-                            to_email: email,
-                            reset_link: resetLink,
-                            reply_to: 'support@focusarena.io'
-                        },
-                        'oj27ybVSh1kjvSPzV' // ✅ Configured
-                    );
-
-                    // Email sent successfully
-                    toast.success('Reset link sent to your email!');
-                    setEmailSent(true);
-                } catch (emailError) {
-                    console.error("EmailJS Error:", emailError);
-                    toast.error("Failed to send email. Check console.");
-                }
-            } else {
-                toast.success(response.data.message);
-                setEmailSent(true);
-            }
+            const response = await authAPI.requestPasswordReset(email);
+            toast.success(response.message || 'If that email exists, a reset link has been sent.');
+            setEmailSent(true);
         } catch (error) {
             console.error(error);
-            setEmailSent(true);
-            toast.success('If that email exists, a reset link has been sent.');
+            toast.error('Unable to start password reset right now.');
         } finally {
             setIsLoading(false);
         }
@@ -125,12 +91,12 @@ export default function ForgotPassword() {
                         disabled={isLoading}
                         className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded uppercase tracking-widest transition-all disabled:opacity-50 text-sm mb-4"
                     >
-                        {isLoading ? 'PROCESSING...' : '✉️ SEND RESET LINK'}
+                        {isLoading ? 'PROCESSING...' : 'SEND RESET LINK'}
                     </button>
 
                     <div className="text-center">
                         <Link to="/login" className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
-                            ← Back to Login
+                            Back to Login
                         </Link>
                     </div>
                 </form>

@@ -11,6 +11,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     css: true,
+    exclude: ['tests/**', 'node_modules/**', 'dist/**', '.git/**', '.cache/**'],
   },
   server: {
     port: 3000,

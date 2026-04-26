@@ -17,7 +17,7 @@ export default function Login() {
 
             // Check for admin role
             const user = useAuthStore.getState().user
-            toast.success('🎮 Welcome back, Hunter!')
+            toast.success('Welcome back, Hunter.')
 
             if (user?.role === 'Admin') {
                 navigate('/admin')
@@ -87,7 +87,7 @@ export default function Login() {
 
                     {error && (
                         <div className="bg-red-500/20 border border-red-500 rounded-lg p-3 text-red-400 text-sm font-accent">
-                            ⚠️ {error}
+                            {error}
                         </div>
                     )}
 
@@ -96,7 +96,7 @@ export default function Login() {
                         disabled={isLoading}
                         className="holo-button w-full bg-cyan-900/30 border-cyan-400 text-cyan-300 hover:bg-cyan-500/20 hover:text-white transition-all shadow-[0_0_15px_rgba(0,234,255,0.2)] hover:shadow-[0_0_25px_rgba(0,234,255,0.5)] font-bold tracking-widest"
                     >
-                        {isLoading ? 'CONNECTING...' : '⚔️ ENTER ARENA'}
+                        {isLoading ? 'CONNECTING...' : 'ENTER ARENA'}
                     </button>
                 </form>
 

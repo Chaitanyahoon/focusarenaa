@@ -3,6 +3,7 @@ import { shopService, ShopItem } from '../services/shop';
 import { useAuthStore } from '../stores/authStore';
 import ShopItemCard from '../components/shop/ShopItemCard';
 import InventoryModal from '../components/shop/InventoryModal';
+import SystemEmptyState from '../components/shared/SystemEmptyState';
 
 export default function ShopPage() {
     const [items, setItems] = useState<ShopItem[]>([]);
@@ -45,6 +46,9 @@ export default function ShopPage() {
         }
     };
 
+    const themeItems = items.filter(i => i.type === 'Theme');
+    const specialItems = items.filter(i => i.type !== 'Theme');
+
     return (
         <div className="p-6 h-full overflow-y-auto custom-scrollbar relative">
             {/* Header */}
@@ -61,7 +65,7 @@ export default function ShopPage() {
                 <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-end">
                     {/* Gold Display */}
                     <div className="px-4 py-2 bg-black/40 border border-system-gold/30 rounded flex items-center gap-2 shadow-[0_0_10px_rgba(255,215,0,0.1)]">
-                        <span className="text-xl">💰</span>
+                        <span className="h-2.5 w-2.5 rounded-full bg-system-gold shadow-[0_0_12px_rgba(255,215,0,0.45)]" />
                         <span className="font-mono text-xl font-bold text-system-gold">{user?.gold ?? 0}</span>
                         <span className="text-xs text-gray-500 uppercase tracking-widest ml-1">Gold</span>
                     </div>
@@ -80,40 +84,57 @@ export default function ShopPage() {
             {!isLoading && (
                 <>
                     <h2 className="text-lg font-bold font-rajdhani text-gray-300 mb-4 flex items-center gap-2">
-                        <span className="text-system-blue">◆</span> THEME CRYSTALS
+                        <span className="h-2 w-2 rotate-45 bg-system-blue shadow-[0_0_10px_rgb(var(--color-system-blue-rgb)/0.4)]" /> THEME CRYSTALS
                         <span className="text-xs text-gray-600 font-mono ml-2">Unlock new system themes</span>
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-10">
-                        {items.filter(i => i.type === 'Theme').map(item => (
-                            <ShopItemCard
-                                key={item.id}
-                                item={item}
-                                userGold={user?.gold ?? 0}
-                                onPurchase={loadData}
-                                isOwned={isThemeOwned(item)}
-                            />
-                        ))}
-                    </div>
+                    {themeItems.length === 0 ? (
+                        <SystemEmptyState
+                            eyebrow="Vault unavailable"
+                            title="No theme crystals stocked."
+                            description="The default Shadow Blue system remains active. New cosmetic rewards can be stocked from the backend shop catalog."
+                            tone="gold"
+                        />
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-10">
+                            {themeItems.map(item => (
+                                <ShopItemCard
+                                    key={item.id}
+                                    item={item}
+                                    userGold={user?.gold ?? 0}
+                                    onPurchase={loadData}
+                                    isOwned={isThemeOwned(item)}
+                                />
+                            ))}
+                        </div>
+                    )}
 
                     <h2 className="text-lg font-bold font-rajdhani text-gray-300 mb-4 flex items-center gap-2">
-                        <span className="text-system-blue">◆</span> SPECIAL ITEMS
+                        <span className="h-2 w-2 rotate-45 bg-system-blue shadow-[0_0_10px_rgb(var(--color-system-blue-rgb)/0.4)]" /> SPECIAL ITEMS
                         <span className="text-xs text-gray-600 font-mono ml-2">Rare goods & utilities</span>
                     </h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {items.filter(i => i.type !== 'Theme').map(item => (
-                            <ShopItemCard
-                                key={item.id}
-                                item={item}
-                                userGold={user?.gold ?? 0}
-                                onPurchase={loadData}
-                            />
-                        ))}
-                    </div>
+                    {specialItems.length === 0 ? (
+                        <SystemEmptyState
+                            eyebrow="Loot table empty"
+                            title="No special items today."
+                            description="Theme skins are still the main gold sink. Add rare utilities here when the progression economy grows."
+                        />
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {specialItems.map(item => (
+                                <ShopItemCard
+                                    key={item.id}
+                                    item={item}
+                                    userGold={user?.gold ?? 0}
+                                    onPurchase={loadData}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </>
             )}
 
             {isLoading && (
-                <div className="flex justify-center items-center h-64 text-system-blue animate-pulse">
+                <div className="system-card flex justify-center items-center h-64 rounded-2xl text-system-blue animate-pulse">
                     Accessing System Store...
                 </div>
             )}

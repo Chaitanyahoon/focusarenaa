@@ -39,7 +39,7 @@ export default function CreateGateModal({ isOpen, onClose, onGateCreated }: Prop
                 rank: Number(data.rank),
                 deadline: data.deadline ? data.deadline : undefined
             })
-            toast.success('Dungeon Gate Opened!', { icon: '⚔️' })
+            toast.success('Dungeon Gate Opened!')
             reset()
             onGateCreated()
             onClose()
@@ -136,8 +136,8 @@ export default function CreateGateModal({ isOpen, onClose, onGateCreated }: Prop
                                                     {...register('type')}
                                                     className="w-full bg-black/40 border border-gray-700/60 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500/60 transition-all appearance-none cursor-pointer"
                                                 >
-                                                    <option value="Dungeon">⚔️ Dungeon</option>
-                                                    <option value="Raid">🛡️ Raid</option>
+                                                    <option value="Dungeon">Dungeon</option>
+                                                    <option value="Raid">Raid</option>
                                                 </select>
                                             </div>
                                         </div>

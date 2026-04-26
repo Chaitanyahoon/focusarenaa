@@ -1,29 +1,41 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { SystemToaster } from './components/ui/SystemToast'
 import { useAuthStore } from './stores/authStore'
+import { signalRService } from './services/signalr'
 
 // Pages
-import Landing from './pages/Landing'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Dashboard from './pages/Dashboard'
-import Quests from './pages/Quests'
-import Leaderboard from './pages/Leaderboard'
-import Profile from './pages/Profile'
-import Analytics from './pages/Analytics'
-import ShopPage from './pages/ShopPage'
-import GatePage from './pages/GatePage'
-import RaidPage from './pages/RaidPage'
-import GuildPage from './pages/GuildPage'
-import ChatPage from './pages/ChatPage'
-import AdminDashboard from './pages/AdminDashboard'
-import ForgotPassword from './pages/ForgotPassword'
-import ResetPassword from './pages/ResetPassword'
+const Landing = lazy(() => import('./pages/Landing'))
+const Login = lazy(() => import('./pages/Login'))
+const Register = lazy(() => import('./pages/Register'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Quests = lazy(() => import('./pages/Quests'))
+const Leaderboard = lazy(() => import('./pages/Leaderboard'))
+const Profile = lazy(() => import('./pages/Profile'))
+const Analytics = lazy(() => import('./pages/Analytics'))
+const ShopPage = lazy(() => import('./pages/ShopPage'))
+const GatePage = lazy(() => import('./pages/GatePage'))
+const RaidPage = lazy(() => import('./pages/RaidPage'))
+const GuildPage = lazy(() => import('./pages/GuildPage'))
+const ChatPage = lazy(() => import('./pages/ChatPage'))
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
+const ResetPassword = lazy(() => import('./pages/ResetPassword'))
 
 // Layout
 import ProtectedRoute from './components/layout/ProtectedRoute'
 import SystemLayout from './components/layout/SystemLayout'
+
+function RouteFallback() {
+    return (
+        <div className="flex min-h-screen items-center justify-center bg-[#020408] p-4">
+            <div className="system-card rounded-2xl px-8 py-6 text-center">
+                <div className="mx-auto mb-4 h-10 w-10 rounded-full border border-system-blue/30 bg-system-blue/10 shadow-[0_0_24px_rgb(var(--color-system-blue-rgb)/0.18)] animate-pulse" />
+                <div className="text-sm font-mono uppercase tracking-[0.24em] text-system-blue">Loading system module</div>
+            </div>
+        </div>
+    )
+}
 
 function App() {
     const { isAuthenticated, checkAuth, user } = useAuthStore()
@@ -35,9 +47,13 @@ function App() {
 
     useEffect(() => {
         if (isAuthenticated) {
-            import('./services/signalr').then(({ signalRService }) => {
-                signalRService.startConnection()
-            })
+            signalRService.startConnection()
+        } else {
+            signalRService.stopConnection()
+        }
+
+        return () => {
+            signalRService.stopConnection()
         }
     }, [isAuthenticated])
 
@@ -95,35 +111,36 @@ function App() {
         <BrowserRouter>
             <SystemToaster />
 
-            <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Landing />} />
-                <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
-                <Route path="/register" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Register />} />
-                <Route path="/forgot-password" element={isAuthenticated ? <Navigate to="/dashboard" /> : <ForgotPassword />} />
-                <Route path="/reset-password" element={isAuthenticated ? <Navigate to="/dashboard" /> : <ResetPassword />} />
+            <Suspense fallback={<RouteFallback />}>
+                <Routes>
+                    {/* Public Routes */}
+                    <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Landing />} />
+                    <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} />
+                    <Route path="/register" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Register />} />
+                    <Route path="/forgot-password" element={isAuthenticated ? <Navigate to="/dashboard" /> : <ForgotPassword />} />
+                    <Route path="/reset-password" element={isAuthenticated ? <Navigate to="/dashboard" /> : <ResetPassword />} />
 
-                {/* Protected Routes */}
-                <Route element={
-                    <ProtectedRoute>
-                        <SystemLayout />
-                    </ProtectedRoute>
-                }>
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/quests" element={<Quests />} />
-                    <Route path="/leaderboard" element={<Leaderboard />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/profile/:id" element={<Profile />} />
-                    <Route path="/analytics" element={<Analytics />} />
-                    <Route path="/shop" element={<ShopPage />} />
-                    <Route path="/gates" element={<GatePage />} />
-                    <Route path="/gates/:id" element={<RaidPage />} />
-                    <Route path="/guilds" element={<GuildPage />} />
-                    <Route path="/guilds" element={<GuildPage />} />
-                    <Route path="/chat" element={<ChatPage />} />
-                    <Route path="/admin" element={<AdminDashboard />} />
-                </Route>
-            </Routes>
+                    {/* Protected Routes */}
+                    <Route element={
+                        <ProtectedRoute>
+                            <SystemLayout />
+                        </ProtectedRoute>
+                    }>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/quests" element={<Quests />} />
+                        <Route path="/leaderboard" element={<Leaderboard />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/profile/:id" element={<Profile />} />
+                        <Route path="/analytics" element={<Analytics />} />
+                        <Route path="/shop" element={<ShopPage />} />
+                        <Route path="/gates" element={<GatePage />} />
+                        <Route path="/gates/:id" element={<RaidPage />} />
+                        <Route path="/guilds" element={<GuildPage />} />
+                        <Route path="/chat" element={<ChatPage />} />
+                        <Route path="/admin" element={<AdminDashboard />} />
+                    </Route>
+                </Routes>
+            </Suspense>
         </BrowserRouter>
     )
 }

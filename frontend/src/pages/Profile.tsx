@@ -50,7 +50,6 @@ export default function Profile() {
     // Update local state if editing own profile
     const handleProfileUpdate = async () => {
         if (isMe) {
-            const { useAuthStore } = await import('../stores/authStore')
             useAuthStore.getState().fetchProfile()
         }
     }

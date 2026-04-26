@@ -20,12 +20,27 @@ class SignalRService {
             .configureLogging(signalR.LogLevel.Error)
             .build()
 
-        this.connection.on('ReceiveXPUpdate', (_userId: string, _xp: number) => {
+        const handleXPUpdate = (_payload: unknown) => {
             // XP updates handled silently — leaderboard refreshes on navigation
-        })
+        }
+        this.connection.on('XPUpdated', handleXPUpdate)
+        this.connection.on('ReceiveXPUpdate', handleXPUpdate)
 
-        this.connection.on('ReceiveLevelUp', (_userId: string, newLevel: number, username: string) => {
-            systemToast.info(`SYSTEM ALERT: Hunter ${username} has reached Level ${newLevel}!`)
+        const handleLevelUp = (...args: any[]) => {
+            const payload = args.length === 1 ? args[0] : null
+            const username = payload?.userName ?? args[2]
+            const newLevel = payload?.level ?? args[1]
+            if (username && newLevel) {
+                systemToast.info(`SYSTEM ALERT: Hunter ${username} has reached Level ${newLevel}!`)
+            }
+        }
+        this.connection.on('PlayerLeveledUp', handleLevelUp)
+        this.connection.on('ReceiveLevelUp', handleLevelUp)
+
+        this.connection.on('BadgeUnlocked', (payload: any) => {
+            if (payload?.badgeName && payload?.userName) {
+                systemToast.success(`${payload.userName} unlocked ${payload.badgeName}`)
+            }
         })
 
         this.connection.on('ReceiveSystemMessage', (message: string, type: 'info' | 'warning' | 'error' | 'success') => {

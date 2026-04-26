@@ -83,7 +83,7 @@ export default function AssignTaskModal({ isOpen, onClose, raidId, members }: Pr
                                         >
                                             {members.map(m => (
                                                 <option key={m.userId} value={m.userId}>
-                                                    {m.user.name} (Lvl {m.user.level}) {m.role === GuildRole.Leader ? '👑' : ''}
+                                                    {m.user.name} (Lvl {m.user.level}) {m.role === GuildRole.Leader ? '- Leader' : ''}
                                                 </option>
                                             ))}
                                         </select>
@@ -97,9 +97,9 @@ export default function AssignTaskModal({ isOpen, onClose, raidId, members }: Pr
 
                                     <div className="grid grid-cols-2 gap-3">
                                         <select {...register('difficulty', { valueAsNumber: true })} className="bg-black/40 border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500/50">
-                                            <option value={TaskDifficulty.Easy}>⚡ Easy (10 XP)</option>
-                                            <option value={TaskDifficulty.Medium}>🔥 Medium (25 XP)</option>
-                                            <option value={TaskDifficulty.Hard}>💀 Hard (50 XP)</option>
+                                            <option value={TaskDifficulty.Easy}>Easy (10 XP)</option>
+                                            <option value={TaskDifficulty.Medium}>Medium (25 XP)</option>
+                                            <option value={TaskDifficulty.Hard}>Hard (50 XP)</option>
                                         </select>
                                     </div>
 
