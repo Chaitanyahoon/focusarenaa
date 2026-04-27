@@ -72,7 +72,7 @@ export default function InventoryModal({ isOpen, onClose }: Props) {
                                 <div className="flex justify-between items-center mb-6 border-b border-system-blue/20 pb-4">
                                     <Dialog.Title
                                         as="h3"
-                                        className="text-2xl font-bold font-rajdhani text-transparent bg-clip-text bg-gradient-to-r from-system-blue to-purple-500"
+                                        className="text-2xl font-bold font-rajdhani text-transparent bg-clip-text bg-gradient-to-r from-system-blue to-teal-500"
                                     >
                                         INVENTORY
                                     </Dialog.Title>

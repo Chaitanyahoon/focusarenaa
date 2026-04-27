@@ -140,3 +140,5 @@ export default function LeaderboardOverlay({ onClose, theme, currentUserId }: Le
         </motion.div>
     )
 }
+
+// aria-label

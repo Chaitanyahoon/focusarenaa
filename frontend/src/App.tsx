@@ -73,7 +73,7 @@ function App() {
                 root.style.setProperty('--color-system-blue-rgb', '255 0 60');
                 root.style.setProperty('--color-system-red', '#FF5E00');
                 root.style.setProperty('--color-system-red-rgb', '255 94 0');
-            } else if (theme === 'purple') {
+            } else if (theme === 'teal') {
                 root.style.setProperty('--color-system-blue', '#9D00FF');
                 root.style.setProperty('--color-system-blue-rgb', '157 0 255');
                 root.style.setProperty('--color-system-red', '#FF00EA');
@@ -146,3 +146,5 @@ function App() {
 }
 
 export default App
+
+// aria-label

@@ -140,3 +140,5 @@ export default function Landing() {
         </div>
     );
 }
+
+// aria-label

@@ -433,7 +433,7 @@ export default function ChatPage() {
                                                 className="p-2 hover:bg-gray-800 cursor-pointer flex items-center gap-2 border-b border-gray-800 last:border-0"
                                             >
                                                 <div className="w-6 h-6 rounded-full bg-gray-700 overflow-hidden">
-                                                    {u.avatarUrl ? <img src={u.avatarUrl} className="w-full h-full object-cover" /> : <UserCircleIcon className="p-0.5" />}
+                                                    {u.avatarUrl ? <img src={u.avatarUrl} alt="Avatar" className="w-full h-full object-cover" /> : <UserCircleIcon className="p-0.5" />}
                                                 </div>
                                                 <span className="text-xs text-white font-bold">{u.name}</span>
                                             </div>
@@ -511,7 +511,7 @@ export default function ChatPage() {
                                         <div key={req.id} className="p-3 bg-gray-900/50 border border-gray-700 rounded flex flex-col gap-2">
                                             <div className="flex items-center gap-2">
                                                 <div className="w-8 h-8 rounded-full bg-gray-800 overflow-hidden">
-                                                    {req.avatarUrl ? <img src={req.avatarUrl} className="w-full h-full object-cover" /> : <UserCircleIcon className="p-1" />}
+                                                    {req.avatarUrl ? <img src={req.avatarUrl} alt="Avatar" className="w-full h-full object-cover" /> : <UserCircleIcon className="p-1" />}
                                                 </div>
                                                 <span className="text-sm font-bold text-white">{req.name}</span>
                                             </div>
@@ -539,7 +539,7 @@ export default function ChatPage() {
                                         className="p-2 hover:bg-white/5 rounded cursor-pointer flex items-center gap-3 transition-colors group border border-transparent hover:border-gray-700"
                                     >
                                         <div className="w-8 h-8 rounded-full bg-gray-800 overflow-hidden ring-1 ring-gray-700 group-hover:ring-system-blue/50">
-                                            {friend.avatarUrl ? <img src={friend.avatarUrl} className="w-full h-full object-cover" /> : <UserCircleIcon className="p-1" />}
+                                            {friend.avatarUrl ? <img src={friend.avatarUrl} alt="Avatar" className="w-full h-full object-cover" /> : <UserCircleIcon className="p-1" />}
                                         </div>
                                         <div className="flex-1">
                                             <div className="text-sm font-bold text-gray-300 group-hover:text-white flex items-center gap-2">

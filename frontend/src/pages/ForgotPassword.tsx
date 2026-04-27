@@ -30,9 +30,9 @@ export default function ForgotPassword() {
             <div className="min-h-screen bg-gradient-to-br from-[#020408] via-[#0a1120] to-[#020408] flex items-center justify-center p-4">
                 <div className="w-full max-w-md">
                     <div className="text-center mb-8">
-                        <h1 className="text-3xl md:text-4xl font-bold font-rajdhani tracking-widest text-white mb-2">
+                        <h2 className="text-3xl md:text-4xl font-bold font-rajdhani tracking-widest text-white mb-2">
                             CHECK YOUR EMAIL
-                        </h1>
+                        </h2>
                         <p className="text-sm text-gray-400 font-mono">Recovery Link Dispatched</p>
                     </div>
 

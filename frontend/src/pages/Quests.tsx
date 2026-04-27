@@ -164,7 +164,7 @@ export default function Quests() {
                                                 </span>
                                             )}
                                             {task.recurrence !== undefined && task.recurrence !== RecurrenceType.None && (
-                                                <span className="text-xs text-purple-400 flex items-center gap-1 border border-purple-500/30 px-1 rounded">
+                                                <span className="text-xs text-teal-400 flex items-center gap-1 border border-teal-500/30 px-1 rounded">
                                                     <ArrowPathIcon className="w-3 h-3" />
                                                     {RecurrenceType[task.recurrence]}
                                                 </span>

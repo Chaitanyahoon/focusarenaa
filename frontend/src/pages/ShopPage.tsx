@@ -54,7 +54,7 @@ export default function ShopPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 md:gap-0">
                 <div>
-                    <h1 className="text-3xl font-bold font-rajdhani text-transparent bg-clip-text bg-gradient-to-r from-system-blue to-purple-500 filter drop-shadow-[0_0_5px_rgba(var(--color-system-blue-rgb),0.5)]">
+                    <h1 className="text-3xl font-bold font-rajdhani text-transparent bg-clip-text bg-gradient-to-r from-system-blue to-teal-500 filter drop-shadow-[0_0_5px_rgba(var(--color-system-blue-rgb),0.5)]">
                         SYSTEM SHOP
                     </h1>
                     <p className="text-gray-400 font-exo text-sm mt-1">
@@ -141,7 +141,7 @@ export default function ShopPage() {
 
             {/* Decorative background elements */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-system-blue/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-600/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-600/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
             {/* Modals */}
             <InventoryModal
@@ -151,3 +151,5 @@ export default function ShopPage() {
         </div>
     );
 }
+
+// aria-label

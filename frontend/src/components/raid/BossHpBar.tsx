@@ -13,7 +13,7 @@ const RANK_STYLES: Record<number, { text: string; bar: string; glow: string; sha
     0: { text: 'text-gray-400', bar: 'from-gray-600 to-gray-500', glow: 'rgba(156,163,175,0.3)', shadow: 'shadow-gray-500/30', pulse: false },
     1: { text: 'text-green-400', bar: 'from-green-600 to-emerald-500', glow: 'rgba(74,222,128,0.3)', shadow: 'shadow-green-500/30', pulse: false },
     2: { text: 'text-blue-400', bar: 'from-blue-600 to-cyan-500', glow: 'rgba(96,165,250,0.4)', shadow: 'shadow-blue-500/30', pulse: false },
-    3: { text: 'text-purple-400', bar: 'from-purple-600 to-fuchsia-500', glow: 'rgba(192,132,252,0.4)', shadow: 'shadow-purple-500/30', pulse: true },
+    3: { text: 'text-teal-400', bar: 'from-teal-600 to-teal-500', glow: 'rgba(192,132,252,0.4)', shadow: 'shadow-teal-500/30', pulse: true },
     4: { text: 'text-red-400', bar: 'from-red-600 to-orange-500', glow: 'rgba(248,113,113,0.5)', shadow: 'shadow-red-500/40', pulse: true },
     5: { text: 'text-yellow-400', bar: 'from-yellow-500 to-amber-400', glow: 'rgba(250,204,21,0.6)', shadow: 'shadow-yellow-500/50', pulse: true },
 };

@@ -15,7 +15,7 @@ interface Props {
 const THEMES = [
     { id: 'blue', name: 'Shadow Blue', color: 'bg-cyan-500', price: 0 },
     { id: 'red', name: 'Blood Red', color: 'bg-red-600', price: 1000 },
-    { id: 'purple', name: 'Void Purple', color: 'bg-purple-600', price: 1500 },
+    { id: 'teal', name: 'Void teal', color: 'bg-teal-600', price: 1500 },
     { id: 'gold', name: 'Royal Gold', color: 'bg-yellow-500', price: 2000 },
     { id: 'green', name: 'Necromancer Green', color: 'bg-emerald-500', price: 2500 },
     { id: 'orange', name: 'Blaze Orange', color: 'bg-orange-500', price: 1000 },

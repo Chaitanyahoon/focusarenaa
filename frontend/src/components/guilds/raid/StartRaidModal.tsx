@@ -62,7 +62,7 @@ export default function StartRaidModal({ isOpen, onClose, onRaidStarted }: Props
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-[#0c1527] border border-purple-500/30 p-6 shadow-2xl transition-all">
+                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-[#0c1527] border border-teal-500/30 p-6 shadow-2xl transition-all">
                                 <h3 className="text-xl font-black font-rajdhani text-white mb-1 tracking-wider">INITIATE GUILD RAID</h3>
                                 <p className="text-xs text-gray-500 font-mono mb-5">Define the project scope and difficulty</p>
 
@@ -70,12 +70,12 @@ export default function StartRaidModal({ isOpen, onClose, onRaidStarted }: Props
                                     <input
                                         {...register('title', { required: true })}
                                         placeholder="Project Name (e.g. Q4 Migration)"
-                                        className="w-full bg-black/40 border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:border-purple-500/50 outline-none"
+                                        className="w-full bg-black/40 border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:border-teal-500/50 outline-none"
                                     />
                                     <textarea
                                         {...register('description')}
                                         placeholder="Description"
-                                        className="w-full bg-black/40 border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:border-purple-500/50 outline-none h-20"
+                                        className="w-full bg-black/40 border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:border-teal-500/50 outline-none h-20"
                                     />
                                     <div className="grid grid-cols-2 gap-3">
                                         <div>
@@ -84,7 +84,7 @@ export default function StartRaidModal({ isOpen, onClose, onRaidStarted }: Props
                                                 type="number"
                                                 {...register('totalHP', { required: true, min: 100 })}
                                                 defaultValue={1000}
-                                                className="w-full bg-black/40 border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:border-purple-500/50 outline-none"
+                                                className="w-full bg-black/40 border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:border-teal-500/50 outline-none"
                                             />
                                         </div>
                                         <div>
@@ -92,7 +92,7 @@ export default function StartRaidModal({ isOpen, onClose, onRaidStarted }: Props
                                             <input
                                                 {...register('bossName')}
                                                 placeholder="e.g. The Monolith"
-                                                className="w-full bg-black/40 border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:border-purple-500/50 outline-none"
+                                                className="w-full bg-black/40 border border-gray-700/50 rounded-lg px-4 py-3 text-white focus:border-teal-500/50 outline-none"
                                             />
                                         </div>
                                     </div>
@@ -100,7 +100,7 @@ export default function StartRaidModal({ isOpen, onClose, onRaidStarted }: Props
                                     <button
                                         type="submit"
                                         disabled={isLoading}
-                                        className="w-full py-3 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white rounded-lg font-bold tracking-wider transition-all shadow-lg shadow-purple-900/30"
+                                        className="w-full py-3 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white rounded-lg font-bold tracking-wider transition-all shadow-lg shadow-teal-900/30"
                                     >
                                         {isLoading ? 'Initializing...' : 'START RAID'}
                                     </button>

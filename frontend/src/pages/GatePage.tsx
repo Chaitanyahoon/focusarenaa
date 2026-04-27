@@ -34,7 +34,7 @@ export default function GatePage() {
             case GateRank.E: return "text-gray-400 border-gray-400";
             case GateRank.D: return "text-green-400 border-green-400";
             case GateRank.C: return "text-blue-400 border-blue-400";
-            case GateRank.B: return "text-purple-400 border-purple-400";
+            case GateRank.B: return "text-teal-400 border-teal-400";
             case GateRank.A: return "text-red-400 border-red-400";
             case GateRank.S: return "text-yellow-400 border-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.5)]";
             default: return "text-gray-400";
@@ -46,7 +46,7 @@ export default function GatePage() {
             {/* Header */}
             <div className="flex flex-col justify-between gap-4 mb-8 md:flex-row md:items-center">
                 <div>
-                    <h1 className="text-3xl font-bold font-rajdhani text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 filter drop-shadow-[0_0_5px_rgba(59,130,246,0.5)]">
+                    <h1 className="text-3xl font-bold font-rajdhani text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-500 filter drop-shadow-[0_0_5px_rgba(59,130,246,0.5)]">
                         DUNGEON GATES
                     </h1>
                     <p className="text-gray-400 font-exo text-sm mt-1">
@@ -67,7 +67,7 @@ export default function GatePage() {
                                 setIsLoading(false);
                             }
                         }}
-                        className="px-4 py-2 bg-purple-600/20 hover:bg-purple-600/40 border border-purple-500 text-purple-400 hover:text-white font-bold rounded flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(168,85,247,0.2)]"
+                        className="px-4 py-2 bg-teal-600/20 hover:bg-teal-600/40 border border-teal-500 text-teal-400 hover:text-white font-bold rounded flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(168,85,247,0.2)]"
                     >
                         SCAN ANOMALY
                     </button>
@@ -121,7 +121,7 @@ export default function GatePage() {
                                 <span className="bg-blue-900/40 text-blue-300 border border-blue-800/50 px-2 py-1 rounded">
                                     LV.{gate.requiredLevel || 1} REQ
                                 </span>
-                                <span className="bg-purple-900/40 text-purple-300 border border-purple-800/50 px-2 py-1 rounded">
+                                <span className="bg-teal-900/40 text-teal-300 border border-teal-800/50 px-2 py-1 rounded">
                                     {gate.recommendedPartySize || 1} PLAYER(S)
                                 </span>
                                 <span className="bg-gray-800/50 text-gray-400 border border-gray-700/50 px-2 py-1 rounded uppercase">
@@ -153,3 +153,5 @@ export default function GatePage() {
         </div>
     );
 }
+
+// aria-label

@@ -284,7 +284,7 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-center h-full text-white">
                 <div className="text-center">
                     <ShieldCheckIcon className="w-16 h-16 mx-auto text-red-500 mb-4" />
-                    <h1 className="text-2xl font-bold">Access Denied</h1>
+                    <h2 className="text-2xl font-bold">Access Denied</h2>
                     <p className="text-gray-400 mt-2">You do not have permission to view this page.</p>
                 </div>
             </div>
@@ -332,7 +332,7 @@ export default function AdminDashboard() {
                 <button
                     onClick={() => setActiveTab('guilds')}
                     className={`px-4 py-2 rounded-t-lg font-medium transition-colors ${activeTab === 'guilds'
-                        ? 'bg-purple-500/20 text-purple-400 border-b-2 border-purple-500'
+                        ? 'bg-teal-500/20 text-teal-400 border-b-2 border-teal-500'
                         : 'text-gray-400 hover:text-white hover:bg-white/5'
                         }`}
                 >
@@ -594,7 +594,7 @@ export default function AdminDashboard() {
                                 <div className="pt-4">
                                     <button
                                         onClick={handleCreateGate}
-                                        className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-xl font-bold text-white transition-all shadow-lg shadow-indigo-600/20"
+                                        className="w-full py-3 bg-gradient-to-r from-indigo-600 to-teal-600 hover:from-indigo-500 hover:to-teal-500 rounded-xl font-bold text-white transition-all shadow-lg shadow-indigo-600/20"
                                     >
                                         Create Global Gate
                                     </button>
@@ -712,7 +712,7 @@ export default function AdminDashboard() {
                                 placeholder="Search guilds by name..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full bg-black/40 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                                className="w-full bg-black/40 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-teal-500/50"
                             />
                         </div>
 
@@ -748,7 +748,7 @@ export default function AdminDashboard() {
                                                 <td className="p-4 text-gray-300">{guild.leaderName}</td>
                                                 <td className="p-4 text-gray-300">{guild.memberCount} / {guild.capacity}</td>
                                                 <td className="p-4">
-                                                    <span className="px-2 py-1 rounded text-xs font-bold bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                                                    <span className="px-2 py-1 rounded text-xs font-bold bg-teal-500/20 text-teal-400 border border-teal-500/30">
                                                         Lvl {guild.level}
                                                     </span>
                                                 </td>

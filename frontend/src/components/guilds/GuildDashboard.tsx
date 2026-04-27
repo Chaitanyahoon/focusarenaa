@@ -240,7 +240,7 @@ export default function GuildDashboard({ guildId, onLeave }: Props) {
                             <p className="text-gray-400 text-sm mb-6">Start a new Guild Raid to collaborate on a project and earn massive XP.</p>
                             <button
                                 onClick={() => setIsStartRaidOpen(true)}
-                                className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white px-6 py-3 rounded-xl font-black tracking-wider transition-all shadow-lg shadow-purple-900/30 hover:scale-105"
+                                className="inline-flex items-center gap-2 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white px-6 py-3 rounded-xl font-black tracking-wider transition-all shadow-lg shadow-teal-900/30 hover:scale-105"
                             >
                                 <PlayIcon className="w-5 h-5" />
                                 INITIATE PROJECT RAID

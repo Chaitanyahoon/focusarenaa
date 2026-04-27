@@ -11,7 +11,7 @@ interface Props {
 
 const THEME_COLORS: Record<string, string> = {
     red: 'bg-red-600 text-red-600',
-    purple: 'bg-purple-600 text-purple-600',
+    teal: 'bg-teal-600 text-teal-600',
     gold: 'bg-yellow-500 text-yellow-500',
     green: 'bg-emerald-500 text-emerald-500',
     orange: 'bg-orange-500 text-orange-500',
@@ -115,3 +115,5 @@ export default function ShopItemCard({ item, userGold, onPurchase, isOwned = fal
         </div>
     );
 }
+
+// aria-label

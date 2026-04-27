@@ -35,7 +35,7 @@ export default function Register() {
                     <div className="text-xs font-accent tracking-widest text-cyan-400 mb-2 uppercase">
                         [ New Hunter Registration ]
                     </div>
-                    <h1 className="text-4xl font-display font-bold neon-purple mb-2">
+                    <h1 className="text-4xl font-display font-bold neon-teal mb-2">
                         AWAKEN
                     </h1>
                     <p className="text-gray-400 font-accent">
@@ -111,7 +111,7 @@ export default function Register() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="holo-button w-full bg-purple-900/30 border-purple-400 text-purple-300 hover:bg-purple-500/20 hover:text-white transition-all shadow-[0_0_15px_rgba(168,85,247,0.2)] hover:shadow-[0_0_25px_rgba(168,85,247,0.5)] font-bold tracking-widest"
+                        className="holo-button w-full bg-teal-900/30 border-teal-400 text-teal-300 hover:bg-teal-500/20 hover:text-white transition-all shadow-[0_0_15px_rgba(168,85,247,0.2)] hover:shadow-[0_0_25px_rgba(168,85,247,0.5)] font-bold tracking-widest"
                     >
                         {isLoading ? 'INITIALIZING...' : 'BECOME A HUNTER'}
                     </button>

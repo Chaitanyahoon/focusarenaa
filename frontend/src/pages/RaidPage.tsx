@@ -32,12 +32,12 @@ const RANK_ATMOSPHERE: Record<number, { bg: string; particle: string; aura: stri
     0: { bg: 'from-gray-900/50 to-gray-950', particle: 'bg-gray-500', aura: 'shadow-[0_0_60px_rgba(156,163,175,0.15)]', label: 'E-RANK DUNGEON' },
     1: { bg: 'from-green-950/40 to-gray-950', particle: 'bg-green-500', aura: 'shadow-[0_0_60px_rgba(74,222,128,0.15)]', label: 'D-RANK DUNGEON' },
     2: { bg: 'from-blue-950/40 to-gray-950', particle: 'bg-blue-500', aura: 'shadow-[0_0_80px_rgba(96,165,250,0.2)]', label: 'C-RANK DUNGEON' },
-    3: { bg: 'from-purple-950/40 to-gray-950', particle: 'bg-purple-500', aura: 'shadow-[0_0_80px_rgba(192,132,252,0.25)]', label: 'B-RANK DUNGEON' },
+    3: { bg: 'from-teal-950/40 to-gray-950', particle: 'bg-teal-500', aura: 'shadow-[0_0_80px_rgba(192,132,252,0.25)]', label: 'B-RANK DUNGEON' },
     4: { bg: 'from-red-950/40 to-gray-950', particle: 'bg-red-500', aura: 'shadow-[0_0_100px_rgba(248,113,113,0.3)]', label: 'A-RANK DUNGEON' },
     5: { bg: 'from-yellow-950/40 to-amber-950/30', particle: 'bg-yellow-500', aura: 'shadow-[0_0_120px_rgba(250,204,21,0.35)]', label: 'S-RANK DUNGEON' },
 };
 
-const RANK_TEXT_COLORS = ['text-gray-400', 'text-green-400', 'text-blue-400', 'text-purple-400', 'text-red-400', 'text-yellow-400'];
+const RANK_TEXT_COLORS = ['text-gray-400', 'text-green-400', 'text-blue-400', 'text-teal-400', 'text-red-400', 'text-yellow-400'];
 
 export default function RaidPage() {
     const { id } = useParams<{ id: string }>();
@@ -166,7 +166,7 @@ export default function RaidPage() {
                         <span className="bg-blue-900/40 text-blue-300 text-[9px] px-1.5 py-0.5 rounded font-mono border border-blue-800/50">
                             LV.{gate.requiredLevel || 1} REQ
                         </span>
-                        <span className="bg-purple-900/40 text-purple-300 text-[9px] px-1.5 py-0.5 rounded font-mono border border-purple-800/50">
+                        <span className="bg-teal-900/40 text-teal-300 text-[9px] px-1.5 py-0.5 rounded font-mono border border-teal-800/50">
                             {gate.recommendedPartySize || 1} PLAYER(S)
                         </span>
                     </div>

@@ -12,7 +12,7 @@ const generateParticles = (count: number) => {
         size: Math.random() * 8 + 4,    // 4-12px
         color: [
             '#3b82f6', '#22c55e', '#f59e0b', '#ef4444',
-            '#8b5cf6', '#06b6d4', '#ec4899', '#00EAFF'
+            '#14b8a6', '#06b6d4', '#ec4899', '#00EAFF'
         ][Math.floor(Math.random() * 8)],
         rotation: Math.random() * 720 - 360,
         xDrift: Math.random() * 200 - 100,  // horizontal drift

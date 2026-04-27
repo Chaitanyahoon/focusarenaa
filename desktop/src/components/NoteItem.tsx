@@ -37,3 +37,5 @@ const NoteItem = memo(({ item, theme, onDelete, index }: NoteItemProps) => {
 })
 
 export default NoteItem
+
+// aria-label

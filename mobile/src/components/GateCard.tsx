@@ -12,9 +12,9 @@ interface GateCardProps {
 function getRankColor(rank: number) {
   switch (rank) {
     case 5: return '#F6C177'
-    case 4: return '#C4B5FD'
-    case 3: return '#8B5CF6'
-    case 2: return '#7C5CFF'
+    case 4: return '#93C5FD'
+    case 3: return '#14B8A6'
+    case 2: return '#3B82F6'
     case 1: return '#67E8A5'
     default: return '#7B8191'
   }
@@ -180,5 +180,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
 })
+
+// aria-label
 
 // aria-label

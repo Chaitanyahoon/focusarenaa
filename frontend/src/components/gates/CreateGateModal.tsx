@@ -15,7 +15,7 @@ const RANK_CONFIG = [
     { value: GateRank.E, label: 'E', name: 'Simple', xp: 200, gold: 100, color: 'gray', glow: 'rgba(156,163,175,0.3)', border: 'border-gray-500', text: 'text-gray-400', bg: 'bg-gray-500' },
     { value: GateRank.D, label: 'D', name: 'Routine', xp: 500, gold: 250, color: 'green', glow: 'rgba(74,222,128,0.3)', border: 'border-green-500', text: 'text-green-400', bg: 'bg-green-500' },
     { value: GateRank.C, label: 'C', name: 'Moderate', xp: 1000, gold: 500, color: 'blue', glow: 'rgba(96,165,250,0.4)', border: 'border-blue-500', text: 'text-blue-400', bg: 'bg-blue-500' },
-    { value: GateRank.B, label: 'B', name: 'Hard', xp: 2000, gold: 1000, color: 'purple', glow: 'rgba(192,132,252,0.4)', border: 'border-purple-500', text: 'text-purple-400', bg: 'bg-purple-500' },
+    { value: GateRank.B, label: 'B', name: 'Hard', xp: 2000, gold: 1000, color: 'teal', glow: 'rgba(192,132,252,0.4)', border: 'border-teal-500', text: 'text-teal-400', bg: 'bg-teal-500' },
     { value: GateRank.A, label: 'A', name: 'Extreme', xp: 3500, gold: 2000, color: 'red', glow: 'rgba(248,113,113,0.4)', border: 'border-red-500', text: 'text-red-400', bg: 'bg-red-500' },
     { value: GateRank.S, label: 'S', name: 'Impossible', xp: 5000, gold: 5000, color: 'yellow', glow: 'rgba(250,204,21,0.5)', border: 'border-yellow-500', text: 'text-yellow-400', bg: 'bg-yellow-500' },
 ]

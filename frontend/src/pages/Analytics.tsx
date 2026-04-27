@@ -177,7 +177,7 @@ export default function Analytics() {
                 <h1 className="text-4xl font-display font-bold text-white mb-2 tracking-widest uppercase">
                     Battle Analytics
                 </h1>
-                <div className="h-1 w-32 bg-purple-500 mx-auto mb-4 shadow-[0_0_10px_#a855f7]"></div>
+                <div className="h-1 w-32 bg-teal-500 mx-auto mb-4 shadow-[0_0_10px_#14b8a6]"></div>
                 <div className="flex justify-center gap-8 text-sm font-mono text-gray-400">
                     <div>TOTAL XP: <span className="text-white">{stats?.totalXP}</span></div>
                     <div>TASKS CLEARED: <span className="text-white">{stats?.completedTasks}</span></div>
@@ -199,7 +199,7 @@ export default function Analytics() {
 
                 {/* Focus Distribution */}
                 <div className="system-panel p-6 min-h-[400px]">
-                    <h3 className="text-xl font-display font-bold text-purple-400 mb-6">FOCUS DISTRIBUTION</h3>
+                    <h3 className="text-xl font-display font-bold text-teal-400 mb-6">FOCUS DISTRIBUTION</h3>
                     <div className="h-[300px] flex items-center justify-center">
                         {categoryDist ? (
                             <Doughnut

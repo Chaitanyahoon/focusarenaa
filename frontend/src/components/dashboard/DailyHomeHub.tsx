@@ -90,3 +90,5 @@ export default function DailyHomeHub({ streakCount, gold }: DailyHomeHubProps) {
         </section>
     );
 }
+
+// aria-label

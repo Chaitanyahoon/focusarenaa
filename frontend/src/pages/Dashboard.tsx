@@ -315,8 +315,8 @@ export default function Dashboard() {
                             <span className="text-gray-400 font-display text-lg group-hover:text-blue-400 transition-colors">AGI</span>
                             <span className="text-white text-xl font-bold font-mono tracking-wider">{10 + Math.floor(user.level * 1.2)}</span>
                         </div>
-                        <div className="flex justify-between items-center group hover:bg-purple-500/5 px-3 py-1 -mx-3 rounded transition-colors border-b border-transparent hover:border-purple-500/20">
-                            <span className="text-gray-400 font-display text-lg group-hover:text-purple-400 transition-colors">INT</span>
+                        <div className="flex justify-between items-center group hover:bg-teal-500/5 px-3 py-1 -mx-3 rounded transition-colors border-b border-transparent hover:border-teal-500/20">
+                            <span className="text-gray-400 font-display text-lg group-hover:text-teal-400 transition-colors">INT</span>
                             <span className="text-white text-xl font-bold font-mono tracking-wider">{10 + Math.floor(user.level * 1.1)}</span>
                         </div>
                         <div className="flex justify-between items-center group hover:bg-yellow-500/5 px-3 py-1 -mx-3 rounded transition-colors border-b border-transparent hover:border-yellow-500/20">
@@ -446,7 +446,7 @@ export default function Dashboard() {
                                 {[
                                     { id: 'blue', name: 'SHADOW BLUE', price: 0, activeClass: 'border-blue-400 bg-blue-500/20 text-blue-300', ownedClass: 'border-blue-500/50 bg-blue-900/20 hover:bg-blue-500/20 text-blue-300' },
                                     { id: 'red', name: 'BLOOD RED', price: 1000, activeClass: 'border-red-400 bg-red-500/20 text-red-300', ownedClass: 'border-red-500/50 bg-red-900/20 hover:bg-red-500/20 text-red-300' },
-                                    { id: 'purple', name: 'VOID PURPLE', price: 1500, activeClass: 'border-purple-400 bg-purple-500/20 text-purple-300', ownedClass: 'border-purple-500/50 bg-purple-900/20 hover:bg-purple-500/20 text-purple-300' },
+                                    { id: 'teal', name: 'VOID teal', price: 1500, activeClass: 'border-teal-400 bg-teal-500/20 text-teal-300', ownedClass: 'border-teal-500/50 bg-teal-900/20 hover:bg-teal-500/20 text-teal-300' },
                                     { id: 'gold', name: 'ROYAL GOLD', price: 2000, activeClass: 'border-yellow-400 bg-yellow-500/20 text-yellow-300', ownedClass: 'border-yellow-500/50 bg-yellow-900/20 hover:bg-yellow-500/20 text-yellow-300' },
                                     { id: 'green', name: 'NECRO GREEN', price: 2500, activeClass: 'border-emerald-400 bg-emerald-500/20 text-emerald-300', ownedClass: 'border-emerald-500/50 bg-emerald-900/20 hover:bg-emerald-500/20 text-emerald-300' },
                                 ].map((t) => {
